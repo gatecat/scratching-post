@@ -69,3 +69,8 @@ chipBuilder = Chip( conf )
 chipBuilder.doChipFloorplan()
 chipBuilder.doPnR()
 chipBuilder.save()
+
+db = DataBase.getDB()
+rootlib = db.getRootLibrary()
+CRL.LefExport.drive(rootlib.getLibrary("StdCellLib"), 1)
+CRL.DefExport.drive(conf.core, 0)
