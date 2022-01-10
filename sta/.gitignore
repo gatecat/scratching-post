@@ -1,0 +1,9 @@
+*.json
+*_syn.v
+*.blif
+*.lef
+*.def
+*.gds
+*.ap
+*.spi
+__pycache__
