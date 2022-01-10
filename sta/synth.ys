@@ -8,5 +8,5 @@ setundef -zero
 clean -purge
 write_blif arlet6502.blif
 write_json arlet6502.json
-write_verilog arlet6502_syn.v
+write_verilog -noattr arlet6502_syn.v
 stat
