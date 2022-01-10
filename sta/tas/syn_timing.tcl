@@ -19,11 +19,11 @@ foreach cell {sff1_x4 sff1r_x4} {
 }
 
 avt_LoadFile ../arlet6502_syn.v verilog
-set fig [hitas Arlet6502]
+set fig [hitas user_project_core]
 
-inf_SetFigureName Arlet6502
-create_clock -period 10000 -waveform {5000 0} clk
+inf_SetFigureName user_project_core
+create_clock -period 10000 -waveform {5000 0} {io_in[0]}
 
-set fig [ttv_LoadSpecifiedTimingFigure Arlet6502]
+set fig [ttv_LoadSpecifiedTimingFigure user_project_core]
 set stbfig [stb $fig]
 stb_DisplaySlackReport [fopen slack.rep w] $stbfig * * ?? 10  all 10000

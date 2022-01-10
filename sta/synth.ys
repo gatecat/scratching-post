@@ -1,12 +1,13 @@
 read_liberty -lib ../../mpw4/thirdparty/open_pdk/C4M.Sky130/libs.ref/StdCellLib/liberty/StdCellLib_slow.lib
-read_verilog design/ALU.v design/cpu.v design/Arlet6502.v
-synth -flatten -top Arlet6502
+read_verilog design/ALU.v design/cpu.v design/wrapper.v
+synth -flatten -top user_project_core
 dfflibmap -liberty ../../mpw4/thirdparty/open_pdk/C4M.Sky130/libs.ref/StdCellLib/liberty/StdCellLib_slow.lib
 opt
 abc -script +strash;ifraig;scorr;dc2;dretime;strash;&get,-n;&dch,-f;&nf,-D,20000;&put;buffer,-G,1000,-N,64;upsize,-D,20000;dnsize,-D,20000;stime,-p -constr abc.constr -liberty ../../mpw4/thirdparty/open_pdk/C4M.Sky130/libs.ref/StdCellLib/liberty/StdCellLib_slow.lib
 setundef -zero
 clean -purge
-write_blif arlet6502.blif
-write_json arlet6502.json
+write_blif user_project_core.blif
+write_json user_project_core.json
+splitnets # required for Tas
 write_verilog -noattr arlet6502_syn.v
 stat

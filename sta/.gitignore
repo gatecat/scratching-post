@@ -6,4 +6,7 @@
 *.gds
 *.ap
 *.spi
+*.vst
+*.dat
+*.plt
 __pycache__
