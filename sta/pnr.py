@@ -1,4 +1,5 @@
-import sys
+import sys, os
+from pathlib import Path
 
 import CRL, Hurricane as Hur, Katana, Etesian, Anabatic, Cfg
 from Hurricane import DataBase, Transformation, Box, Instance
@@ -72,5 +73,14 @@ chipBuilder.save()
 
 db = DataBase.getDB()
 rootlib = db.getRootLibrary()
-CRL.LefExport.drive(rootlib.getLibrary("StdCellLib"), 1)
-CRL.DefExport.drive(conf.core, 0)
+
+
+Path("export").mkdir(parents=True, exist_ok=True)
+os.chdir("export")
+lib = rootlib.getLibrary("StdCellLib")
+CRL.LefExport.drive(lib, 1)
+CRL.DefExport.drive(conf.corona, 0)
+for cell in lib.getCells():
+    if cell.getName() in (conf.corona.getName(), conf.core.getName(), conf.chip.getName()):
+        continue
+    CRL.DefExport.drive(cell, 0)
