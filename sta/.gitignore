@@ -9,5 +9,5 @@
 *.vst
 *.dat
 *.plt
-*.spef
+export/
 __pycache__
