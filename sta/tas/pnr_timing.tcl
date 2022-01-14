@@ -30,4 +30,4 @@ create_clock -period 10000 -waveform {5000 0} {io_in_from_pad_net(0)}
 
 set fig [ttv_LoadSpecifiedTimingFigure corona_cts_export]
 set stbfig [stb $fig]
-stb_DisplaySlackReport [fopen slack.rep w] $stbfig * * ?? 10  all 10000
+stb_DisplaySlackReport [fopen slack_pnr.rep w] $stbfig * * ?? 10  all 10000

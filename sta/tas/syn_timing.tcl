@@ -26,4 +26,4 @@ create_clock -period 10000 -waveform {5000 0} {io_in[0]}
 
 set fig [ttv_LoadSpecifiedTimingFigure user_project_core]
 set stbfig [stb $fig]
-stb_DisplaySlackReport [fopen slack.rep w] $stbfig * * ?? 10  all 10000
+stb_DisplaySlackReport [fopen slack_syn.rep w] $stbfig * * ?? 10  all 10000
