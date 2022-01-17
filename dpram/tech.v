@@ -16,3 +16,12 @@ endmodule
 module OR(input A, B, output Q);
 	assign #600 Q = A|B;
 endmodule
+
+module AND(input A, B, output Q);
+	assign #600 Q = A&B;
+endmodule
+
+module NAND(input A, B, output Q);
+	assign #400 Q = ~(A&B);
+endmodule
+
