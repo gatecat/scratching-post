@@ -7,6 +7,7 @@ wire [DEL:0] delay_line;
 
 assign delay_line[0] = clk;
 
+// Chain of buffers to make a delay line
 genvar ii;
 for (ii = 0; ii < DEL; ii = ii + 1'b1) begin: bufs
 	(* keep *) BUF buf_i (.A(delay_line[ii]), .Q(delay_line[ii + 1]));
@@ -15,16 +16,23 @@ end
 wire inv_dly_0, inv_dly_1;
 wire pulse_0, pulse_1;
 
-
+// AND inverted past value of delay line with current value in order to create pulses
 (* keep *) INV inv_0 (.A(delay_line[5]), .Q(inv_dly_0));
 (* keep *) INV inv_1 (.A(delay_line[20]), .Q(inv_dly_1));
 
 (* keep *) NAND pulse_gen_0 (.A(clk), .B(inv_dly_0), .Q(pulse_0));
 (* keep *) NAND pulse_gen_1 (.A(delay_line[15]), .B(inv_dly_1), .Q(pulse_1));
 
+// Combine those pulses together (using NAND+NAND is more efficient in CMOS than AND+OR, and equivalent by DeMorgan's)
+
 (* keep *) NAND pulse_or (.A(pulse_0), .B(pulse_1), .Q(clkx2));
 
+// Output a signal that goes high inbetween those pulses to select between read and then write
 assign wr_rdn = delay_line[10];
+
+// clk    ____------------____________------------__________
+// clkx2  _____--__--__________________--__--_______________
+// wr_rdn ________------------____________------------______
 
 endmodule
 
@@ -39,7 +47,7 @@ module dpram(input clk, input [7:0] waddr, raddr, wdata, input we, output [7:0] 
 	// Enable a write if the sequence generator is in the write phase and write enable is asserted
 	NAND wrn_or_i (.A(wr_rdn_seq), .B(we), .Q(rd_wrn_ram));
 
-	// Select between the two addresses
+	// Select between the two addresses (read address in the first phase with rd_wrn_ram high; then write address)
 	genvar ii;
 	for (ii = 0; ii < 8; ii = ii + 1'b1) begin: addr_muxes
 		(* keep *) MUX2 mux_i (.A(waddr[ii]), .B(raddr[ii]), .S(rd_wrn_ram), .Q(addr_ram[ii]));
