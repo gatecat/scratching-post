@@ -19,11 +19,11 @@ foreach cell {sff1_x4 sff1r_x4} {
 }
 
 avt_LoadFile ../vexriscv_syn.v verilog
-set fig [hitas vexriscv]
+set fig [hitas user_project_core]
 
-inf_SetFigureName vexriscv
+inf_SetFigureName user_project_core
 create_clock -period 10000 -waveform {5000 0} {clk}
 
-set fig [ttv_LoadSpecifiedTimingFigure vexriscv]
+set fig [ttv_LoadSpecifiedTimingFigure user_project_core]
 set stbfig [stb $fig]
 stb_DisplaySlackReport [fopen slack_syn.rep w] $stbfig * * ?? 10  all 10000
