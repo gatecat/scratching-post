@@ -1,0 +1,14 @@
+VexRiscv_LinuxMpw.v
+*.json
+*_syn.v
+*.blif
+*.lef
+*.def
+*.gds
+*.ap
+*.spi
+*.vst
+*.dat
+*.plt
+export/
+__pycache__

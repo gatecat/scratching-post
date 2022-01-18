@@ -1,0 +1,14 @@
+read_liberty -lib ../../mpw4/thirdparty/open_pdk/C4M.Sky130/libs.ref/StdCellLib/liberty/StdCellLib_slow.lib
+read_verilog VexRiscv_LinuxMpw.v
+synth -flatten -top VexRiscv
+dfflibmap -liberty ../../mpw4/thirdparty/open_pdk/C4M.Sky130/libs.ref/StdCellLib/liberty/StdCellLib_slow.lib
+opt
+abc -script +strash;ifraig;scorr;dc2;dretime;strash;&get,-n;&dch,-f;&nf,-D,20000;&put;buffer,-G,1000,-N,32;upsize,-D,20000;dnsize,-D,20000;stime,-p -constr abc.constr -liberty ../../mpw4/thirdparty/open_pdk/C4M.Sky130/libs.ref/StdCellLib/liberty/StdCellLib_slow.lib
+setundef -zero
+clean -purge
+rename VexRiscv vexriscv # avoid case issues
+write_blif vexriscv.blif
+write_json vexriscv.json
+splitnets -ports # required for Tas
+write_verilog -noattr vexriscv_syn.v
+stat
