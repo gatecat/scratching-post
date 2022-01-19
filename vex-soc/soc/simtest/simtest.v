@@ -31,9 +31,10 @@ module testbench;
 
 endmodule
 
-
+`ifndef POSTSYN
 // Bidirectional IO buffer
 module BB(input T, I, output O, inout B);
 	assign B = T ? 1'bz : I;
 	assign O = B;
 endmodule
+`endif
