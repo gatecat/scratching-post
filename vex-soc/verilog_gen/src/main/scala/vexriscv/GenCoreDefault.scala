@@ -12,7 +12,10 @@ import vexriscv.plugin._
 
 import scala.collection.mutable.ArrayBuffer
 
-object SpinalConfig extends spinal.core.SpinalConfig(){
+object SpinalConfig extends spinal.core.SpinalConfig(
+  defaultConfigForClockDomains = ClockDomainConfig(
+    resetKind = spinal.core.SYNC
+  )) {
 }
 
 
