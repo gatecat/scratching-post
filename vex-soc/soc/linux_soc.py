@@ -8,6 +8,7 @@ from cores.vexriscv_wrapper import Vexriscv
 from cores.gpio import GPIOPeripheral
 from cores.spimemio_wrapper import SPIMemIO
 from cores.hyperram import HyperRAM
+from cores.uart import UARTPeripheral
 
 class LinuxSoC(Elaboratable):
     def __init__(self, *, flash_pins, uart_pins, hyperram0_pins, hyperram1_pins, gpio_pins, gpio_count, jtag_pins):
@@ -18,6 +19,7 @@ class LinuxSoC(Elaboratable):
 
         spi_ctrl_base = 0xb0000000
         gpio_base = 0xb1000000
+        uart_base = 0xb2000000
 
         self._arbiter = wishbone.Arbiter(addr_width=30, data_width=32, granularity=8)
         self._decoder = wishbone.Decoder(addr_width=30, data_width=32, granularity=8)
@@ -41,6 +43,9 @@ class LinuxSoC(Elaboratable):
         self.gpio = GPIOPeripheral(gpio_count, gpio_pins)
         self._decoder.add(self.gpio.bus, addr=gpio_base)
 
+        self.uart = UARTPeripheral(divisor=(27000000//115200), pins=uart_pins)
+        self._decoder.add(self.uart.bus, addr=uart_base)
+
         self.memory_map = self._decoder.bus.memory_map
 
     def elaborate(self, platform):
@@ -54,6 +59,7 @@ class LinuxSoC(Elaboratable):
         m.submodules.hyperram0 = self.hyperram0
         m.submodules.hyperram1 = self.hyperram1
         m.submodules.gpio     = self.gpio
+        m.submodules.uart     = self.uart
 
         m.d.comb += [
             self._arbiter.bus.connect(self._decoder.bus),
@@ -71,19 +77,6 @@ class LinuxSoC(Elaboratable):
         ]
 
         return m
-
-# Create a pretend UART resource with arbitrary signals
-class UARTPins():
-    class Input():
-        def __init__(self, sig):
-            self.i = sig
-    class Output():
-        def __init__(self, sig):
-            self.o = sig
-    def __init__(self, rx, tx):
-        self.rx = UARTPins.Input(rx)
-        self.tx = UARTPins.Output(tx)
-
 
 class SoCWrapper(Elaboratable):
     def __init__(self, build_dir="build"):
@@ -172,12 +165,10 @@ class SoCWrapper(Elaboratable):
             ResetSignal().eq(rst_sync1),
         ]
 
-        uart_pins = UARTPins(rx=self.i("uart_rx"), tx=self.o("uart_tx"))
-
         # The SoC itself
         m.submodules.soc = LinuxSoC(
             flash_pins=resource_pins("flash_"),
-            uart_pins=uart_pins,
+            uart_pins=resource_pins("uart_"),
             hyperram0_pins=resource_pins("ram0_"),
             hyperram1_pins=resource_pins("ram1_"),
             gpio_count=2, gpio_pins=resource_pins("gpio_"),
@@ -186,7 +177,7 @@ class SoCWrapper(Elaboratable):
 
         # Remaining pins
         for pin, bit in self.pinout.items():
-            if pin in ("clk", "rstn", "uart_rx") or pin.startswith("unalloc_"): # inputs and TODOs
+            if pin in ("clk", "rstn") or pin.startswith("unalloc_"): # inputs and TODOs
                 m.d.comb += [
                     self.io_oeb[bit].eq(1),
                     self.io_out[bit].eq(0),

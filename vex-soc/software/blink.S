@@ -1,8 +1,11 @@
 start:
     li s0, 3
     li s1, 0xb1000000
+    li s2, 0xb2000000
     sw s0, 4(s1)
 outerloop:
+	li s0, 0x6e
+	sw s0, 0(s2)
     li s0, 1
     sw s0, 0(s1)
     jal ra, delay
