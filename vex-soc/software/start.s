@@ -4,7 +4,7 @@ start:
 
 # zero-initialize register file
 addi x1, zero, 0
-li x2, 0x10800000 # Top of stack
+li x2, 0x11000000 # Top of stack
 addi x3, zero, 0
 addi x4, zero, 0
 addi x5, zero, 0
@@ -75,7 +75,7 @@ end_init_bss:
 
 # Update LEDs
 li a0, 0xb1000000
-li a1, 1
+li a1, 2
 sw a1, 0(a0)
 
 # call main

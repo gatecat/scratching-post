@@ -1,12 +1,12 @@
 #include <stdint.h>
 
-volatile uint8_t *const LED = (volatile uint8_t *)0xb1000000;
+volatile uint32_t *const LED = (volatile uint32_t *)0xb1000000;
 
 
-volatile uint8_t *const UART_TX = (volatile uint8_t *)0xb2000000;
-volatile uint8_t *const UART_RX = (volatile uint8_t *)0xb2000004;
-volatile uint8_t *const UART_TX_RDY = (volatile uint8_t *)0xb2000008;
-volatile uint8_t *const UART_RX_AVL = (volatile uint8_t *)0xb200000c;
+volatile uint32_t *const UART_TX = (volatile uint32_t *)0xb2000000;
+volatile uint32_t *const UART_RX = (volatile uint32_t *)0xb2000004;
+volatile uint32_t *const UART_TX_RDY = (volatile uint32_t *)0xb2000008;
+volatile uint32_t *const UART_RX_AVL = (volatile uint32_t *)0xb200000c;
 
 void putc(char c) {
 	if (c == '\n') putc('\r');
@@ -31,6 +31,8 @@ void main() {
 	puts("🐱: nyaa~!\n");
 	while(1) {
 		*LED = 2;
+		delay();
 		*LED = 1;
+		delay();
 	};
 }
