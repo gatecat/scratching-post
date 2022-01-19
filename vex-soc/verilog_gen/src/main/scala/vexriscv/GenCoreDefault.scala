@@ -26,6 +26,7 @@ object GenCoreDefault{
 
       plugins ++= List(
         new IBusCachedPlugin(
+          resetVector = 0x100000, // 1MB
           relaxedPcCalculation = true,
           prediction = NONE,
           compressedGen = false,
