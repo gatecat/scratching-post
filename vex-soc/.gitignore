@@ -1,0 +1,14 @@
+*.json
+*_syn.v
+*.blif
+*.lef
+*.def
+*.gds
+*.ap
+*.spi
+*.vst
+*.dat
+*.plt
+export/
+build/
+__pycache__
