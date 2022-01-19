@@ -8,9 +8,9 @@
 
 from amaranth import *
 
-from thirdparty.amaranth_soc import wishbone
-from thirdparty.amaranth_soc.memory import MemoryMap
-from thirdparty.lambdasoc.periph import Peripheral
+from amaranth_soc import wishbone
+from amaranth_soc.memory import MemoryMap
+from .peripheral import Peripheral
 
 # for Migen compat
 def timeline(m, trigger, events):

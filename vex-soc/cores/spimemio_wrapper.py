@@ -1,10 +1,10 @@
 from amaranth import *
 from amaranth.utils import log2_int
 
-from thirdparty.amaranth_soc import wishbone
-from thirdparty.amaranth_soc.memory import MemoryMap
+from amaranth_soc import wishbone
+from amaranth_soc.memory import MemoryMap
 
-from thirdparty.lambdasoc.periph import Peripheral
+from .peripheral import Peripheral
 
 __all__ = ["SPIMemIO"]
 

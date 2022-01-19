@@ -1,9 +1,6 @@
 from amaranth import *
 
-from thirdparty.lambdasoc.periph import Peripheral
-
-__all__ = ["GPIOPeripheral"]
-
+from .peripheral import Peripheral
 
 class GPIOPeripheral(Peripheral, Elaboratable):
     def __init__(self, width, pins, **kwargs):
