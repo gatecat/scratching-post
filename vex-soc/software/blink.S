@@ -12,7 +12,7 @@ outerloop:
     j outerloop
 
 delay:
-    li t0, 360000
+    li t0, 3600000
 delayloop:
     addi t0, t0, -1
     bnez t0, delayloop
