@@ -11,7 +11,8 @@
 	model = "mpw5 soc-linux";
 
 	chosen {
-		bootargs = "mem=16M@0x10000000 rootwait console=catteuart earlycon=catteuart swiotlb=32";
+		bootargs = "mem=15M@0x10000000 rootwait console=catteuart earlycon swiotlb=32";
+		stdout-path = &catteuart0;
 	};
 
 	cpus {
@@ -47,7 +48,7 @@
 
 	memory@10000000 {
 		device_type = "memory";
-		reg = <0x10000000 0x1000000>;
+		reg = <0x10000000 0x0F00000>;
 	};
 
 	/*
