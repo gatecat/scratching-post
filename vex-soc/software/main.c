@@ -27,12 +27,20 @@ void delay() {
 		;
 }
 
+#define csr_write(csr, val)					\
+({								\
+	unsigned long __v = (unsigned long)(val);		\
+	__asm__ __volatile__ ("csrw " #csr ", %0"		\
+						      : : "rK" (__v));			\
+})
+
 void main() {
 	puts("🐱: nyaa~!\n");
-	while(1) {
-		*LED = 2;
-		delay();
-		*LED = 1;
-		delay();
-	};
+	csr_write(mepc, 0x00200000); // Linux image base
+	__asm__ __volatile__ (
+		" li a0, 0\n"
+		" li a1, %0\n"
+		" mret"
+		 : : "i" (0x00180000) // DTB base
+	);
 }

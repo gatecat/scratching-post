@@ -1,0 +1,502 @@
+From 91ec0787a14e1de5a4ae9e648eb88cd31b2fb286 Mon Sep 17 00:00:00 2001
+From: gatecat <gatecat@ds0.me>
+Date: Wed, 19 Jan 2022 20:34:52 +0000
+Subject: [PATCH] Add UART driver
+
+Signed-off-by: gatecat <gatecat@ds0.me>
+---
+ drivers/tty/serial/Kconfig     |  32 +++
+ drivers/tty/serial/Makefile    |   1 +
+ drivers/tty/serial/catteuart.c | 425 +++++++++++++++++++++++++++++++++
+ 3 files changed, 458 insertions(+)
+ create mode 100644 drivers/tty/serial/catteuart.c
+
+diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
+index fc543ac97c13..80f1f1b2ad31 100644
+--- a/drivers/tty/serial/Kconfig
++++ b/drivers/tty/serial/Kconfig
+@@ -1562,6 +1562,38 @@ config SERIAL_LITEUART_CONSOLE
+ 	  and warnings and which allows logins in single user mode).
+ 	  Otherwise, say 'N'.
+ 
++config SERIAL_CATTEUART
++	tristate "CatteUART serial port support"
++	depends on HAS_IOMEM
++	depends on OF || COMPILE_TEST
++	select SERIAL_CORE
++	help
++	  This driver is for the FPGA-based CatteUART serial controller from
++	  Amaranth SoC.
++
++	  Say 'Y' or 'M' here if you wish to use the CatteUART serial controller.
++	  Otherwise, say 'N'.
++
++config SERIAL_CATTEUART_MAX_PORTS
++	int "Maximum number of CatteUART ports"
++	depends on SERIAL_CATTEUART
++	default "1"
++	help
++	  Set this to the maximum number of serial ports you want the driver
++	  to support.
++
++config SERIAL_CATTEUART_CONSOLE
++	bool "CatteUART serial port console support"
++	depends on SERIAL_CATTEUART=y
++	select SERIAL_CORE_CONSOLE
++	select SERIAL_EARLYCON
++	help
++	  Say 'Y' or 'M' here if you wish to use the FPGA-based CatteUART serial
++	  controller from an Amaranth SoC as the system console
++	  (the system console is the device which receives all kernel messages
++	  and warnings and which allows logins in single user mode).
++	  Otherwise, say 'N'.
++
+ endmenu
+ 
+ config SERIAL_MCTRL_GPIO
+diff --git a/drivers/tty/serial/Makefile b/drivers/tty/serial/Makefile
+index 7da0856cd198..48bb0eafb351 100644
+--- a/drivers/tty/serial/Makefile
++++ b/drivers/tty/serial/Makefile
+@@ -87,6 +87,7 @@ obj-$(CONFIG_SERIAL_RDA)	+= rda-uart.o
+ obj-$(CONFIG_SERIAL_MILBEAUT_USIO) += milbeaut_usio.o
+ obj-$(CONFIG_SERIAL_SIFIVE)	+= sifive.o
+ obj-$(CONFIG_SERIAL_LITEUART) += liteuart.o
++obj-$(CONFIG_SERIAL_CATTEUART)	+= catteuart.o
+ 
+ # GPIOLIB helpers for modem control lines
+ obj-$(CONFIG_SERIAL_MCTRL_GPIO)	+= serial_mctrl_gpio.o
+diff --git a/drivers/tty/serial/catteuart.c b/drivers/tty/serial/catteuart.c
+new file mode 100644
+index 000000000000..b53226e62b1a
+--- /dev/null
++++ b/drivers/tty/serial/catteuart.c
+@@ -0,0 +1,425 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * CatteUART serial controller Driver
++ *
++ * Copyright (C) 2019-2020 Antmicro <www.antmicro.com>
++ * Copyright (C) 2021 Sylvain Munaut <tnt@246tNt.com>
++ * Copyright (C) 2022 gatecat <gatecat@ds0.me>
++
++ */
++
++#include <linux/console.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_address.h>
++#include <linux/of_platform.h>
++#include <linux/serial.h>
++#include <linux/serial_core.h>
++#include <linux/slab.h>
++#include <linux/timer.h>
++#include <linux/tty_flip.h>
++#include <linux/xarray.h>
++
++struct catteuart_regs {
++	uint32_t tx;
++	uint32_t rx;
++	uint32_t tx_rdy;
++	uint32_t rx_avl;
++} __attribute__((packed,aligned(4)));
++
++#define to_catteuart_regs(port)	(volatile struct catteuart_regs __iomem *)(port->membase)
++
++struct catteuart_port {
++	struct uart_port port;
++	struct timer_list timer;
++	u32 id;
++};
++
++#define to_catteuart_port(port)	container_of(port, struct catteuart_port, port)
++
++static DEFINE_XARRAY_FLAGS(catteuart_array, XA_FLAGS_ALLOC);
++
++#ifdef CONFIG_SERIAL_CATTEUART_CONSOLE
++static struct console catteuart_console;
++#endif
++
++static struct uart_driver catteuart_driver = {
++	.owner = THIS_MODULE,
++	.driver_name = "catteuart",
++	.dev_name = "ttyCAT",
++	.major = 0,
++	.minor = 0,
++	.nr = CONFIG_SERIAL_CATTEUART_MAX_PORTS,
++#ifdef CONFIG_SERIAL_CATTEUART_CONSOLE
++	.cons = &catteuart_console,
++#endif
++};
++
++/*
++static void catteuart_timer(struct timer_list *t)
++{
++	// TODO
++}
++*/
++
++static void catteuart_putchar(struct uart_port *port, int ch)
++{
++	volatile struct catteuart_regs __iomem *regs = to_catteuart_regs(port);
++
++	while (!regs->tx_rdy)
++		cpu_relax();
++
++	regs->tx = ch;
++}
++
++static unsigned int catteuart_tx_empty(struct uart_port *port)
++{
++	volatile struct catteuart_regs __iomem *regs = to_catteuart_regs(port);
++	return regs->tx_rdy;
++}
++
++static void catteuart_set_mctrl(struct uart_port *port, unsigned int mctrl)
++{
++	/* modem control register is not present in NitroUART */
++}
++
++static unsigned int catteuart_get_mctrl(struct uart_port *port)
++{
++	return TIOCM_CTS | TIOCM_DSR | TIOCM_CAR;
++}
++
++static void catteuart_stop_tx(struct uart_port *port)
++{
++}
++
++static void catteuart_start_tx(struct uart_port *port)
++{
++	struct circ_buf *xmit = &port->state->xmit;
++	unsigned char ch;
++
++	if (unlikely(port->x_char)) {
++		catteuart_putchar(port, port->x_char);
++		port->icount.tx++;
++		port->x_char = 0;
++	} else if (!uart_circ_empty(xmit)) {
++		while (xmit->head != xmit->tail) {
++			ch = xmit->buf[xmit->tail];
++			xmit->tail = (xmit->tail + 1) & (UART_XMIT_SIZE - 1);
++			port->icount.tx++;
++			catteuart_putchar(port, ch);
++		}
++	}
++
++	if (uart_circ_chars_pending(xmit) < WAKEUP_CHARS)
++		uart_write_wakeup(port);
++}
++
++static void catteuart_stop_rx(struct uart_port *port)
++{
++	struct catteuart_port *uart = to_catteuart_port(port);
++
++	/* just delete timer */
++	del_timer(&uart->timer);
++}
++
++static void catteuart_break_ctl(struct uart_port *port, int break_state)
++{
++	/* NitroUART doesn't support sending break signal */
++}
++
++static int catteuart_startup(struct uart_port *port)
++{
++	struct catteuart_port *uart = to_catteuart_port(port);
++
++	/* prepare timer for polling */
++	// timer_setup(&uart->timer, catteuart_timer, 0);
++	// mod_timer(&uart->timer, jiffies + uart_poll_timeout(port));
++
++	return 0;
++}
++
++static void catteuart_shutdown(struct uart_port *port)
++{
++}
++
++static void catteuart_set_termios(struct uart_port *port, struct ktermios *new,
++				 struct ktermios *old)
++{
++	unsigned int baud;
++	unsigned long flags;
++
++	spin_lock_irqsave(&port->lock, flags);
++
++	/* update baudrate */
++	baud = uart_get_baud_rate(port, new, old, 0, 2000000);
++	uart_update_timeout(port, new->c_cflag, baud);
++	/* FIXME ??? */
++
++	spin_unlock_irqrestore(&port->lock, flags);
++}
++
++static const char *catteuart_type(struct uart_port *port)
++{
++	return "catte";
++}
++
++static void catteuart_release_port(struct uart_port *port)
++{
++}
++
++static int catteuart_request_port(struct uart_port *port)
++{
++	return 0;
++}
++
++static void catteuart_config_port(struct uart_port *port, int flags)
++{
++	/*
++	 * Driver core for serial ports forces a non-zero value for port type.
++	 * Write an arbitrary value here to accommodate the serial core driver,
++	 * as ID part of UAPI is redundant.
++	 */
++	port->type = 1;
++}
++
++static int catteuart_verify_port(struct uart_port *port,
++				struct serial_struct *ser)
++{
++	if (port->type != PORT_UNKNOWN && ser->type != 1)
++		return -EINVAL;
++
++	return 0;
++}
++
++static const struct uart_ops catteuart_ops = {
++	.tx_empty     = catteuart_tx_empty,
++	.set_mctrl    = catteuart_set_mctrl,
++	.get_mctrl    = catteuart_get_mctrl,
++	.stop_tx      = catteuart_stop_tx,
++	.start_tx     = catteuart_start_tx,
++	.stop_rx      = catteuart_stop_rx,
++	.break_ctl    = catteuart_break_ctl,
++	.startup      = catteuart_startup,
++	.shutdown     = catteuart_shutdown,
++	.set_termios  = catteuart_set_termios,
++	.type         = catteuart_type,
++	.release_port = catteuart_release_port,
++	.request_port = catteuart_request_port,
++	.config_port  = catteuart_config_port,
++	.verify_port  = catteuart_verify_port,
++};
++
++static int catteuart_probe(struct platform_device *pdev)
++{
++	struct catteuart_port *uart;
++	struct uart_port *port;
++	struct resource *res;
++	struct xa_limit limit;
++	int dev_id, ret;
++
++	/* look for aliases; auto-enumerate for free index if not found */
++	dev_id = of_alias_get_id(pdev->dev.of_node, "serial");
++	if (dev_id < 0)
++		limit = XA_LIMIT(0, CONFIG_SERIAL_CATTEUART_MAX_PORTS);
++	else
++		limit = XA_LIMIT(dev_id, dev_id);
++
++	uart = devm_kzalloc(&pdev->dev, sizeof(struct catteuart_port), GFP_KERNEL);
++	if (!uart)
++		return -ENOMEM;
++
++	ret = xa_alloc(&catteuart_array, &dev_id, uart, limit, GFP_KERNEL);
++	if (ret)
++		return ret;
++
++	uart->id = dev_id;
++	port = &uart->port;
++
++	/* get membase */
++	port->membase = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
++	if (!port->membase)
++		return -ENXIO;
++	port->mapbase = res->start;
++
++	/* values not from device tree */
++	port->dev = &pdev->dev;
++	port->iotype = UPIO_MEM;
++	port->flags = UPF_BOOT_AUTOCONF;
++	port->ops = &catteuart_ops;
++	port->regshift = 2;
++	port->fifosize = 384;		// FIXME specify in device tree ?
++	port->iobase = 1;
++	port->type = PORT_UNKNOWN;
++	port->line = dev_id;
++	spin_lock_init(&port->lock);
++
++	return uart_add_one_port(&catteuart_driver, &uart->port);
++}
++
++static int catteuart_remove(struct platform_device *pdev)
++{
++	struct uart_port *port = platform_get_drvdata(pdev);
++	struct catteuart_port *uart = to_catteuart_port(port);
++
++	xa_erase(&catteuart_array, uart->id);
++
++	return 0;
++}
++
++static const struct of_device_id catteuart_of_match[] = {
++	{ .compatible = "gatecat,catteuart" },
++	{}
++};
++MODULE_DEVICE_TABLE(of, catteuart_of_match);
++
++static struct platform_driver catteuart_platform_driver = {
++	.probe = catteuart_probe,
++	.remove = catteuart_remove,
++	.driver = {
++		.name = "catteuart",
++		.of_match_table = catteuart_of_match,
++	},
++};
++
++#ifdef CONFIG_SERIAL_CATTEUART_CONSOLE
++
++static void catteuart_console_write(struct console *co, const char *s,
++	unsigned int count)
++{
++	struct catteuart_port *uart;
++	struct uart_port *port;
++	unsigned long flags;
++
++	uart = (struct catteuart_port *)xa_load(&catteuart_array, co->index);
++	port = &uart->port;
++
++	spin_lock_irqsave(&port->lock, flags);
++	uart_console_write(port, s, count, catteuart_putchar);
++	spin_unlock_irqrestore(&port->lock, flags);
++}
++
++static int catteuart_console_setup(struct console *co, char *options)
++{
++	struct catteuart_port *uart;
++	struct uart_port *port;
++	int baud = 1000000;
++	int bits = 8;
++	int parity = 'n';
++	int flow = 'n';
++
++	uart = (struct catteuart_port *)xa_load(&catteuart_array, co->index);
++	if (!uart)
++		return -ENODEV;
++
++	port = &uart->port;
++	if (!port->membase)
++		return -ENODEV;
++
++	if (options)
++		uart_parse_options(options, &baud, &parity, &bits, &flow);
++
++	return uart_set_options(port, co, baud, parity, bits, flow);
++}
++
++static struct console catteuart_console = {
++	.name = "catteuart",	// console names can't contain numbers !!!
++	.write = catteuart_console_write,
++	.device = uart_console_device,
++	.setup = catteuart_console_setup,
++	.flags = CON_PRINTBUFFER,
++	.index = -1,
++	.data = &catteuart_driver,
++};
++
++static int __init catteuart_console_init(void)
++{
++	register_console(&catteuart_console);
++
++	return 0;
++}
++console_initcall(catteuart_console_init);
++#endif /* CONFIG_SERIAL_CATTEUART_CONSOLE */
++
++static int __init catteuart_init(void)
++{
++	int res;
++
++	res = uart_register_driver(&catteuart_driver);
++	if (res)
++		return res;
++
++	res = platform_driver_register(&catteuart_platform_driver);
++	if (res) {
++		uart_unregister_driver(&catteuart_driver);
++		return res;
++	}
++
++	return 0;
++}
++
++static void __exit catteuart_exit(void)
++{
++	platform_driver_unregister(&catteuart_platform_driver);
++	uart_unregister_driver(&catteuart_driver);
++}
++
++#ifdef CONFIG_SERIAL_EARLYCON
++static unsigned int catteuart_early_in(struct uart_port *port, int offset)
++{
++	offset <<= port->regshift;
++	return readw(port->membase + offset);
++}
++
++static void catteuart_early_out(struct uart_port *port, int offset,
++				  int value)
++{
++	offset <<= port->regshift;
++	writew(value, port->membase + offset);
++}
++
++static void catteuart_early_putc(struct uart_port *port, int c)
++{
++	unsigned int status;
++
++	for (;;) {
++		status = catteuart_early_in(port, 2);
++		if (status)
++				break;
++		cpu_relax();
++	}
++	catteuart_early_out(port, 0, c);
++}
++
++static void catteuart_serial_write(struct console *console, const char *s,
++				    unsigned int count)
++{
++	struct earlycon_device *device = console->data;
++	struct uart_port *port = &device->port;
++
++	uart_console_write(port, s, count, catteuart_early_putc);
++}
++
++static int __init early_catteuart_serial_setup(struct earlycon_device *device,
++					  const char *options)
++{
++	struct uart_port *port = &device->port;
++
++	if (!(device->port.membase || device->port.iobase))
++		return -ENODEV;
++
++	port->regshift = 2;
++	device->con->write = catteuart_serial_write;
++	return 0;
++}
++
++OF_EARLYCON_DECLARE(catteuart, "gatecat,catteuart", early_catteuart_serial_setup);
++#endif /* CONFIG_SERIAL_EARLYCON */
++
++
++module_init(catteuart_init);
++module_exit(catteuart_exit);
++
++MODULE_AUTHOR("gatecat <gatecat@ds0.me>");
++MODULE_DESCRIPTION("CatteUART serial driver");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS("platform: catteuart");
+-- 
+2.34.1
+

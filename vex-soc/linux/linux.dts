@@ -1,0 +1,90 @@
+/*
+ * gatecat's linux soc DTS
+ */
+
+/dts-v1/;
+
+/ {
+	#address-cells = <0x1>;
+	#size-cells = <0x1>;
+	compatible = "enjoy-digital,litex-vexriscv-soclinux";
+	model = "mpw5 soc-linux";
+
+	chosen {
+		bootargs = "mem=16M@0x10000000 rootwait console=catteuart earlycon=catteuart swiotlb=32";
+	};
+
+	cpus {
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+		timebase-frequency = <15000000>;
+
+		cpu@0 {
+			clock-frequency = <15000000>;
+			compatible = "spinalhdl,vexriscv", "sifive,rocket0", "riscv";
+			d-tlb-sets = <0x1>;
+			d-tlb-size = <0x20>;
+			device_type = "cpu";
+			i-cache-block-size = <0x20>;
+			i-cache-sets = <0x1>;
+			i-cache-size = <0x800>;
+			i-tlb-sets = <0x1>;
+			i-tlb-size = <0x20>;
+			mmu-type = "riscv,sv32";
+			reg = <0x0>;
+			riscv,isa = "rv32ia";
+			sifive,itim = <0x1>;
+			status = "okay";
+			tlb-split;
+
+			L0: interrupt-controller {
+				#interrupt-cells = <0x00000001>;
+				interrupt-controller;
+				compatible = "riscv,cpu-intc";
+			};
+		};
+	};
+
+	memory@10000000 {
+		device_type = "memory";
+		reg = <0x10000000 0x1000000>;
+	};
+
+	/*
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells    = <1>;
+		ranges;
+		vexriscv_emulator@{emulator_base:x} {
+			reg = <0x{emulator_base:x} 0x{emulator_size:x}>;
+		};
+	};
+	*/
+
+	soc {
+		#address-cells = <0x1>;
+		#size-cells = <0x1>;
+		bus-frequency = <15000000>;
+		compatible = "simple-bus";
+		ranges;
+
+		intc0: interrupt-controller {
+		   interrupt-controller;
+			#interrupt-cells = <1>;
+		   compatible = "vexriscv,intc0";
+		   status = "okay";
+	   };
+
+		catteuart0: uart@82000000 {
+			device_type = "serial";
+			compatible = "gatecat,catteuart";
+			reg = <0x82000000 0x100>;
+			status = "okay";
+		};
+
+	};
+
+	aliases {
+		serial0 = &catteuart0;
+	};
+};
