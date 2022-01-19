@@ -7,7 +7,7 @@ blink.bin: blink.elf
 	riscv64-linux-gnu-objcopy -O binary blink.elf blink.bin
 
 blink.prog: blink.bin
-	ecpprog -O 1M blink.bin
+	ecpprog -k 2 -o 1M blink.bin
 
 .PHONY: blink.prog
 
