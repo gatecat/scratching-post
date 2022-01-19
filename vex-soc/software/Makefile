@@ -9,5 +9,15 @@ blink.bin: blink.elf
 blink.prog: blink.bin
 	ecpprog -k 2 -o 1M blink.bin
 
-.PHONY: blink.prog
+bios.elf: sections.lds start.s main.c
+	riscv32-unknown-linux-gnu-gcc -g -march=rv32ima -mabi=ilp32 -Wl,--build-id=none,-Bstatic,-T,sections.lds,--strip-debug -static -ffreestanding -nostdlib -o bios.elf start.s main.c
+
+bios.bin: bios.elf
+	riscv64-linux-gnu-objcopy -O binary bios.elf bios.bin
+
+bios.prog: bios.bin
+	ecpprog -k 2 -o 1M bios.bin
+
+
+.PHONY: blink.prog bios.prog
 
