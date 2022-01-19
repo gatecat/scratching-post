@@ -27,7 +27,7 @@ class SPIMemIO(Peripheral, Elaboratable):
                                       data_width=32, granularity=8)
         self.flash = flash
         map = MemoryMap(addr_width=24, data_width=8)
-        map.add_resource("flash", size=2**24)
+        map.add_resource(name="flash", size=2**24, resource=self)
         self.data_bus.memory_map = map
 
         bank            = self.csr_bank()

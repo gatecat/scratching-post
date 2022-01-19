@@ -46,13 +46,13 @@ class HyperRAM(Peripheral, Elaboratable):
 
     This core favors portability and ease of use over performance.
     """
-    def __init__(self, *, io):
+    def __init__(self, *, index, io):
         super().__init__()
         self.io = io
         self.bus = wishbone.Interface(addr_width=21,
                                       data_width=32, granularity=8)
         map = MemoryMap(addr_width=23, data_width=8)
-        map.add_resource("hyperram", size=2**23)
+        map.add_resource(name=f"hyperram{index}", size=2**23, resource=self)
         self.bus.memory_map = map
         self.size = 2**23
         # # #

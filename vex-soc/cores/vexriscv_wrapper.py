@@ -3,13 +3,11 @@ from amaranth.utils import log2_int
 
 from amaranth_soc import wishbone
 
-from .peripheral import Peripheral
-
-class Vexriscv():
+class Vexriscv(Elaboratable):
     def __init__(self):
-        self.dbus = wishbone.Interface(addr_width=29,
+        self.dbus = wishbone.Interface(addr_width=30,
                                       data_width=32, granularity=8, features={"cti", "bte"}) 
-        self.ibus = wishbone.Interface(addr_width=29,
+        self.ibus = wishbone.Interface(addr_width=30,
                                       data_width=32, granularity=8, features={"cti", "bte"})
         self.timer_irq = Signal()
         self.software_irq = Signal()
@@ -22,6 +20,7 @@ class Vexriscv():
         self.size = 2**24
 
     def elaborate(self, platform):
+        m = Module()
         m.submodules.vex = Instance(
             "VexRiscv",
             i_timerInterrupt=self.timer_irq,
