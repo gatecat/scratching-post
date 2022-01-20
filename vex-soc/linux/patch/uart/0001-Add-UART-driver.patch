@@ -1,4 +1,4 @@
-From 91ec0787a14e1de5a4ae9e648eb88cd31b2fb286 Mon Sep 17 00:00:00 2001
+From d41320ad4f8fb5c987551e52c61ef3ef85602874 Mon Sep 17 00:00:00 2001
 From: gatecat <gatecat@ds0.me>
 Date: Wed, 19 Jan 2022 20:34:52 +0000
 Subject: [PATCH] Add UART driver
@@ -12,7 +12,7 @@ Signed-off-by: gatecat <gatecat@ds0.me>
  create mode 100644 drivers/tty/serial/catteuart.c
 
 diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
-index fc543ac97c13..80f1f1b2ad31 100644
+index 0e5ccb25bdb1..98adee1a1e8c 100644
 --- a/drivers/tty/serial/Kconfig
 +++ b/drivers/tty/serial/Kconfig
 @@ -1562,6 +1562,38 @@ config SERIAL_LITEUART_CONSOLE

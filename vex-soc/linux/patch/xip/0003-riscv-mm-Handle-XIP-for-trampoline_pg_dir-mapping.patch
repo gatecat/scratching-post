@@ -1,0 +1,31 @@
+From 543047def3ffc6c38ced5bd50d9eb2000085f4ca Mon Sep 17 00:00:00 2001
+From: Myrtle Shah <gatecat@ds0.me>
+Date: Thu, 20 Jan 2022 16:41:34 +0000
+Subject: [PATCH 3/3] riscv/mm: Handle XIP for trampoline_pg_dir mapping
+
+Signed-off-by: Myrtle Shah <gatecat@ds0.me>
+---
+ arch/riscv/mm/init.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
+index eeafefd1c2b3..ea5de0b0c724 100644
+--- a/arch/riscv/mm/init.c
++++ b/arch/riscv/mm/init.c
+@@ -653,8 +653,13 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
+ #endif
+ #else
+ 	/* Setup trampoline PGD */
++#ifdef CONFIG_XIP_KERNEL
++	create_pgd_mapping(trampoline_pg_dir, kernel_map.virt_addr,
++			   kernel_map.xiprom, PGDIR_SIZE, PAGE_KERNEL_EXEC);
++#else
+ 	create_pgd_mapping(trampoline_pg_dir, kernel_map.virt_addr,
+ 			   kernel_map.phys_addr, PGDIR_SIZE, PAGE_KERNEL_EXEC);
++#endif
+ #endif
+ 
+ 	/*
+-- 
+2.34.1
+
