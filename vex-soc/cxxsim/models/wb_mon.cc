@@ -17,7 +17,7 @@ struct wb_mon : public bb_p_wb__mon {
 				uint32_t addr = (p_adr.get<uint32_t>() << 2U);
 				uint32_t data = p_we ? p_dat__w.get<uint32_t>() : p_dat__r.get<uint32_t>();
 				if (addr == 0xb2000000 && p_we)
-					log("UART: %c\n", (char)data);
+					log("%c", (char)data);
 				out << stringf("%08x,%c,", addr, p_we ? 'W' : 'R');
 
 				for (int i = 3; i >= 0; i--) {
