@@ -33,6 +33,18 @@ int main(int argc, char **argv) {
 
 	ExecTrace trace("build/cpu.trace", top.p_soc_2e_cpu_2e_vex_2e_memory__to__writeBack__PC, top.p_soc_2e_cpu_2e_vex_2e_memory__to__writeBack__INSTRUCTION);
 
+	std::ifstream kernel("/home/gatecat/linux/arch/riscv/boot/Image", std::ios::binary);
+	uint32_t addr = (1*1024*1024)/4 - 1;
+	top.memory_p_soc_2e_hyperram0_2e___mem[addr++].set(0xdeadbeef); // magic
+	while (kernel) {
+		uint32_t word = 0;
+		kernel.read(reinterpret_cast<char*>(&word), 4);
+		if (!kernel)
+			break;
+		top.memory_p_soc_2e_hyperram0_2e___mem[addr++].set(word);
+	}
+	// memory_p_soc_2e_hyperram0_2e___mem
+
 	top.step();
 	int i = 0;
 	auto tick = [&]() {

@@ -485,8 +485,9 @@ void main() {
 	puts("copying kernel...\n");
 	uint32_t *kernel = (uint32_t *)0x00200000;
 	uint32_t *dest = (uint32_t *)0x10100000;
-	for(int i = 0; i < 1024*1024; i++)
-		*dest++ = *kernel++;
+	if (*(dest - 1) != 0xdeadbeef) // flag for simulation where we skip the slow SPI load
+		for(int i = 0; i < 1024*1024; i++)
+			*dest++ = *kernel++;
 	puts("about to boop the kernel, ganbatte~!\n");
 	__asm__ __volatile__ (
 		" li a0, 0\n"
