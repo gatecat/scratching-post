@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 
 	spiflash_load(*top.cell_p_spiflash_2e_bb, "../software/bios.bin", 1*1024*1024);
 	spiflash_load(*top.cell_p_spiflash_2e_bb, "../linux/linux.dtb", 1*1024*1024 + 512*1024);
-	spiflash_load(*top.cell_p_spiflash_2e_bb, "/home/gatecat/linux/arch/riscv/boot/xipImage", 2*1024*1024);
+	spiflash_load(*top.cell_p_spiflash_2e_bb, "/home/gatecat/linux/arch/riscv/boot/xipImage", 8*1024*1024);
 
 	wb_mon_set_output(*top.cell_p_bus__mon_2e_bb, "build/wishbone_log.csv");
 

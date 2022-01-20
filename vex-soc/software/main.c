@@ -12,9 +12,7 @@ volatile uint32_t *const UART_RX_AVL = (volatile uint32_t *)0xb200000c;
 void putc(char c) {
 	if (c == '\n') putc('\r');
 	while (!(*UART_TX_RDY & 0x1)) {
-		*LED = 0;
 	}
-	*LED = 3;
 	*UART_TX = c;
 }
 
@@ -388,7 +386,7 @@ void main() {
 	csr_write(mscratch, (uint32_t)__stacktop - 32 * 4); // exception stack pointer
 	csr_write(mstatus,  0x0800 | MSTATUS_MPIE);
 	csr_write(mie,      0);
-	csr_write(mepc, 0x00200000); // Linux image base
+	csr_write(mepc, 0x00800000); // Linux image base
 	csr_write(medeleg, MEDELEG_INSTRUCTION_PAGE_FAULT | MEDELEG_LOAD_PAGE_FAULT | MEDELEG_STORE_PAGE_FAULT | MEDELEG_USER_ENVIRONNEMENT_CALL);
 	csr_write(mideleg, MIDELEG_SUPERVISOR_TIMER | MIDELEG_SUPERVISOR_EXTERNAL | MIDELEG_SUPERVISOR_SOFTWARE);
 	puts("about to boop the kernel, ganbatte~!\n");
