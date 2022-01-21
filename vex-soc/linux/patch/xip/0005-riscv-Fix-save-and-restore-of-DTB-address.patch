@@ -1,0 +1,31 @@
+From 98d05965f5ecc2bc6903e3768dc9c136839a95d6 Mon Sep 17 00:00:00 2001
+From: gatecat <gatecat@ds0.me>
+Date: Fri, 21 Jan 2022 22:57:13 +0000
+Subject: [PATCH 5/5] riscv: Fix save and restore of DTB address
+
+Signed-off-by: gatecat <gatecat@ds0.me>
+---
+ arch/riscv/kernel/head.S | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/riscv/kernel/head.S b/arch/riscv/kernel/head.S
+index b1ca65abeb1e..b4a9be04d33b 100644
+--- a/arch/riscv/kernel/head.S
++++ b/arch/riscv/kernel/head.S
+@@ -284,10 +284,12 @@ pmp_done:
+ 	la sp, _end + THREAD_SIZE
+ 	XIP_FIXUP_OFFSET sp
+ 	mv s0, a0
++	mv s1, a1
+ 	call __copy_data
+ 
+-	/* Restore a0 copy */
++	/* Restore a0, a1 copy */
+ 	mv a0, s0
++	mv a1, s1
+ #endif
+ 
+ #ifndef CONFIG_XIP_KERNEL
+-- 
+2.34.1
+
