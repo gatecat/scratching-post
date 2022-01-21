@@ -1,6 +1,7 @@
 #undef NDEBUG
 
 #include <backends/cxxrtl/cxxrtl.h>
+#include <backends/cxxrtl/cxxrtl_vcd.h>
 #include "build/sim_soc.h"
 #include "models/spiflash.h"
 #include "models/wb_mon.h"
@@ -44,6 +45,15 @@ void load_memory(memory<32> &mem, const std::string &filename, uint32_t offset) 
 int main(int argc, char **argv) {
 	cxxrtl_design::p_sim__top top;
 
+    cxxrtl::debug_items all_debug_items;
+    top.debug_info(all_debug_items);
+
+    cxxrtl::vcd_writer vcd;
+    vcd.timescale(1, "us");
+
+    vcd.add_without_memories(all_debug_items);
+    std::ofstream trace_vcd("build/trace.vcd");
+
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../software/bios.bin", 1*1024*1024);
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../linux/linux.dtb", 1*1024*1024 + 512*1024);
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "/home/gatecat/linux/arch/riscv/boot/xipImage", 8*1024*1024);
@@ -53,12 +63,17 @@ int main(int argc, char **argv) {
 	ExecTrace trace("build/cpu.trace", top.p_soc_2e_cpu_2e_vex_2e_decode__to__execute__PC); 
 
 	top.step();
-	int i = 0;
+	int64_t i = 0, vcd_count = 0;
+	bool enable_vcd = false;
 	auto tick = [&]() {
 		top.p_clk.set(false);
 		top.step();
+		if (enable_vcd)
+			vcd.sample(i*2 + 0);
 		top.p_clk.set(true);
 		top.step();
+		if (enable_vcd)
+			vcd.sample(i*2 + 1);
 		trace.tick();
 		if (((i++) % 500000) == 0) {
 			log("scause: %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__scause__exceptionCode.get<uint32_t>());
@@ -71,6 +86,18 @@ int main(int argc, char **argv) {
 			log("mtvec:  %d %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mtvec__mode.get<uint32_t>(), top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mtvec__base.get<uint32_t>());
 			log("stvec:  %d %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__stvec__mode.get<uint32_t>(), top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__stvec__base.get<uint32_t>());
 		}
+		if (top.p_soc_2e_cpu_2e_vex_2e_decode__to__execute__PC.get<uint32_t>() == 0xc00221d4 && !enable_vcd) {
+			log("enabling VCD trace!!\n");
+			enable_vcd = true;
+			vcd.sample(i*2 + 1);
+		}
+		if (enable_vcd) {
+	        trace_vcd << vcd.buffer;
+	        vcd.buffer.clear();
+	        if ((i % 100) == 0)
+	        	trace_vcd.flush();
+	        ++vcd_count;
+		}
 	};
 	top.p_rst.set(true);
 	tick();
@@ -78,6 +105,9 @@ int main(int argc, char **argv) {
 
 	while (1) {
 		tick();
+		if (enable_vcd && vcd_count == 5000) {
+			break;
+		}
 	}
 	return 0;
 }
