@@ -29,8 +29,11 @@ class SimLinuxSoC(Elaboratable):
         self._arbiter.add(self.cpu.dbus)
 
         self.rom = SPIMemIO(flash=flash_pins)
-        self._decoder.add(self.rom.data_bus, addr=spi_base)
+        # self._decoder.add(self.rom.data_bus, addr=spi_base)
         self._decoder.add(self.rom.ctrl_bus, addr=spi_ctrl_base)
+
+        self.sim_rom = SRAMPeripheral(size=16*1024*1024, index=2)
+        self._decoder.add(self.sim_rom.bus, addr=spi_base)
 
         self.hyperram0 = SRAMPeripheral(size=8*1024*1024, index=0)
         self._decoder.add(self.hyperram0.bus, addr=ram0_base)
@@ -54,6 +57,7 @@ class SimLinuxSoC(Elaboratable):
 
         m.submodules.decoder  = self._decoder
         m.submodules.rom      = self.rom
+        m.submodules.sim_rom  = self.sim_rom
         m.submodules.hyperram0 = self.hyperram0
         m.submodules.hyperram1 = self.hyperram1
         m.submodules.gpio     = self.gpio

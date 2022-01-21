@@ -1,3 +1,5 @@
+#undef NDEBUG
+
 #include <backends/cxxrtl/cxxrtl.h>
 #include "build/sim_soc.h"
 #include "models/spiflash.h"
@@ -22,16 +24,35 @@ struct ExecTrace {
 	}
 };
 
+void load_memory(memory<32> &mem, const std::string &filename, uint32_t offset) {
+	assert((offset % 4) == 0);
+	offset /= 4;
+	std::ifstream in(filename, std::ios::binary);
+	while (true) {
+		uint8_t word[4];
+		in.read(reinterpret_cast<char*>(&word), 4);
+		if (!in)
+			break;
+		mem[offset++].set<uint32_t>(
+			uint32_t(word[3]) << 24U |
+			uint32_t(word[2]) << 16U |
+			uint32_t(word[1]) <<  8U |
+			uint32_t(word[0]));
+	}
+}
+
 int main(int argc, char **argv) {
 	cxxrtl_design::p_sim__top top;
 
-	spiflash_load(*top.cell_p_spiflash_2e_bb, "../software/bios.bin", 1*1024*1024);
-	spiflash_load(*top.cell_p_spiflash_2e_bb, "../linux/linux.dtb", 1*1024*1024 + 512*1024);
-	spiflash_load(*top.cell_p_spiflash_2e_bb, "/home/gatecat/linux/arch/riscv/boot/xipImage", 8*1024*1024);
+	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../software/bios.bin", 1*1024*1024);
+	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../linux/linux.dtb", 1*1024*1024 + 512*1024);
+	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "/home/gatecat/linux/arch/riscv/boot/xipImage", 8*1024*1024);
 
 	wb_mon_set_output(*top.cell_p_bus__mon_2e_bb, "build/wishbone_log.csv");
 
 	ExecTrace trace("build/cpu.trace", top.p_soc_2e_cpu_2e_vex_2e_decode__to__execute__PC);
+
+	// 
 
 	top.step();
 	auto tick = [&]() {
