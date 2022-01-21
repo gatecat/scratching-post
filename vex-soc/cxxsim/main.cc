@@ -50,17 +50,27 @@ int main(int argc, char **argv) {
 
 	wb_mon_set_output(*top.cell_p_bus__mon_2e_bb, "build/wishbone_log.csv");
 
-	ExecTrace trace("build/cpu.trace", top.p_soc_2e_cpu_2e_vex_2e_decode__to__execute__PC);
-
-	// 
+	ExecTrace trace("build/cpu.trace", top.p_soc_2e_cpu_2e_vex_2e_decode__to__execute__PC); 
 
 	top.step();
+	int i = 0;
 	auto tick = [&]() {
 		top.p_clk.set(false);
 		top.step();
 		top.p_clk.set(true);
 		top.step();
 		trace.tick();
+		if (((i++) % 500000) == 0) {
+			log("scause: %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__scause__exceptionCode.get<uint32_t>());
+			log("mcause: %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mcause__exceptionCode.get<uint32_t>());
+			log("sepc:   %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__sepc.get<uint32_t>());
+			log("mepc:   %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mepc.get<uint32_t>());
+			log("stval:  %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__stval.get<uint32_t>());
+			log("mtval:  %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mtval.get<uint32_t>());
+			log("stval:  %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__stval.get<uint32_t>());
+			log("mtvec:  %d %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mtvec__mode.get<uint32_t>(), top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mtvec__base.get<uint32_t>());
+			log("stvec:  %d %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__stvec__mode.get<uint32_t>(), top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__stvec__base.get<uint32_t>());
+		}
 	};
 	top.p_rst.set(true);
 	tick();

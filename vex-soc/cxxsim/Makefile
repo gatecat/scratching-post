@@ -34,7 +34,7 @@ cores_verilog=$(wildcard ../cores/*.v)
 vex_verilog=../verilog_gen/VexRiscvLinuxAsic.v
 
 build/sim_soc.cc: build/sim_soc.il build/sim_blackboxes.v $(cores_verilog) $(vex_verilog)
-	yosys -p "write_cxxrtl -g0 -header $@" $^
+	yosys -p "write_cxxrtl -g2 -header $@" $^
 
 build/sim_soc.h: build/sim_soc.cc
 

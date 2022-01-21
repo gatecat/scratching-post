@@ -48,13 +48,13 @@ object GenCoreDefault{
             twoCycleCache = true
           )
         ),
-        new DBusCachedPlugin(
+        /*new DBusCachedPlugin(
           dBusCmdMasterPipe = true,
           dBusCmdSlavePipe = true,
           dBusRspSlavePipe = false,
           relaxedMemoryTranslationRegister = false,
           config = new DataCacheConfig(
-            cacheSize = 256,
+            cacheSize = 64,
             bytePerLine = 32,
             wayCount = 1,
             addressWidth = 32,
@@ -69,6 +69,12 @@ object GenCoreDefault{
           ),
           memoryTranslatorPortConfig = MmuPortConfig(portTlbSize = 4),
           csrInfo = true
+        ),*/
+        new DBusSimplePlugin(
+          catchAddressMisaligned = true,
+          catchAccessFault = true,
+          withLrSc = true,
+          memoryTranslatorPortConfig = MmuPortConfig(portTlbSize = 4)
         ),
         new MmuPlugin(
           ioRange = (x => x(31 downto 28) === 0xB || x(31 downto 28) === 0xE || x(31 downto 28) === 0xF)

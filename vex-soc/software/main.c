@@ -3,11 +3,23 @@
 
 volatile uint32_t *const LED = (volatile uint32_t *)0xb1000000;
 
-
 volatile uint32_t *const UART_TX = (volatile uint32_t *)0xb2000000;
 volatile uint32_t *const UART_RX = (volatile uint32_t *)0xb2000004;
 volatile uint32_t *const UART_TX_RDY = (volatile uint32_t *)0xb2000008;
 volatile uint32_t *const UART_RX_AVL = (volatile uint32_t *)0xb200000c;
+
+
+#define max(a,b) \
+	({ __typeof__ (a) _a = (a); \
+	 __typeof__ (b) _b = (b); \
+	 _a > _b ? _a : _b; })
+
+
+#define min(a,b) \
+	({ __typeof__ (a) _a = (a); \
+	 __typeof__ (b) _b = (b); \
+	 _a < _b ? _a : _b; })
+
 
 void putc(char c) {
 	if (c == '\n') putc('\r');
@@ -129,6 +141,7 @@ void print_trap(void) {
 }
 
 void default_trap(void) {
+	print_trap();
 
 	while(1) {};
 }
@@ -307,7 +320,6 @@ static uint32_t vexriscv_read_instruction(uint32_t pc){
 __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 
 	print_trap();
-
 	int32_t cause = csr_read(mcause);
 
 	/* Interrupt */
@@ -375,6 +387,84 @@ __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 			    csr_write(mepc, mepc + 4);
 			    csr_write(mtvec, vexriscv_machine_mode_trap_entry); //Restore mtvec
 		    }break;
+			/* Illegal instruction */
+			case CAUSE_ILLEGAL_INSTRUCTION:{
+				uint32_t mepc = csr_read(mepc);
+				uint32_t mstatus = csr_read(mstatus);
+				uint32_t instr = csr_read(mbadaddr);
+
+				uint32_t opcode = instr & 0x7f;
+				uint32_t funct3 = (instr >> 12) & 0x7;
+				switch(opcode){
+					/* Atomic */
+					case 0x2f:
+						switch(funct3){
+							case 0x2:{
+								uint32_t sel = instr >> 27;
+								uint32_t addr = vexriscv_read_register((instr >> 15) & 0x1f);
+								int32_t src = vexriscv_read_register((instr >> 20) & 0x1f);
+								uint32_t rd = (instr >> 7) & 0x1f;
+								int32_t read_value;
+								int32_t write_value = 0
+								;
+								if(vexriscv_read_word(addr, &read_value)) {
+									vexriscv_machine_mode_trap_to_supervisor_trap(mepc, mstatus);
+									return;
+								}
+
+								switch(sel){
+									case 0x0:  write_value = src + read_value; break;
+									case 0x1:  write_value = src; break;
+									case 0x2:  break; /*  LR, SC done in hardware (cheap) and require */
+									case 0x3:  break; /*  to keep track of context switches */
+									case 0x4:  write_value = src ^ read_value; break;
+									case 0xC:  write_value = src & read_value; break;
+									case 0x8:  write_value = src | read_value; break;
+									case 0x10: write_value = min(src, read_value); break;
+									case 0x14: write_value = max(src, read_value); break;
+									case 0x18: write_value = min((unsigned int)src, (unsigned int)read_value); break;
+									case 0x1C: write_value = max((unsigned int)src, (unsigned int)read_value); break;
+									default: default_trap(); return; break;
+								}
+								if(vexriscv_write_word(addr, write_value)){
+									vexriscv_machine_mode_trap_to_supervisor_trap(mepc, mstatus);
+									return;
+								}
+								vexriscv_write_register(rd, read_value);
+								csr_write(mepc, mepc + 4);
+								csr_write(mtvec, vexriscv_machine_mode_trap_entry); /* Restore MTVEC */
+							} break;
+							default: default_trap(); break;
+						} break;
+					/* CSR */
+					case 0x73:{
+						uint32_t input = (instr & 0x4000) ? ((instr >> 15) & 0x1f) : vexriscv_read_register((instr >> 15) & 0x1f);
+						__attribute__((unused)) uint32_t clear, set;
+						uint32_t write;
+						switch (funct3 & 0x3) {
+							case 0: default_trap(); break;
+							case 1: clear = ~0; set = input; write = 1; break;
+							case 2: clear = 0; set = input; write = ((instr >> 15) & 0x1f) != 0; break;
+							case 3: clear = input; set = 0; write = ((instr >> 15) & 0x1f) != 0; break;
+						}
+						uint32_t csrAddress = instr >> 20;
+						uint32_t old;
+						switch(csrAddress){
+							default: default_trap(); break;
+						}
+						if(write) {
+							switch(csrAddress){
+								default: default_trap(); break;
+							}
+						}
+
+						vexriscv_write_register((instr >> 7) & 0x1f, old);
+						csr_write(mepc, mepc + 4);
+
+					} break;
+					default: default_trap(); break;
+				}
+			} break;
 			default: default_trap(); break;
 		}
 	}
