@@ -50,7 +50,7 @@ void delay() {
 
 static uint32_t *__stacktop = (uint32_t*)0x010FFFF00;
 
-static void vexriscv_machine_mode_trap_entry(void) {
+__attribute__((naked)) static void vexriscv_machine_mode_trap_entry(void) {
 	__asm__ __volatile__ (
 	"csrrw sp, mscratch, sp\n"
 	"sw x1,   1*4(sp)\n"

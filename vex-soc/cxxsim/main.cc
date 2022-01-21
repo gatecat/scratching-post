@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
 		if (enable_vcd)
 			vcd.sample(i*2 + 1);
 		trace.tick();
-		if (((i++) % 500000) == 0) {
+		/*if (((i++) % 500000) == 0) {
 			log("scause: %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__scause__exceptionCode.get<uint32_t>());
 			log("mcause: %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mcause__exceptionCode.get<uint32_t>());
 			log("sepc:   %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__sepc.get<uint32_t>());
@@ -85,12 +85,12 @@ int main(int argc, char **argv) {
 			log("stval:  %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__stval.get<uint32_t>());
 			log("mtvec:  %d %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mtvec__mode.get<uint32_t>(), top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__mtvec__base.get<uint32_t>());
 			log("stvec:  %d %08x\n", top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__stvec__mode.get<uint32_t>(), top.p_soc_2e_cpu_2e_vex_2e_CsrPlugin__stvec__base.get<uint32_t>());
-		}
-		if (top.p_soc_2e_cpu_2e_vex_2e_decode__to__execute__PC.get<uint32_t>() == 0xc00221d4 && !enable_vcd) {
+		}*/
+		/*if (top.p_soc_2e_cpu_2e_vex_2e_decode__to__execute__PC.get<uint32_t>() == 0xc00221d4 && !enable_vcd) {
 			log("enabling VCD trace!!\n");
 			enable_vcd = true;
 			vcd.sample(i*2 + 1);
-		}
+		}*/
 		if (enable_vcd) {
 	        trace_vcd << vcd.buffer;
 	        vcd.buffer.clear();
