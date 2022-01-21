@@ -48,7 +48,7 @@ void delay() {
 		;
 }
 
-static uint32_t *__stacktop = (uint32_t*)0x010FFFF00;
+#define __stacktop ((uint32_t*)0x10FFFF00)
 
 __attribute__((naked)) static void vexriscv_machine_mode_trap_entry(void) {
 	__asm__ __volatile__ (
@@ -119,6 +119,17 @@ __attribute__((naked)) static void vexriscv_machine_mode_trap_entry(void) {
 	);
 }
 
+static int vexriscv_read_register(uint32_t id){
+	unsigned int sp = (unsigned int) (__stacktop);
+	return ((int*) sp)[id-32];
+}
+static void vexriscv_write_register(uint32_t id, int value){
+	uint32_t sp = (uint32_t) (__stacktop);
+	((uint32_t*) sp)[id-32] = value;
+}
+
+
+
 void print_trap(void) {
 	puts("😿: mraow~!\n");
 
@@ -137,24 +148,12 @@ void print_trap(void) {
 	puts("      mbadaddr: ");
 	puthex(csr_read(mbadaddr));
 	puts("\n");
-
 }
 
 void default_trap(void) {
 	print_trap();
-
 	while(1) {};
 }
-
-static int vexriscv_read_register(uint32_t id){
-	unsigned int sp = (unsigned int) (__stacktop);
-	return ((int*) sp)[id-32];
-}
-static void vexriscv_write_register(uint32_t id, int value){
-	uint32_t sp = (uint32_t) (__stacktop);
-	((uint32_t*) sp)[id-32] = value;
-}
-
 
 
 #define vexriscv_trap_barrier_start \
@@ -319,7 +318,6 @@ static uint32_t vexriscv_read_instruction(uint32_t pc){
 
 __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 
-	print_trap();
 	int32_t cause = csr_read(mcause);
 
 	/* Interrupt */
@@ -338,9 +336,6 @@ __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 			    uint32_t mepc = csr_read(mepc);
 			    uint32_t mstatus = csr_read(mstatus);
 			    uint32_t instruction = vexriscv_read_instruction(mepc);
-			    puts("instruction: ");
-			    puthex(instruction);
-			    puts("\n");
 			    uint32_t address = csr_read(mbadaddr);
 			    uint32_t func3 =(instruction >> 12) & 0x7;
 			    uint32_t rd = (instruction >> 7) & 0x1F;
@@ -358,9 +353,6 @@ __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 				    vexriscv_machine_mode_trap_to_supervisor_trap(mepc, mstatus);
 				    return;
 			    }
-			    puts("readValue: ");
-			    puthex(readValue);
-			    puts("\n");
 			    vexriscv_write_register(rd, readValue);
 			    csr_write(mepc, mepc + 4);
 			    csr_write(mtvec, vexriscv_machine_mode_trap_entry); //Restore mtvec
@@ -473,7 +465,7 @@ __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 void main() {
 	puts("🐱: nyaa~!\n");
 	csr_write(mtvec,    vexriscv_machine_mode_trap_entry);
-	csr_write(mscratch, (uint32_t)__stacktop - 32 * 4); // exception stack pointer
+	csr_write(mscratch, ((uint32_t)__stacktop )- 32 * 4); // exception stack pointer
 	csr_write(mstatus,  0x0800 | MSTATUS_MPIE);
 	csr_write(mie,      0);
 	csr_write(mepc, 0x00800000); // Linux image base
