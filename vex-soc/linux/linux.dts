@@ -11,7 +11,7 @@
 	model = "mpw5 soc-linux";
 
 	chosen {
-		bootargs = "rootwait console=catteuart earlycon swiotlb=32";
+		bootargs = "earlycon console=catte0 swiotlb=32 root=mtd:rootfs rootwait rootfstype=romfs";
 		stdout-path = &catteuart0;
 	};
 
@@ -81,6 +81,21 @@
 			compatible = "gatecat,catteuart";
 			reg = <0xb2000000 0x100>;
 			status = "okay";
+		};
+
+
+		flash: flash@200000 {
+			#address-cells = <1>;
+			#size-cells = <1>;
+			compatible = "mtd-rom";
+			probe-type = "map_rom";
+			reg = <0x00200000 0x00600000>;
+			bank-width = <4>;
+			device-width = <1>;
+			partition@0 {
+				label = "rootfs";
+				reg = <0 0x00600000>;
+			};
 		};
 
 	};

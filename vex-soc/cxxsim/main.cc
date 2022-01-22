@@ -19,7 +19,7 @@ struct ExecTrace {
 	uint32_t last = 0xFFFFFFFF;
 	void tick() {
 		uint32_t pc = signal.get<uint32_t>();
-		if (pc != last)
+		if (pc != last && pc != (last + 4))
 			out << stringf("%08x", pc) << std::endl;
 		last = pc;
 	}
@@ -57,6 +57,9 @@ int main(int argc, char **argv) {
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../software/bios.bin", 1*1024*1024);
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../linux/linux.dtb", 15*1024*1024 + 512*1024);
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "/home/gatecat/linux/arch/riscv/boot/xipImage", 8*1024*1024);
+
+	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "/home/gatecat/rootfs.bin", 2*1024*1024);
+
 
 	wb_mon_set_output(*top.cell_p_bus__mon_2e_bb, "build/wishbone_log.csv");
 
