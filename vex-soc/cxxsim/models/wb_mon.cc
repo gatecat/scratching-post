@@ -19,8 +19,8 @@ struct wb_mon : public bb_p_wb__mon {
 				uint32_t data = p_we ? p_dat__w.get<uint32_t>() : p_dat__r.get<uint32_t>();
 				if (addr == 0xb2000000 && p_we)
 					log("%c", (char)data);
-				if (addr == 0xb1000000 && p_we)
-					log("debug: %x\n", (uint32_t)data);
+				/*if (addr == 0xb1000000 && p_we)
+					log("debug: %x\n", (uint32_t)data);*/
 				out << stringf("%08x,%c,", addr, p_we ? 'W' : 'R');
 
 				for (int i = 3; i >= 0; i--) {

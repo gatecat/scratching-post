@@ -76,10 +76,10 @@
 		   status = "okay";
 	   };
 
-		catteuart0: uart@82000000 {
+		catteuart0: uart@b2000000 {
 			device_type = "serial";
 			compatible = "gatecat,catteuart";
-			reg = <0x82000000 0x100>;
+			reg = <0xb2000000 0x100>;
 			status = "okay";
 		};
 
