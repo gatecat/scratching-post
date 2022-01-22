@@ -1,7 +1,7 @@
 From ec59ff0309daee15331fffc0b38126efebb4b267 Mon Sep 17 00:00:00 2001
 From: Myrtle Shah <gatecat@ds0.me>
 Date: Thu, 20 Jan 2022 16:41:34 +0000
-Subject: [PATCH 3/5] riscv/mm: Handle XIP for trampoline_pg_dir mapping
+Subject: [PATCH 3/6] riscv/mm: Handle XIP for trampoline_pg_dir mapping
 
 Signed-off-by: Myrtle Shah <gatecat@ds0.me>
 ---

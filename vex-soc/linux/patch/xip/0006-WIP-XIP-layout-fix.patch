@@ -1,0 +1,241 @@
+From b0d6bbc1796dd0a53bb1e9ca127e41d5608e838b Mon Sep 17 00:00:00 2001
+From: gatecat <gatecat@ds0.me>
+Date: Sat, 22 Jan 2022 08:01:41 +0000
+Subject: [PATCH 6/6] [WIP] XIP layout fix
+
+---
+ arch/riscv/include/asm/page.h | 16 ++++++-
+ arch/riscv/kernel/setup.c     | 38 ++++++++++++++-
+ arch/riscv/mm/init.c          | 90 ++++++++++++++++++++++++++++++++---
+ 3 files changed, 134 insertions(+), 10 deletions(-)
+
+diff --git a/arch/riscv/include/asm/page.h b/arch/riscv/include/asm/page.h
+index b3e5ff0125fe..37a038380a49 100644
+--- a/arch/riscv/include/asm/page.h
++++ b/arch/riscv/include/asm/page.h
+@@ -109,7 +109,13 @@ extern phys_addr_t phys_ram_base;
+ #define is_linear_mapping(x)	\
+ 	((x) >= PAGE_OFFSET && (!IS_ENABLED(CONFIG_64BIT) || (x) < kernel_map.virt_addr))
+ 
+-#define linear_mapping_pa_to_va(x)	((void *)((unsigned long)(x) + kernel_map.va_pa_offset))
++#define linear_mapping_pa_to_va(y)	({						\
++	unsigned long _y = y;								\
++	(IS_ENABLED(CONFIG_XIP_KERNEL) && _y < phys_ram_base) ?					\
++		(void *)((unsigned long)(_y) + (PAGE_OFFSET - kernel_map.xiprom)) :		\
++		(void *)((unsigned long)(_y) + kernel_map.va_pa_offset + XIP_OFFSET);	\
++	})
++
+ #define kernel_mapping_pa_to_va(y)	({						\
+ 	unsigned long _y = y;								\
+ 	(IS_ENABLED(CONFIG_XIP_KERNEL) && _y < phys_ram_base) ?					\
+@@ -118,7 +124,13 @@ extern phys_addr_t phys_ram_base;
+ 	})
+ #define __pa_to_va_nodebug(x)		linear_mapping_pa_to_va(x)
+ 
+-#define linear_mapping_va_to_pa(x)	((unsigned long)(x) - kernel_map.va_pa_offset)
++#define linear_mapping_va_to_pa(y) ({						\
++	unsigned long _y = y;							\
++	(IS_ENABLED(CONFIG_XIP_KERNEL) && _y < PAGE_OFFSET + XIP_OFFSET) ?	\
++		(((unsigned long)(_y) - PAGE_OFFSET) + kernel_map.xiprom) :		\
++		((unsigned long)(_y) - kernel_map.va_pa_offset - XIP_OFFSET);	\
++	})
++
+ #define kernel_mapping_va_to_pa(y) ({						\
+ 	unsigned long _y = y;							\
+ 	(IS_ENABLED(CONFIG_XIP_KERNEL) && _y < kernel_map.virt_addr + XIP_OFFSET) ?	\
+diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+index 63241abe84eb..21b02d9e3109 100644
+--- a/arch/riscv/kernel/setup.c
++++ b/arch/riscv/kernel/setup.c
+@@ -249,10 +249,46 @@ static void __init init_resources(void)
+ 	memblock_free(mem_res, mem_res_sz);
+ }
+ 
++static volatile uint32_t *const UART_TX = (volatile uint32_t *)0xb2000000;
++static volatile uint32_t *const UART_RX = (volatile uint32_t *)0xb2000004;
++static volatile uint32_t *const UART_TX_RDY = (volatile uint32_t *)0xb2000008;
++static volatile uint32_t *const UART_RX_AVL = (volatile uint32_t *)0xb200000c;
++
++static void uart_putc(char c) {
++      if (c == '\n') uart_putc('\r');
++       while (!(*UART_TX_RDY & 0x1)) {
++       }
++       *UART_TX = c;
++}
++static void uart_puts(const char *s) {
++       while (*s != 0)
++               uart_putc(*s++);
++}
++
++static void uart_puthex(uint32_t x) {
++       int i;
++       for (i = 7; i >= 0; i--) {
++               uint8_t nib = (x >> (4 * i)) & 0xF;
++               if (nib <= 9)
++                       uart_putc('0' + nib);
++               else
++                      uart_putc('A' + (nib - 10));
++       }
++}
++
+ 
+ static void __init parse_dtb(void)
+ {
+ 	/* Early scan of device tree from init memory */
++
++	uart_puts("dtb_early_va: ");
++	uart_puthex(dtb_early_va);
++	uart_puts("\n");
++
++	uart_puts("*dtb_early_va: ");
++	uart_puthex(*(uint32_t*)dtb_early_va);
++	uart_puts("\n");
++
+ 	if (early_init_dt_scan(dtb_early_va)) {
+ 		const char *name = of_flat_dt_get_machine_name();
+ 
+@@ -286,7 +322,7 @@ void __init setup_arch(char **cmdline_p)
+ #if IS_ENABLED(CONFIG_BUILTIN_DTB)
+ 	unflatten_and_copy_device_tree();
+ #else
+-	if (early_init_dt_verify(__va(XIP_FIXUP(dtb_early_pa))))
++	if (early_init_dt_verify(__va(dtb_early_pa)))
+ 		unflatten_device_tree();
+ 	else
+ 		pr_err("No DTB found in kernel mappings\n");
+diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
+index ea5de0b0c724..4f4af571202e 100644
+--- a/arch/riscv/mm/init.c
++++ b/arch/riscv/mm/init.c
+@@ -539,6 +539,17 @@ static void __init create_kernel_page_table(pgd_t *pgdir,
+ 		create_pgd_mapping(pgdir, va,
+ 				   kernel_map.phys_addr + (va - (kernel_map.virt_addr + XIP_OFFSET)),
+ 				   PMD_SIZE, PAGE_KERNEL);
++
++   create_pgd_mapping(pgdir, 0xb0000000,
++                      0xb0000000,
++                     PMD_SIZE, PAGE_KERNEL);
++   create_pgd_mapping(pgdir, 0xb1000000,
++                      0xb1000000,
++                      PMD_SIZE, PAGE_KERNEL);
++   create_pgd_mapping(pgdir, 0xb2000000,
++                      0xb2000000,
++                      PMD_SIZE, PAGE_KERNEL);
++
+ }
+ #else
+ static void __init create_kernel_page_table(pgd_t *pgdir, bool early)
+@@ -555,6 +566,35 @@ static void __init create_kernel_page_table(pgd_t *pgdir, bool early)
+ }
+ #endif
+ 
++static volatile uint32_t *const UART_TX = (volatile uint32_t *)0xb2000000;
++static volatile uint32_t *const UART_RX = (volatile uint32_t *)0xb2000004;
++static volatile uint32_t *const UART_TX_RDY = (volatile uint32_t *)0xb2000008;
++static volatile uint32_t *const UART_RX_AVL = (volatile uint32_t *)0xb200000c;
++
++static void uart_putc(char c) {
++      if (c == '\n') uart_putc('\r');
++       while (!(*UART_TX_RDY & 0x1)) {
++       }
++       *UART_TX = c;
++}
++static void uart_puts(const char *s) {
++       while (*s != 0)
++               uart_putc(*s++);
++}
++
++static void uart_puthex(uint32_t x) {
++       int i;
++       for (i = 7; i >= 0; i--) {
++               uint8_t nib = (x >> (4 * i)) & 0xF;
++               if (nib <= 9)
++                       uart_putc('0' + nib);
++               else
++                      uart_putc('A' + (nib - 10));
++       }
++}
++
++
++
+ /*
+  * Setup a 4MB mapping that encompasses the device tree: for 64-bit kernel,
+  * this means 2 PMD entries whereas for 32-bit kernel, this is only 1 PGDIR
+@@ -705,7 +745,7 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
+ 
+ static void __init setup_vm_final(void)
+ {
+-	uintptr_t va, map_size;
++	uintptr_t va, map_size, end_va;
+ 	phys_addr_t pa, start, end;
+ 	u64 i;
+ 
+@@ -728,16 +768,23 @@ static void __init setup_vm_final(void)
+ 	for_each_mem_range(i, &start, &end) {
+ 		if (start >= end)
+ 			break;
+-		if (start <= __pa(PAGE_OFFSET) &&
+-		    __pa(PAGE_OFFSET) < end)
+-			start = __pa(PAGE_OFFSET);
+-		if (end >= __pa(PAGE_OFFSET) + memory_limit)
+-			end = __pa(PAGE_OFFSET) + memory_limit;
++
++		if (start <= __pa(PAGE_OFFSET + XIP_OFFSET) &&
++		    __pa(PAGE_OFFSET + XIP_OFFSET) < end)
++			start = __pa(PAGE_OFFSET + XIP_OFFSET);
++		if (end >= __pa(PAGE_OFFSET + XIP_OFFSET) + memory_limit)
++			end = __pa(PAGE_OFFSET + XIP_OFFSET) + memory_limit;
+ 
+ 		map_size = best_map_size(start, end - start);
+ 		for (pa = start; pa < end; pa += map_size) {
+ 			va = (uintptr_t)__va(pa);
+-
++			if (pa == start) {
++				uart_puts("swapper_pg_dir RAM ");
++				uart_puthex(pa);
++				uart_puts(" ");
++				uart_puthex(va);
++				uart_puts("\n");
++			}
+ 			create_pgd_mapping(swapper_pg_dir, va, pa, map_size,
+ 					   pgprot_from_va(va));
+ 		}
+@@ -746,6 +793,35 @@ static void __init setup_vm_final(void)
+ #ifdef CONFIG_64BIT
+ 	/* Map the kernel */
+ 	create_kernel_page_table(swapper_pg_dir, false);
++#else
++
++#ifdef CONFIG_XIP_KERNEL
++	// Map flash-resident XIP banks, too
++	end_va = PAGE_OFFSET + kernel_map.xiprom_sz;
++	for (va = PAGE_OFFSET; va < end_va; va += PMD_SIZE) {
++		if (va == PAGE_OFFSET) {
++			uart_puts("swapper_pg_dir ROM ");
++			uart_puthex(va);
++			uart_puts(" ");
++			uart_puthex(kernel_map.xiprom + (va - kernel_map.virt_addr));
++			uart_puts("\n");
++		}
++		create_pgd_mapping(swapper_pg_dir, va,
++				   kernel_map.xiprom + (va - kernel_map.virt_addr), 
++				   PMD_SIZE, PAGE_KERNEL_EXEC);
++	}
++
++#ifndef CONFIG_BUILTIN_DTB
++	// Make sure a ROM DTB is mapped, too
++	if (dtb_early_pa >= kernel_map.xiprom && dtb_early_pa < (kernel_map.xiprom + XIP_OFFSET)) {
++		create_pgd_mapping(swapper_pg_dir, (PAGE_OFFSET + (dtb_early_pa - kernel_map.xiprom)) & ~(PMD_SIZE - 1),
++				   dtb_early_pa & ~(PMD_SIZE - 1), 
++				   PMD_SIZE, PAGE_KERNEL_EXEC);
++	}
++#endif
++
++#endif
++
+ #endif
+ 
+ 	/* Clear fixmap PTE and PMD mappings */
+-- 
+2.34.1
+

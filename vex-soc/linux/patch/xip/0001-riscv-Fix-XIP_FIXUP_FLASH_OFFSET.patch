@@ -1,7 +1,7 @@
 From 9ec6b7056d5097a07216bd6facc08ea2e4a6ad48 Mon Sep 17 00:00:00 2001
 From: Myrtle Shah <gatecat@ds0.me>
 Date: Thu, 20 Jan 2022 15:07:07 +0000
-Subject: [PATCH 1/5] riscv: Fix XIP_FIXUP_FLASH_OFFSET
+Subject: [PATCH 1/6] riscv: Fix XIP_FIXUP_FLASH_OFFSET
 
 There were several problems with the calculation. Not only was an 'and'
 being computed into t1 but thrown away; but the 'and' itself would
