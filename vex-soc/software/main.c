@@ -318,6 +318,38 @@ static uint32_t vexriscv_read_instruction(uint32_t pc){
 	return i;
 }
 
+static uint32_t vexriscv_sbi_ext(uint32_t fid, uint32_t extid){
+	switch (fid) {
+		case SBI_EXT_SPEC_VERSION:
+			return 0x00000001;
+		case SBI_EXT_IMPL_ID:
+			return 0;
+		case SBI_EXT_IMPL_VERSION:
+			return 0;
+		case SBI_EXT_PROBE_EXTENSION:
+			break;
+		case SBI_EXT_GET_MVENDORID:
+			return 0;
+		case SBI_EXT_GET_MARCHID:
+			return 0;
+		case SBI_EXT_GET_MIMPID:
+			return 0;
+		default:
+			return 0;
+	}
+
+	/* sbi_probe_extension() */
+	switch (extid) {
+		case SBI_CONSOLE_PUTCHAR:
+		case SBI_CONSOLE_GETCHAR:
+		case SBI_SET_TIMER:
+		case SBI_EXT_BASE:
+			return 1;
+		default:
+			return 0;
+	}
+}
+
 __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 
 	int32_t cause = csr_read(mcause);
@@ -465,6 +497,37 @@ __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 					default: default_trap(); break;
 				}
 			} break;
+			case CAUSE_SCALL:{
+				uint32_t which = vexriscv_read_register(17);
+				uint32_t a0 = vexriscv_read_register(10);
+				uint32_t a1 = vexriscv_read_register(11);
+				__attribute__((unused)) uint32_t a2 = vexriscv_read_register(12);
+				switch(which){
+					case SBI_CONSOLE_PUTCHAR: {
+						putc(a0);
+						csr_write(mepc, csr_read(mepc) + 4);
+					} break;
+					case SBI_CONSOLE_GETCHAR: {
+						vexriscv_write_register(10, 0);
+						csr_write(mepc, csr_read(mepc) + 4);
+					} break;
+					case SBI_SET_TIMER: {
+						*TIME_HIGH = a1;
+						*TIME_LOW = a0;
+						csr_set(mie, MIE_MTIE);
+						csr_clear(sip, MIP_STIP);
+						csr_write(mepc, csr_read(mepc) + 4);
+					} break;
+					case SBI_EXT_BASE: {
+						vexriscv_write_register(10, vexriscv_sbi_ext(a0, a1));
+						csr_write(mepc, csr_read(mepc) + 4);
+					} break;
+					default: {
+						vexriscv_write_register(10, -2); /* SBI_ERR_NOT_SUPPORTED */
+						csr_write(mepc, csr_read(mepc) + 4);
+					} break;
+				}
+			} break;
 			default: default_trap(); break;
 		}
 	}
@@ -484,6 +547,6 @@ void main() {
 		" li a0, 0\n"
 		" li a1, %0\n"
 		" mret"
-		 : : "i" (0x00180000) // DTB base
+		 : : "i" (0x00f80000) // DTB base
 	);
 }

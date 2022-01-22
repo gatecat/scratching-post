@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
     std::ofstream trace_vcd("build/trace.vcd");
 
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../software/bios.bin", 1*1024*1024);
-	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../linux/linux.dtb", 1*1024*1024 + 512*1024);
+	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../linux/linux.dtb", 15*1024*1024 + 512*1024);
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "/home/gatecat/linux/arch/riscv/boot/xipImage", 8*1024*1024);
 
 	wb_mon_set_output(*top.cell_p_bus__mon_2e_bb, "build/wishbone_log.csv");
