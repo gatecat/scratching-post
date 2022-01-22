@@ -8,6 +8,8 @@ volatile uint32_t *const UART_RX = (volatile uint32_t *)0xb2000004;
 volatile uint32_t *const UART_TX_RDY = (volatile uint32_t *)0xb2000008;
 volatile uint32_t *const UART_RX_AVL = (volatile uint32_t *)0xb200000c;
 
+volatile uint32_t *const TIME_LOW = (volatile uint32_t *)0xb3000000;
+volatile uint32_t *const TIME_HIGH = (volatile uint32_t *)0xb3000004;
 
 #define max(a,b) \
 	({ __typeof__ (a) _a = (a); \
@@ -442,6 +444,12 @@ __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 						uint32_t csrAddress = instr >> 20;
 						uint32_t old;
 						switch(csrAddress){
+							case RDCYCLE :
+							case RDINSTRET:
+							case RDTIME  : old = *TIME_LOW; break;
+							case RDCYCLEH :
+							case RDINSTRETH:
+							case RDTIMEH : old = *TIME_HIGH; break;
 							default: default_trap(); break;
 						}
 						if(write) {

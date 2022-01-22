@@ -9,6 +9,7 @@ from cores.gpio import GPIOPeripheral
 from cores.spimemio_wrapper import SPIMemIO
 from cores.hyperram import HyperRAM
 from cores.uart import UARTPeripheral
+from cores.platform_timer import PlatformTimer
 
 class LinuxSoC(Elaboratable):
     def __init__(self, *, flash_pins, uart_pins, hyperram0_pins, hyperram1_pins, gpio_pins, gpio_count, jtag_pins):
@@ -20,6 +21,7 @@ class LinuxSoC(Elaboratable):
         spi_ctrl_base = 0xb0000000
         gpio_base = 0xb1000000
         uart_base = 0xb2000000
+        timer_base = 0xb3000000
 
         self._arbiter = wishbone.Arbiter(addr_width=30, data_width=32, granularity=8)
         self._decoder = wishbone.Decoder(addr_width=30, data_width=32, granularity=8)
@@ -46,6 +48,9 @@ class LinuxSoC(Elaboratable):
         self.uart = UARTPeripheral(divisor=(27000000//115200), pins=uart_pins)
         self._decoder.add(self.uart.bus, addr=uart_base)
 
+        self.timer = PlatformTimer(width=48)
+        self._decoder.add(self.timer.bus, addr=timer_base)
+
         self.memory_map = self._decoder.bus.memory_map
 
     def elaborate(self, platform):
@@ -60,6 +65,7 @@ class LinuxSoC(Elaboratable):
         m.submodules.hyperram1 = self.hyperram1
         m.submodules.gpio     = self.gpio
         m.submodules.uart     = self.uart
+        m.submodules.timer     = self.timer
 
         m.d.comb += [
             self._arbiter.bus.connect(self._decoder.bus),
@@ -72,7 +78,7 @@ class LinuxSoC(Elaboratable):
             self.jtag_pins["tms_oeb"].eq(1),
             self.jtag_pins["tdo_oeb"].eq(0),
             self.cpu.software_irq.eq(0),
-            self.cpu.timer_irq.eq(0),
+            self.cpu.timer_irq.eq(self.timer.timer_irq),
             self.cpu.ext_irq.eq(0)
         ]
 
