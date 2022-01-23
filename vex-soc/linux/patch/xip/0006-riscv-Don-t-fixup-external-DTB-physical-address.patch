@@ -1,0 +1,30 @@
+From f9afeb78a24eb329ef8d126da057e3848df2d9f4 Mon Sep 17 00:00:00 2001
+From: Myrtle Shah <gatecat@ds0.me>
+Date: Sun, 23 Jan 2022 21:03:45 +0000
+Subject: [PATCH 6/7] riscv: Don't fixup external DTB physical address
+
+The physical address is always 'real' physical address, as it is
+provided by the bootloader which does not attempt to perform any XIP
+fixup.
+
+Signed-off-by: Myrtle Shah <gatecat@ds0.me>
+---
+ arch/riscv/kernel/setup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+index 63241abe84eb..cf98163a5059 100644
+--- a/arch/riscv/kernel/setup.c
++++ b/arch/riscv/kernel/setup.c
+@@ -286,7 +286,7 @@ void __init setup_arch(char **cmdline_p)
+ #if IS_ENABLED(CONFIG_BUILTIN_DTB)
+ 	unflatten_and_copy_device_tree();
+ #else
+-	if (early_init_dt_verify(__va(XIP_FIXUP(dtb_early_pa))))
++	if (early_init_dt_verify(__va(dtb_early_pa)))
+ 		unflatten_device_tree();
+ 	else
+ 		pr_err("No DTB found in kernel mappings\n");
+-- 
+2.34.1
+
