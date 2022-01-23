@@ -1,4 +1,4 @@
-From e7a4746fb2d58923bcdd9d1b2e5d345969d79dfc Mon Sep 17 00:00:00 2001
+From 022123d79fd5200aaf702f513a0925e959de6eb8 Mon Sep 17 00:00:00 2001
 From: Myrtle Shah <gatecat@ds0.me>
 Date: Sun, 23 Jan 2022 20:58:41 +0000
 Subject: [PATCH 7/7] riscv: Add memory layout for 32-bit XIP kernels
@@ -16,9 +16,9 @@ corresponding virtual mapping.
 
 Signed-off-by: Myrtle Shah <gatecat@ds0.me>
 ---
- arch/riscv/include/asm/page.h | 25 +++++++++++++++++++
- arch/riscv/mm/init.c          | 46 ++++++++++++++++++++++++++++++-----
- 2 files changed, 65 insertions(+), 6 deletions(-)
+ arch/riscv/include/asm/page.h | 25 ++++++++++++++++++
+ arch/riscv/mm/init.c          | 49 ++++++++++++++++++++++++++++++-----
+ 2 files changed, 68 insertions(+), 6 deletions(-)
 
 diff --git a/arch/riscv/include/asm/page.h b/arch/riscv/include/asm/page.h
 index b3e5ff0125fe..338baf789b7a 100644
@@ -66,19 +66,22 @@ index b3e5ff0125fe..338baf789b7a 100644
  	unsigned long _y = y;							\
  	(IS_ENABLED(CONFIG_XIP_KERNEL) && _y < kernel_map.virt_addr + XIP_OFFSET) ?	\
 diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
-index ea5de0b0c724..4bf181a0e653 100644
+index ea5de0b0c724..70d9989a0151 100644
 --- a/arch/riscv/mm/init.c
 +++ b/arch/riscv/mm/init.c
-@@ -705,7 +705,7 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
+@@ -705,7 +705,10 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa)
  
  static void __init setup_vm_final(void)
  {
 -	uintptr_t va, map_size;
-+	uintptr_t va, map_size, end_va, adj_offset;
++	uintptr_t va, map_size, adj_offset;
++#if defined(CONFIG_XIP_KERNEL) && !defined(CONFIG_64BIT)
++	uintptr_t end_va;
++#endif
  	phys_addr_t pa, start, end;
  	u64 i;
  
-@@ -724,15 +724,26 @@ static void __init setup_vm_final(void)
+@@ -724,15 +727,26 @@ static void __init setup_vm_final(void)
  			   __pa_symbol(fixmap_pgd_next),
  			   PGDIR_SIZE, PAGE_TABLE);
  
@@ -110,7 +113,7 @@ index ea5de0b0c724..4bf181a0e653 100644
  
  		map_size = best_map_size(start, end - start);
  		for (pa = start; pa < end; pa += map_size) {
-@@ -746,6 +757,29 @@ static void __init setup_vm_final(void)
+@@ -746,6 +760,29 @@ static void __init setup_vm_final(void)
  #ifdef CONFIG_64BIT
  	/* Map the kernel */
  	create_kernel_page_table(swapper_pg_dir, false);
