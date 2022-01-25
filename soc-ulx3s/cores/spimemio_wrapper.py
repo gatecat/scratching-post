@@ -64,8 +64,8 @@ class SPIMemIO(Peripheral, Elaboratable):
             o_ready=spi_ready,
             i_addr=Cat(Const(0, 2), self.data_bus.adr), # Hack to force a 1MB offset
             o_rdata=self.data_bus.dat_r,
-            o_flash_csb=self.flash["csn_o"],
-            o_flash_clk=self.flash["clk_o"],
+            o_flash_csb=self.flash.csn_o,
+            o_flash_clk=self.flash.clk_o,
             o_flash_io0_oe=self.flash.d_oe[0],
             o_flash_io1_oe=self.flash.d_oe[1],
             o_flash_io2_oe=self.flash.d_oe[2],
