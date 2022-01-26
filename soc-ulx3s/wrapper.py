@@ -68,9 +68,9 @@ class Ulx3sWrapper(Elaboratable):
                 Subsignal("clk",    Pins("22-", conn=("gpio", 0), dir='o')),
                 Subsignal("rwds",   Pins("21+", conn=("gpio", 0), dir='io')),
 
-                Subsignal("dq",     Pins("17- 16- 15- 14- 17+ 16+ 15+ 14+", conn=("gpio", 0), dir='io')),
+                Subsignal("dq",     Pins("17- 16- 15- 14- 14+ 15+ 16+ 17+", conn=("gpio", 0), dir='io')),
 
-                Attrs(IOSTANDARD="LVCMOS33"),
+                Attrs(IO_TYPE="LVCMOS33"),
             )
         ])
 
@@ -82,7 +82,7 @@ class Ulx3sWrapper(Elaboratable):
             plat_hram.rstn.o.eq(hram.rstn_o),
 
             plat_hram.rwds.o.eq(hram.rwds_o),
-            plat_hram.rwds.oe.eq(hram.rwds_o),
+            plat_hram.rwds.oe.eq(hram.rwds_oe),
             hram.rwds_i.eq(plat_hram.rwds.i),
 
             plat_hram.dq.o.eq(hram.dq_o),

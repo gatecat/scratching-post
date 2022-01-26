@@ -87,13 +87,14 @@ class HyperRAM(Peripheral, Elaboratable):
         dq_i = Signal(8)
         dq_oe = Signal()
 
-        rwds_o = self.pins.rwds_o
+        rwds_o = Signal()
         rwds_oe = Signal()
 
         m.d.comb += [
             self.pins.csn_o.eq(~cs),
             self.pins.clk_o.eq(clk),
-            self.pins.rwds_oe.eq(~rwds_oe),
+            self.pins.rwds_o.eq(rwds_o),
+            self.pins.rwds_oe.eq(rwds_oe),
             self.pins.dq_o.eq(dq_o),
             self.pins.dq_oe.eq(Repl(dq_oe, 8)),
             self.pins.rstn_o.eq(1),
@@ -104,7 +105,7 @@ class HyperRAM(Peripheral, Elaboratable):
         m.d.sync += clk_phase.eq(clk_phase + 1)
         with m.Switch(clk_phase):
             with m.Case(1):
-                m.d.sync += clk.eq(cs)
+                m.d.sync += clk.eq(cs.any())
             with m.Case(3):
                 m.d.sync += clk.eq(0)
 
@@ -158,7 +159,3 @@ class HyperRAM(Peripheral, Elaboratable):
         timeline(m, self.bus.cyc & self.bus.stb & t_seq_start, t_seq)
         return m
 
-    def add_tristate(self, pad):
-        t = TSTriple(len(pad))
-        self.specials += t.get_tristate(pad)
-        return t

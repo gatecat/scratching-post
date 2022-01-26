@@ -18,6 +18,7 @@ class Ulx3sSoc(Ulx3sWrapper):
 
         # Memory regions
         self.spi_base = 0x00000000
+        self.hyperram_base = 0x10000000
 
         # CSR regions
         self.spi_ctrl_base = 0xb0000000
@@ -40,6 +41,7 @@ class Ulx3sSoc(Ulx3sWrapper):
         self._decoder.add(self.rom.ctrl_bus, addr=self.spi_ctrl_base)
 
         self.hyperram = HyperRAM(pins=super().get_hram(m, platform))
+        self._decoder.add(self.hyperram.bus, addr=self.hyperram_base)
 
         self.gpio = GPIOPeripheral(pins=super().get_led_gpio(m, platform))
         self._decoder.add(self.gpio.bus, addr=self.led_gpio_base)

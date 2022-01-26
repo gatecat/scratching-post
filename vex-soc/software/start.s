@@ -37,7 +37,7 @@ addi x31, zero, 0
 
 # Set LED GPIO as output
 li a0, 0xb1000000
-li a1, 3
+li a1, 0xff
 sw a1, 4(a0)
 
 # Update LEDs
@@ -60,7 +60,7 @@ end_init_data:
 
 # Update LEDs
 li a0, 0xb1000000
-li a1, 2
+li a1, 8
 sw a1, 0(a0)
 
 # zero-init bss section
