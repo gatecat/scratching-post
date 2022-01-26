@@ -1,4 +1,5 @@
 from amaranth import *
+from amaranth.build import *
 from amaranth.lib.cdc import ResetSynchronizer
 from amaranth_boards.ulx3s import *
 from amaranth_boards.ulx3s import *
@@ -6,6 +7,7 @@ from amaranth_boards.ulx3s import *
 from cores.spimemio_wrapper import QSPIPins
 from cores.gpio import GPIOPins
 from cores.uart import UARTPins
+from cores.hyperram import HyperRAMPins
 
 class Ulx3sWrapper(Elaboratable):
     """
@@ -56,6 +58,38 @@ class Ulx3sWrapper(Elaboratable):
             uart.rx_i.eq(plat_uart.rx.i),
         ]
         return uart
+
+    def get_hram(self, m, platform):
+        # Dual HyperRAM PMOD, starting at GPIO 14+/-
+        platform.add_resources([
+            Resource("hyperram", 0,
+                Subsignal("csn",    Pins("23- 23+ 24- 24+", conn=("gpio", 0), dir='o')),
+                Subsignal("rstn",   Pins("22+", conn=("gpio", 0), dir='o')),
+                Subsignal("clk",    Pins("22-", conn=("gpio", 0), dir='o')),
+                Subsignal("rwds",   Pins("21+", conn=("gpio", 0), dir='io')),
+
+                Subsignal("dq",     Pins("17- 16- 15- 14- 17+ 16+ 15+ 14+", conn=("gpio", 0), dir='io')),
+
+                Attrs(IOSTANDARD="LVCMOS33"),
+            )
+        ])
+
+        plat_hram = platform.request("hyperram", 0)
+        hram = HyperRAMPins(cs_count=4)
+        m.d.comb += [
+            plat_hram.clk.o.eq(hram.clk_o),
+            plat_hram.csn.o.eq(hram.csn_o),
+            plat_hram.rstn.o.eq(hram.rstn_o),
+
+            plat_hram.rwds.o.eq(hram.rwds_o),
+            plat_hram.rwds.oe.eq(hram.rwds_o),
+            hram.rwds_i.eq(plat_hram.rwds.i),
+
+            plat_hram.dq.o.eq(hram.dq_o),
+            plat_hram.dq.oe.eq(hram.dq_oe[0]),
+            hram.dq_i.eq(plat_hram.dq.i),
+        ]
+        return hram
 
     def elaborate(self, platform):
         clk25 = platform.request("clk25")

@@ -544,6 +544,14 @@ void main() {
 	csr_write(mideleg, MIDELEG_SUPERVISOR_TIMER | MIDELEG_SUPERVISOR_EXTERNAL | MIDELEG_SUPERVISOR_SOFTWARE);
 	puts("about to boop the kernel, ganbatte~!\n");
 	__asm__ __volatile__ (
+		// zero initial memory
+		" li t0, 0x10000000\n"
+		" li t1, 0x10100000\n"
+		"1:\n"
+		" sw x0, 0(t0)\n"
+		" addi t0, t0, 4\n"
+		" blt t0, t1, 1b\n"
+		// boot kernel
 		" li a0, 0\n"
 		" li a1, %0\n"
 		" mret"

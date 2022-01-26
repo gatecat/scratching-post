@@ -9,6 +9,7 @@ from amaranth_vexriscv.vexriscv import VexRiscv
 from cores.gpio import GPIOPeripheral
 from cores.spimemio_wrapper import SPIMemIO
 from cores.uart import UARTPeripheral
+from cores.hyperram import HyperRAM
 
 
 class Ulx3sSoc(Ulx3sWrapper):
@@ -30,13 +31,15 @@ class Ulx3sSoc(Ulx3sWrapper):
         self._arbiter = wishbone.Arbiter(addr_width=30, data_width=32, granularity=8)
         self._decoder = wishbone.Decoder(addr_width=30, data_width=32, granularity=8)
 
-        self.cpu = VexRiscv(config="LiteDebug", reset_vector=0x00100000)
+        self.cpu = VexRiscv(config="LinuxMPW5", reset_vector=0x00100000)
         self._arbiter.add(self.cpu.ibus)
         self._arbiter.add(self.cpu.dbus)
 
         self.rom = SPIMemIO(flash=super().get_flash(m, platform))
         self._decoder.add(self.rom.data_bus, addr=self.spi_base)
         self._decoder.add(self.rom.ctrl_bus, addr=self.spi_ctrl_base)
+
+        self.hyperram = HyperRAM(pins=super().get_hram(m, platform))
 
         self.gpio = GPIOPeripheral(pins=super().get_led_gpio(m, platform))
         self._decoder.add(self.gpio.bus, addr=self.led_gpio_base)
@@ -50,6 +53,7 @@ class Ulx3sSoc(Ulx3sWrapper):
         m.submodules.cpu      = self.cpu
         m.submodules.decoder  = self._decoder
         m.submodules.rom      = self.rom
+        m.submodules.hyperram = self.hyperram
         m.submodules.gpio     = self.gpio
         m.submodules.uart     = self.uart
 
