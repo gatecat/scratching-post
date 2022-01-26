@@ -3,6 +3,7 @@ from amaranth_boards.ulx3s import *
 from amaranth_boards.ulx3s import *
 
 from cores.spimemio_wrapper import QSPIPins
+from cores.gpio import GPIOPins
 
 class Ulx3sWrapper(Elaboratable):
     """
@@ -15,9 +16,10 @@ class Ulx3sWrapper(Elaboratable):
 
         flash = QSPIPins()
         # Flash clock requires a special primitive to access in ECP5
-        m.submodules.usrmclk = Instance("USRMCLKTS",
+        m.submodules.usrmclk = Instance("USRMCLK",
             i_USRMCLKI=flash.clk_o,
             i_USRMCLKTS=ResetSignal(), # tristate in reset for programmer accesss
+            a_keep=1,
         )
         # IO pins and buffers
         m.submodules += Instance("OBZ",
@@ -37,10 +39,16 @@ class Ulx3sWrapper(Elaboratable):
             )
         return flash
 
+    def get_led_gpio(self, m, platform):
+        leds = GPIOPins(width=8)
+        for i in range(8):
+            led = platform.request("led", i)
+            m.d.comb += led.o.eq(leds.o[i])
+        return leds
+
     def elaborate(self, platform):
         clk25 = platform.request("clk25")
         m = Module()
         m.domains.sync = ClockDomain()
         m.d.comb += ClockSignal().eq(clk25.i)
-        print(flash)
         return m

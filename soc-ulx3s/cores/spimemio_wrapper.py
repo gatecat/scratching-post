@@ -6,6 +6,8 @@ from amaranth_soc.memory import MemoryMap
 
 from .peripheral import Peripheral
 
+from pathlib import Path
+
 class QSPIPins(Record):
     def __init__(self):
         layout = [
@@ -83,7 +85,8 @@ class SPIMemIO(Peripheral, Elaboratable):
             o_cfgreg_do=cfgreg_do,
         )
         m.submodules.bridge  = self._bridge
-        m.d.comb += [self._cfgreg[i].r_data.eq(cfgreg_do[i*8:(i+1)*8])]
+        for i in range(4):
+            m.d.comb += [self._cfgreg[i].r_data.eq(cfgreg_do[i*8:(i+1)*8])]
 
         # From https://github.com/im-tomu/foboot/blob/master/hw/rtl/picorvspi.py
         read_active = Signal()
@@ -96,6 +99,8 @@ class SPIMemIO(Peripheral, Elaboratable):
         with m.Else():
             m.d.sync += self.data_bus.ack.eq(0)
 
-        platform.add_file(Path(__file__).parent / f"verilog/spimemio.v")
+        filename = Path(__file__).parent / f"verilog/spimemio.v"
+        with open(filename, 'r') as f:
+            platform.add_file(str(filename), f)
 
         return m
