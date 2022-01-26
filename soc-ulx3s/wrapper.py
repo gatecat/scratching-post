@@ -1,4 +1,5 @@
 from amaranth import *
+from amaranth.lib.cdc import ResetSynchronizer
 from amaranth_boards.ulx3s import *
 from amaranth_boards.ulx3s import *
 
@@ -51,4 +52,6 @@ class Ulx3sWrapper(Elaboratable):
         m = Module()
         m.domains.sync = ClockDomain()
         m.d.comb += ClockSignal().eq(clk25.i)
+        reset_in = platform.request("button_pwr", 0)
+        m.submodules += ResetSynchronizer(reset_in)
         return m
