@@ -97,7 +97,7 @@ class HyperRAM(Peripheral, Elaboratable):
             self.pins.rwds_oe.eq(rwds_oe),
             self.pins.dq_o.eq(dq_o),
             self.pins.dq_oe.eq(Repl(dq_oe, 8)),
-            self.pins.rstn_o.eq(1),
+            self.pins.rstn_o.eq(~ResetSignal()),
             dq_i.eq(self.pins.dq_i),
         ]
 

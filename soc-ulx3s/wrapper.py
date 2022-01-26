@@ -60,15 +60,15 @@ class Ulx3sWrapper(Elaboratable):
         return uart
 
     def get_hram(self, m, platform):
-        # Dual HyperRAM PMOD, starting at GPIO 14+/-
+        # Dual HyperRAM PMOD, starting at GPIO 0+/-
         platform.add_resources([
             Resource("hyperram", 0,
-                Subsignal("csn",    Pins("23- 23+ 24- 24+", conn=("gpio", 0), dir='o')),
-                Subsignal("rstn",   Pins("22+", conn=("gpio", 0), dir='o')),
-                Subsignal("clk",    Pins("22-", conn=("gpio", 0), dir='o')),
-                Subsignal("rwds",   Pins("21+", conn=("gpio", 0), dir='io')),
+                Subsignal("csn",    Pins("9- 9+ 10- 10+", conn=("gpio", 0), dir='o')),
+                Subsignal("rstn",   Pins("8+", conn=("gpio", 0), dir='o')),
+                Subsignal("clk",    Pins("8-", conn=("gpio", 0), dir='o')),
+                Subsignal("rwds",   Pins("7+", conn=("gpio", 0), dir='io')),
 
-                Subsignal("dq",     Pins("17- 16- 15- 14- 14+ 15+ 16+ 17+", conn=("gpio", 0), dir='io')),
+                Subsignal("dq",     Pins("3- 2- 1- 0- 0+ 1+ 2+ 3+", conn=("gpio", 0), dir='io')),
 
                 Attrs(IO_TYPE="LVCMOS33"),
             )
@@ -86,7 +86,7 @@ class Ulx3sWrapper(Elaboratable):
             hram.rwds_i.eq(plat_hram.rwds.i),
 
             plat_hram.dq.o.eq(hram.dq_o),
-            plat_hram.dq.oe.eq(hram.dq_oe[0]),
+            plat_hram.dq.oe.eq(hram.dq_oe),
             hram.dq_i.eq(plat_hram.dq.i),
         ]
         return hram
