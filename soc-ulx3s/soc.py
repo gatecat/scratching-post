@@ -41,11 +41,17 @@ class Ulx3sSoc(Ulx3sWrapper):
         self.gpio = GPIOPeripheral(pins=super().get_led_gpio(m, platform))
         self._decoder.add(self.gpio.bus, addr=self.led_gpio_base)
 
+        self.uart = UARTPeripheral(
+            init_divisor=(25000000//115200),
+            pins=super().get_uart(m, platform))
+        self._decoder.add(self.uart.bus, addr=self.uart_base)
+
         m.submodules.arbiter  = self._arbiter
         m.submodules.cpu      = self.cpu
         m.submodules.decoder  = self._decoder
         m.submodules.rom      = self.rom
         m.submodules.gpio     = self.gpio
+        m.submodules.uart     = self.uart
 
         m.d.comb += [
             self._arbiter.bus.connect(self._decoder.bus),

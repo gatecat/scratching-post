@@ -5,6 +5,7 @@ from amaranth_boards.ulx3s import *
 
 from cores.spimemio_wrapper import QSPIPins
 from cores.gpio import GPIOPins
+from cores.uart import UARTPins
 
 class Ulx3sWrapper(Elaboratable):
     """
@@ -46,6 +47,15 @@ class Ulx3sWrapper(Elaboratable):
             led = platform.request("led", i)
             m.d.comb += led.o.eq(leds.o[i])
         return leds
+
+    def get_uart(self, m, platform):
+        plat_uart = platform.request("uart")
+        uart = UARTPins()
+        m.d.comb += [
+            plat_uart.tx.o.eq(uart.tx_o),
+            uart.rx_i.eq(plat_uart.rx.i),
+        ]
+        return uart
 
     def elaborate(self, platform):
         clk25 = platform.request("clk25")

@@ -45,8 +45,7 @@ class UARTPeripheral(Peripheral, Elaboratable):
         m = Module()
         m.submodules.bridge  = self._bridge
 
-
-        m.submodules.tx = tx = AsyncSerialTX(divisor=self.divisor)
+        m.submodules.tx = tx = AsyncSerialTX(divisor=self.init_divisor)
         m.d.comb += [
             self.pins.tx_o.eq(tx.o),
             tx.data.eq(self.tx_data.w_data),
@@ -61,7 +60,7 @@ class UARTPeripheral(Peripheral, Elaboratable):
         rx_buf = Signal(8)
         rx_avail = Signal()
 
-        m.submodules.rx = rx = AsyncSerialRX(divisor=self.divisor)
+        m.submodules.rx = rx = AsyncSerialRX(divisor=self.init_divisor)
 
         with m.If(self.rx_data.r_stb):
             m.d.sync += rx_avail.eq(0)
