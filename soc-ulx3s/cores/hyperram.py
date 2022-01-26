@@ -63,11 +63,13 @@ class HyperRAM(Peripheral, Elaboratable):
 
     This core favors portability and ease of use over performance.
     """
-    def __init__(self, *, pins, index=0):
+    def __init__(self, *, pins, latency=7, index=0):
         super().__init__()
         self.pins = pins
         self.cs_count = len(self.pins.csn_o)
         self.size = 2**23 * self.cs_count
+        self.latency = latency
+        assert self.latency in (6, 7) # TODO: anything else possible ?
         self.bus = wishbone.Interface(addr_width=ceil(log2(self.size / 4)),
                                       data_width=32, granularity=8)
         map = MemoryMap(addr_width=ceil(log2(self.size)), data_width=8)
@@ -135,8 +137,8 @@ class HyperRAM(Peripheral, Elaboratable):
             # DT,  Action
             (3,    []),
             (12,   [cs.eq(1 << (self.bus.adr[21:])), dq_oe.eq(1), sr.eq(ca)]),    # Command: 6 clk
-            (44,   [dq_oe.eq(0)]),                         # Latency(default): 2*6 clk
-            (2,    [dq_oe.eq(self.bus.we),                 # Write/Read data byte: 2 clk
+            (self.latency * 8 - 4,   [dq_oe.eq(0)]),        # Latency(default): 2*6 clk
+            (2,    [dq_oe.eq(self.bus.we),                  # Write/Read data byte: 2 clk
                     sr[:16].eq(0),
                     sr[16:].eq(self.bus.dat_w),
                     rwds_oe.eq(self.bus.we),
