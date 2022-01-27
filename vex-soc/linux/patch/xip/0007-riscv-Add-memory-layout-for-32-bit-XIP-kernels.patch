@@ -1,7 +1,7 @@
 From 022123d79fd5200aaf702f513a0925e959de6eb8 Mon Sep 17 00:00:00 2001
 From: Myrtle Shah <gatecat@ds0.me>
 Date: Sun, 23 Jan 2022 20:58:41 +0000
-Subject: [PATCH 7/7] riscv: Add memory layout for 32-bit XIP kernels
+Subject: [PATCH 7/8] riscv: Add memory layout for 32-bit XIP kernels
 
 The standard linear mapping used for 32-bit RISC-V kernels is not
 compatible with XIP.

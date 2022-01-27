@@ -1,7 +1,7 @@
 From 5d2094e88e2b9e023b1f7eaa688758b6b41e5e3c Mon Sep 17 00:00:00 2001
 From: Myrtle Shah <gatecat@ds0.me>
 Date: Sun, 23 Jan 2022 20:56:02 +0000
-Subject: [PATCH 5/7] riscv: Fix DTB pointer save and restore
+Subject: [PATCH 5/8] riscv: Fix DTB pointer save and restore
 
 For XIP kernels, a1 would be overwritten by the call to __copy_data.
 

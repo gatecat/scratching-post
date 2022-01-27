@@ -1,7 +1,7 @@
 From f9afeb78a24eb329ef8d126da057e3848df2d9f4 Mon Sep 17 00:00:00 2001
 From: Myrtle Shah <gatecat@ds0.me>
 Date: Sun, 23 Jan 2022 21:03:45 +0000
-Subject: [PATCH 6/7] riscv: Don't fixup external DTB physical address
+Subject: [PATCH 6/8] riscv: Don't fixup external DTB physical address
 
 The physical address is always 'real' physical address, as it is
 provided by the bootloader which does not attempt to perform any XIP

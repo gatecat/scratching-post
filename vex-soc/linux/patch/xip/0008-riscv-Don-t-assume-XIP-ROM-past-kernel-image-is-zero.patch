@@ -1,0 +1,43 @@
+From 7b2d50dce5749e15e1b8a5e8f2f38ae164c90653 Mon Sep 17 00:00:00 2001
+From: Myrtle Shah <gatecat@ds0.me>
+Date: Thu, 27 Jan 2022 19:27:03 +0000
+Subject: [PATCH 8/8] riscv: Don't assume XIP ROM past kernel image is zero
+
+__copy_data was copying the entire data size out of ROM into RAM, even
+though part of this range is BSS and not included in the kernel image,
+so cannot be assumed to be filled with zeros in the ROM either.
+
+In fact, typical SPI flash, as in the hardware I'm working with
+will start out filled with 0xFF after being erased.
+
+Signed-off-by: Myrtle Shah <gatecat@ds0.me>
+---
+ arch/riscv/mm/init.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
+index 70d9989a0151..d91a29fb9087 100644
+--- a/arch/riscv/mm/init.c
++++ b/arch/riscv/mm/init.c
+@@ -459,9 +459,16 @@ asmlinkage void __init __copy_data(void)
+ {
+ 	void *from = (void *)(&__data_loc);
+ 	void *to = (void *)CONFIG_PHYS_RAM_BASE;
+-	size_t sz = (size_t)((uintptr_t)(&_end) - (uintptr_t)(&_sdata));
++	/* Up to BSS is copied from ROM */
++	size_t rom_sz = (size_t)((uintptr_t)(&__bss_start) - (uintptr_t)(&_sdata));
++	/*
++	 * Fill from BSS onwards with zeros, ROM after the kernel image is undefined
++	 * and shouldn't be copied from*/
++	void *bss_to = ((void *)CONFIG_PHYS_RAM_BASE) + rom_sz;
++	size_t bss_sz = (size_t)((uintptr_t)(&_end) - (uintptr_t)(&__bss_start));
+ 
+-	memcpy(to, from, sz);
++	memcpy(to, from, rom_sz);
++	memset(bss_to, 0x00, bss_sz);
+ }
+ #endif
+ 
+-- 
+2.34.1
+
