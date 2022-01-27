@@ -54,6 +54,8 @@ int main(int argc, char **argv) {
     vcd.add_without_memories(all_debug_items);
     std::ofstream trace_vcd("build/trace.vcd");
 
+    for (unsigned i = 0; i < 4*1024*1024; i++)
+    	top.memory_p_soc_2e_sim__rom_2e___mem[i].set<uint32_t>(0xFFFFFFFF);
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../software/bios.bin", 1*1024*1024);
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "../linux/linux.dtb", 15*1024*1024 + 512*1024);
 	load_memory(top.memory_p_soc_2e_sim__rom_2e___mem, "/home/gatecat/linux/arch/riscv/boot/xipImage", 8*1024*1024);
