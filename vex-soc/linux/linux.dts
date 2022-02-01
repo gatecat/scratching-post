@@ -11,8 +11,8 @@
 	model = "mpw5 soc-linux";
 
 	chosen {
-		bootargs = "earlycon console=catte0 swiotlb=32 root=mtd:rootfs rootwait rootfstype=romfs";
-		stdout-path = &catteuart0;
+		bootargs = "earlycon=sbi console=catte0 swiotlb=32 root=mtd:rootfs rootwait rootfstype=romfs";
+		// stdout-path = &catteuart0;
 	};
 
 	cpus {

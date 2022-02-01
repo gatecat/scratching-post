@@ -21,7 +21,7 @@ struct wb_mon : public bb_p_wb__mon {
 					log("%c", (char)data);
 				/*if (addr == 0xb1000000 && p_we)
 					log("debug: %x\n", (uint32_t)data);*/
-				/*out << stringf("%08x,%c,", addr, p_we ? 'W' : 'R');
+				out << stringf("%08x,%c,", addr, p_we ? 'W' : 'R');
 
 				for (int i = 3; i >= 0; i--) {
 					if (p_sel.bit(i))
@@ -29,7 +29,7 @@ struct wb_mon : public bb_p_wb__mon {
 					else
 						out << "__";
 				}
-				out << std::endl;*/
+				out << std::endl;
 				stall_count = 0;
 			} else if (p_stb && p_cyc) {
 				++stall_count;

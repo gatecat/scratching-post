@@ -150,6 +150,18 @@ void print_trap(void) {
 	puts("      mbadaddr: ");
 	puthex(csr_read(mbadaddr));
 	puts("\n");
+
+	puts("      regs:\n");
+	puthex(0);
+	puts(" ");
+	for (int i = 1; i < 32; i++) {
+		puthex(vexriscv_read_register(i));
+		if ((i % 4) == 3)
+			puts("\n");
+		else
+			puts(" ");
+	}
+	puts("\n");
 }
 
 void default_trap(void) {
@@ -353,6 +365,8 @@ static uint32_t vexriscv_sbi_ext(uint32_t fid, uint32_t extid){
 __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 
 	int32_t cause = csr_read(mcause);
+
+	// print_trap();
 
 	/* Interrupt */
 	if(cause < 0){

@@ -10,7 +10,7 @@ from cores.gpio import GPIOPeripheral
 from cores.spimemio_wrapper import SPIMemIO
 from cores.uart import UARTPeripheral
 from cores.hyperram import HyperRAM
-
+from cores.platform_timer import PlatformTimer
 
 class Ulx3sSoc(Ulx3sWrapper):
     def __init__(self):
@@ -51,6 +51,9 @@ class Ulx3sSoc(Ulx3sWrapper):
             pins=super().get_uart(m, platform))
         self._decoder.add(self.uart.bus, addr=self.uart_base)
 
+        self.timer = PlatformTimer(width=48)
+        self._decoder.add(self.timer.bus, addr=self.timer_base)
+
         m.submodules.arbiter  = self._arbiter
         m.submodules.cpu      = self.cpu
         m.submodules.decoder  = self._decoder
@@ -58,6 +61,7 @@ class Ulx3sSoc(Ulx3sWrapper):
         m.submodules.hyperram = self.hyperram
         m.submodules.gpio     = self.gpio
         m.submodules.uart     = self.uart
+        m.submodules.timer    = self.timer
 
         m.d.comb += [
             self._arbiter.bus.connect(self._decoder.bus),
@@ -65,7 +69,7 @@ class Ulx3sSoc(Ulx3sWrapper):
             self.cpu.jtag_tdi.eq(0),
             self.cpu.jtag_tms.eq(0),
             self.cpu.software_irq.eq(0),
-            self.cpu.timer_irq.eq(0),
+            self.cpu.timer_irq.eq(self.timer.timer_irq),
         ]
 
         return m
