@@ -1,6 +1,10 @@
 #include <stdint.h>
 #include "riscv.h"
 
+#include "drivers/uart.h"
+
+volatile uart_regs_t *const UART0 = (volatile uart_regs_t*)0xb2000000;
+
 volatile uint32_t *const LED = (volatile uint32_t *)0xb1000000;
 
 volatile uint32_t *const UART_TX = (volatile uint32_t *)0xb2000000;
@@ -548,7 +552,7 @@ __attribute__((used)) void vexriscv_machine_mode_trap(void) {
 }
 
 void main() {
-	puts("🐱: nyaa~!\n");
+	uart_puts(UART0, "🐱: nyaa~!\n");
 	csr_write(mtvec,    vexriscv_machine_mode_trap_entry);
 	csr_write(mscratch, ((uint32_t)__stacktop )- 32 * 4); // exception stack pointer
 	csr_write(mstatus,  0x0800 | MSTATUS_MPIE);
