@@ -12,5 +12,6 @@ typedef struct __attribute__((packed)) {
 
 void uart_putc(volatile uart_regs_t *uart, char c);
 void uart_puts(volatile uart_regs_t *uart, const char *s);
+void uart_puthex(volatile uart_regs_t *uart, uint32_t x);
 
 #endif

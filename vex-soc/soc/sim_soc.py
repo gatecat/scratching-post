@@ -10,6 +10,7 @@ from cores.spimemio_wrapper import SPIMemIO
 from cores.sram import SRAMPeripheral
 from cores.uart import UARTPeripheral
 from cores.platform_timer import PlatformTimer
+from cores.soc_id import SoCID
 
 class SimLinuxSoC(Elaboratable):
     def __init__(self, *, flash_pins, uart_pins, gpio_pins, gpio_count):
@@ -22,6 +23,7 @@ class SimLinuxSoC(Elaboratable):
         gpio_base = 0xb1000000
         uart_base = 0xb2000000
         timer_base = 0xb3000000
+        soc_id_base = 0xb4000000
 
         self._arbiter = wishbone.Arbiter(addr_width=30, data_width=32, granularity=8)
         self._decoder = wishbone.Decoder(addr_width=30, data_width=32, granularity=8)
@@ -52,6 +54,9 @@ class SimLinuxSoC(Elaboratable):
         self.timer = PlatformTimer(width=48)
         self._decoder.add(self.timer.bus, addr=timer_base)
 
+        self.soc_id = SoCID(type_id=0xca7f100f)
+        self._decoder.add(self.soc_id.bus, addr=soc_id_base)
+
         self.memory_map = self._decoder.bus.memory_map
 
     def elaborate(self, platform):
@@ -68,6 +73,7 @@ class SimLinuxSoC(Elaboratable):
         m.submodules.gpio     = self.gpio
         m.submodules.uart     = self.uart
         m.submodules.timer     = self.timer
+        m.submodules.soc_id   = self.soc_id
 
         m.d.comb += [
             self._arbiter.bus.connect(self._decoder.bus),
