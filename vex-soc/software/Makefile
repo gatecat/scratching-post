@@ -9,8 +9,8 @@ blink.bin: blink.elf
 blink.prog: blink.bin
 	ecpprog -k 2 -o 1M blink.bin
 
-bios.elf: sections.lds start.s main.c
-	riscv32-unknown-linux-gnu-gcc -g -march=rv32ima -mabi=ilp32 -Wl,--build-id=none,-Bstatic,-T,sections.lds,--strip-debug -static -ffreestanding -nostdlib -o bios.elf start.s main.c
+bios.elf: sections.lds start.s main.c $(wildcard drivers/*.c)
+	riscv32-unknown-linux-gnu-gcc -g -march=rv32ima -mabi=ilp32 -Wl,--build-id=none,-Bstatic,-T,sections.lds,--strip-debug -static -ffreestanding -nostdlib -o bios.elf start.s main.c $(wildcard drivers/*.c)
 
 bios.bin: bios.elf
 	riscv64-linux-gnu-objcopy -O binary bios.elf bios.bin
