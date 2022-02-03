@@ -18,7 +18,7 @@ class Ulx3sWrapper(Elaboratable):
     def get_flash(self, m, platform):
         flash = QSPIPins()
         if hasattr(platform, "is_sim") and platform.is_sim:
-            pass
+            m.submodules.flash = platform.add_model("spiflash_model", flash, edge_det=['clk_o', 'csn_o'])
         else:
             plat_flash = platform.request("spi_flash", dir=dict(cs='-', copi='-', cipo='-', wp='-', hold='-'))
             # Flash clock requires a special primitive to access in ECP5
