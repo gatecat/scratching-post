@@ -73,8 +73,7 @@ class Ulx3sWrapper(Elaboratable):
         # Dual HyperRAM PMOD, starting at GPIO 0+/-
         hram = HyperRAMPins(cs_count=4)
         if hasattr(platform, "is_sim") and platform.is_sim:
-            # TODO
-            pass
+            m.submodules.hram = platform.add_model("hyperram_model", hram, edge_det=['clk_o', ])
         else:
             platform.add_resources([
                 Resource("hyperram", 0,
