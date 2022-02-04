@@ -7,7 +7,7 @@ from amaranth.back import rtlil
 class SimPlatform():
     def __init__(self):
         self.is_sim = True
-        self.build_dir = "build/sim"
+        self.build_dir = "sim/build"
         self.extra_files = set()
         self.clk = Signal()
         self.rst = Signal()
@@ -44,8 +44,19 @@ class SimPlatform():
 
         output = rtlil.convert(e, name="sim_top", ports=[self.clk, self.rst], platform=self)
 
-        top_rtlil = Path(self.build_dir) / "sim_top.il"
+        top_rtlil = Path(self.build_dir) / "sim_soc.il"
         with open(top_rtlil, "w") as f:
             for box_content in self.sim_boxes.values():
                 f.write(box_content)
             f.write(output)
+        top_ys = Path(self.build_dir) / "sim_soc.ys"
+        with open(top_ys, "w") as f:
+            for extra in sorted(self.extra_files):
+                if extra.endswith(".il"):
+                    print(f"read_rtlil {extra}", file=f)
+                else:
+                    print(f"read_verilog -defer {extra}", file=f)
+            print("read_ilang sim_soc.il", file=f)
+            print("hierarchy -top sim_top", file=f)
+            print("write_cxxrtl -g1 -header sim_soc.cc", file=f)
+
