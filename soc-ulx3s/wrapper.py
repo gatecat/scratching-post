@@ -4,10 +4,10 @@ from amaranth.lib.cdc import ResetSynchronizer
 from amaranth_boards.ulx3s import *
 from amaranth_boards.ulx3s import *
 
-from cores.spimemio_wrapper import QSPIPins
-from cores.gpio import GPIOPins
-from cores.uart import UARTPins
-from cores.hyperram import HyperRAMPins
+from amaranth_orchard.memory.spimemio import QSPIPins
+from amaranth_orchard.base.gpio import GPIOPins
+from amaranth_orchard.io.uart import UARTPins
+from amaranth_orchard.memory.hyperram import HyperRAMPins
 
 class Ulx3sWrapper(Elaboratable):
     """

@@ -6,11 +6,12 @@ from amaranth_soc import wishbone
 
 from amaranth_vexriscv.vexriscv import VexRiscv
 
-from cores.gpio import GPIOPeripheral
-from cores.spimemio_wrapper import SPIMemIO
-from cores.uart import UARTPeripheral
-from cores.hyperram import HyperRAM
-from cores.platform_timer import PlatformTimer
+from amaranth_orchard.base.gpio import GPIOPeripheral
+from amaranth_orchard.memory.spimemio import SPIMemIO
+from amaranth_orchard.io.uart import UARTPeripheral
+from amaranth_orchard.memory.hyperram import HyperRAM
+from amaranth_orchard.base.platform_timer import PlatformTimer
+from amaranth_orchard.base.soc_id import SoCID
 
 class Ulx3sSoc(Ulx3sWrapper):
     def __init__(self):
@@ -25,6 +26,7 @@ class Ulx3sSoc(Ulx3sWrapper):
         self.led_gpio_base = 0xb1000000
         self.uart_base = 0xb2000000
         self.timer_base = 0xb3000000
+        self.soc_id_base = 0xb4000000
 
     def elaborate(self, platform):
         m = super().elaborate(platform)
@@ -54,6 +56,10 @@ class Ulx3sSoc(Ulx3sWrapper):
         self.timer = PlatformTimer(width=48)
         self._decoder.add(self.timer.bus, addr=self.timer_base)
 
+        soc_type = 0xBADCA77E if hasattr(platform, "is_sim") and platform.is_sim else 0xCA7F100F
+        self.soc_id = SoCID(type_id=soc_type)
+        self._decoder.add(self.soc_id.bus, addr=self.soc_id_base)
+
         m.submodules.arbiter  = self._arbiter
         m.submodules.cpu      = self.cpu
         m.submodules.decoder  = self._decoder
@@ -62,6 +68,7 @@ class Ulx3sSoc(Ulx3sWrapper):
         m.submodules.gpio     = self.gpio
         m.submodules.uart     = self.uart
         m.submodules.timer    = self.timer
+        m.submodules.soc_id   = self.soc_id
 
         m.d.comb += [
             self._arbiter.bus.connect(self._decoder.bus),
