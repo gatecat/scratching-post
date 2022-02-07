@@ -42,6 +42,10 @@ struct spiflash_model : public bb_p_spiflash__model {
             sn.command = sn.curr_byte;
             if (sn.command == 0xab) {
                 log("flash: power up\n");
+            } else if (sn.command == 0x03 || sn.command == 0xff) {
+                // nothing to do
+            } else {
+                log("flash: unknown command %02x\n", sn.command);
             }
         } else {
             if (sn.command == 0x03) {

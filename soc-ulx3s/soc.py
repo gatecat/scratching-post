@@ -56,7 +56,7 @@ class Ulx3sSoc(Ulx3sWrapper):
         self.timer = PlatformTimer(width=48)
         self._decoder.add(self.timer.bus, addr=self.timer_base)
 
-        soc_type = 0xBADCA77E if hasattr(platform, "is_sim") and platform.is_sim else 0xCA7F100F
+        soc_type = 0xBADCA77E if self.is_sim(platform) else 0xCA7F100F
         self.soc_id = SoCID(type_id=soc_type)
         self._decoder.add(self.soc_id.bus, addr=self.soc_id_base)
 

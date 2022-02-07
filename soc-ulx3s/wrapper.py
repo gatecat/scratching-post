@@ -15,9 +15,12 @@ class Ulx3sWrapper(Elaboratable):
     the Amaranth platform and the format of pins that the IP cores expect.
     """
 
+    def is_sim(self, platform):
+        return hasattr(platform, "is_sim") and platform.is_sim
+
     def get_flash(self, m, platform):
         flash = QSPIPins()
-        if hasattr(platform, "is_sim") and platform.is_sim:
+        if self.is_sim(platform):
             m.submodules.flash = platform.add_model("spiflash_model", flash, edge_det=['clk_o', 'csn_o'])
         else:
             plat_flash = platform.request("spi_flash", dir=dict(cs='-', copi='-', cipo='-', wp='-', hold='-'))
@@ -47,7 +50,7 @@ class Ulx3sWrapper(Elaboratable):
 
     def get_led_gpio(self, m, platform):
         leds = GPIOPins(width=8)
-        if hasattr(platform, "is_sim") and platform.is_sim:
+        if self.is_sim(platform):
             # TODO
             pass
         else:
@@ -58,7 +61,7 @@ class Ulx3sWrapper(Elaboratable):
 
     def get_uart(self, m, platform):
         uart = UARTPins()
-        if hasattr(platform, "is_sim") and platform.is_sim:
+        if self.is_sim(platform):
             m.submodules.uart_model = platform.add_model("uart_model", uart, edge_det=[])
         else:
             plat_uart = platform.request("uart")
@@ -71,7 +74,7 @@ class Ulx3sWrapper(Elaboratable):
     def get_hram(self, m, platform):
         # Dual HyperRAM PMOD, starting at GPIO 0+/-
         hram = HyperRAMPins(cs_count=4)
-        if hasattr(platform, "is_sim") and platform.is_sim:
+        if self.is_sim(platform):
             m.submodules.hram = platform.add_model("hyperram_model", hram, edge_det=['clk_o', ])
         else:
             platform.add_resources([
@@ -105,7 +108,7 @@ class Ulx3sWrapper(Elaboratable):
 
     def elaborate(self, platform):
         m = Module()
-        if hasattr(platform, "is_sim") and platform.is_sim:
+        if self.is_sim(platform):
             m.domains.sync = ClockDomain()
             m.d.comb += ClockSignal().eq(platform.clk)
             m.d.comb += ResetSignal().eq(platform.rst)
