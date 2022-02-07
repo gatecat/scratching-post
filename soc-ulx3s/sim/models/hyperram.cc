@@ -42,11 +42,12 @@ struct hyperram_model : public bb_p_hyperram__model {
         if (sn.clk_count < 6) {
             sn.ca |= uint64_t(p_dq__o.get<uint8_t>()) << ((5U - sn.clk_count) * 8U);
         } else if (sn.clk_count == 6) {
-            sn.addr = ((((sn.ca & 0x0FFFFFFFU) >> 16U) << 3) | (sn.ca & 0x7)) * 2; // *2 to convert word address to byte address
+            sn.addr = ((((sn.ca & 0x0FFFFFFFFFULL) >> 16U) << 3) | (sn.ca & 0x7)) * 2; // *2 to convert word address to byte address
             sn.addr += sn.dev * (8U * 1024U * 1024U); // device offsets
-        } else if (sn.clk_count >= (6 + 2 * latency)) {
+        } else if (sn.clk_count >= (4 + 4 * latency)) {
             bool is_read = (sn.ca >> 47) & 0x1;
             if (is_read) {
+                // log("read %08x %02x\n", sn.addr, data.at(sn.addr));
                 p_dq__i.set(data.at(sn.addr++));
                 p_rwds__i.set(posedge);
             } else {
@@ -68,6 +69,7 @@ struct hyperram_model : public bb_p_hyperram__model {
         if (sn.curr_cs != s.curr_cs) {
             // reset selected device
             sn.dev = decode_onecold(sn.curr_cs);
+            // log("sel %d\n", sn.dev);
             sn.clk_count = 0;
             sn.ca = 0;
         }

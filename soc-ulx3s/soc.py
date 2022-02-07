@@ -79,6 +79,9 @@ class Ulx3sSoc(Ulx3sWrapper):
             self.cpu.timer_irq.eq(self.timer.timer_irq),
         ]
 
+        if self.is_sim(platform):
+            m.submodules.bus_mon = platform.add_monitor("wb_mon", self._decoder.bus)
+
         return m
 
 if __name__ == "__main__":

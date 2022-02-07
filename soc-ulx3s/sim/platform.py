@@ -39,6 +39,23 @@ class SimPlatform():
             self.sim_boxes[inst_type] = box
         return Instance(inst_type, **conns)
 
+    def add_monitor(self, inst_type, rec):
+        conns = dict(i_clk=ClockSignal(), a_keep=True)
+        for field, width, _ in rec.layout:
+            conns[f'i_{field}'] = getattr(rec,field)
+        if inst_type not in self.sim_boxes:
+            box =  'attribute \\blackbox 1\n'
+            box += 'attribute \\cxxrtl_blackbox 1\n'
+            box += 'attribute \\keep 1\n'
+            box += f'module \\{inst_type}\n'
+            box += '  attribute \\cxxrtl_edge "a"\n'
+            box += '  wire width 1 input 0 \\clk\n'
+            for i, (field, width, _) in enumerate(rec.layout):
+                box += f'  wire width {width} input {i+1} \\{field}\n'
+            box += 'end\n\n'
+            self.sim_boxes[inst_type] = box
+        return Instance(inst_type, **conns)
+
     def build(self, e):
         Path(self.build_dir).mkdir(parents=True, exist_ok=True)
 

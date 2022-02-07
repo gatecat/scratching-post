@@ -3,6 +3,7 @@
 #include <backends/cxxrtl/cxxrtl.h>
 #include "build/sim_soc.h"
 #include "models/spiflash.h"
+#include "models/wb_mon.h"
 
 #include "models/log.h"
 
@@ -13,6 +14,7 @@ using namespace cxxrtl_design;
 int main(int argc, char **argv) {
     cxxrtl_design::p_sim__top top;
 
+    wb_mon_set_output(*top.cell_p_bus__mon, "build/wishbone_log.csv");
     spiflash_load(*top.cell_p_flash, "../../vex-soc/software/bios.bin", 0x00100000U);
 
     top.step();
