@@ -59,8 +59,7 @@ class Ulx3sWrapper(Elaboratable):
     def get_uart(self, m, platform):
         uart = UARTPins()
         if hasattr(platform, "is_sim") and platform.is_sim:
-            # TODO
-            pass
+            m.submodules.uart_model = platform.add_model("uart_model", uart, edge_det=[])
         else:
             plat_uart = platform.request("uart")
             m.d.comb += [

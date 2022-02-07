@@ -51,10 +51,10 @@ struct hyperram_model : public bb_p_hyperram__model {
                 p_rwds__i.set(posedge);
             } else {
                 if (!p_rwds__o) { // data mask 
-                    log("write %08x %02x\n", sn.addr, p_dq__o.get<uint8_t>());
+                    // log("write %08x %02x\n", sn.addr, p_dq__o.get<uint8_t>());
                     data.at(sn.addr) = p_dq__o.get<uint8_t>();
                 } else {
-                    log("write %08x XX\n", sn.addr);
+                    // log("write %08x XX\n", sn.addr);
                 }
                 sn.addr++;
             }

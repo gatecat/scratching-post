@@ -49,8 +49,8 @@ struct spiflash_model : public bb_p_spiflash__model {
                     sn.addr |= (uint32_t(sn.curr_byte) << ((3 - sn.byte_count) * 8));
                 }
                 if (sn.byte_count >= 3) {
-                    if (sn.byte_count == 3)
-                        log("flash: begin read 0x%06x\n", sn.addr);
+                    //if (sn.byte_count == 3)
+                    //    log("flash: begin read 0x%06x\n", sn.addr);
                     sn.out_buffer = data.at(sn.addr);
                     sn.addr = (sn.addr + 1) & 0x00FFFFFF;
                 }
