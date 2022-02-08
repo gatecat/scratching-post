@@ -17,6 +17,9 @@ volatile uint32_t *const UART_RX_AVL = (volatile uint32_t *)0xb200000c;
 volatile uint32_t *const TIME_LOW = (volatile uint32_t *)0xb3000000;
 volatile uint32_t *const TIME_HIGH = (volatile uint32_t *)0xb3000004;
 
+volatile uint32_t *const SPICTRL = (volatile uint32_t *)0xb0000000;
+
+
 #define max(a,b) \
 	({ __typeof__ (a) _a = (a); \
 	 __typeof__ (b) _b = (b); \
@@ -88,6 +91,37 @@ void cmd_read_flash_id()
 	puts("Flash ID: ");
 	puthex(id);
 	puts("\n");
+}
+
+void set_flash_qspi_flag()
+{
+	uint8_t buffer[8];
+
+	// Read Configuration Registers (RDCR1 35h)
+	buffer[0] = 0x35;
+	buffer[1] = 0x00; // rdata
+	flashio(buffer, 2, 0);
+	uint8_t sr2 = buffer[1];
+
+	// Write Enable Volatile (50h) + Write Status Register 2 (31h)
+	buffer[0] = 0x31;
+	buffer[1] = sr2 | 2; // Enable QSPI
+	flashio(buffer, 2, 0x50);
+}
+
+void set_flash_mode_quad()
+{
+	*SPICTRL = (*SPICTRL & ~0x007f0000) | 0x00240000;
+}
+
+void set_flash_mode_qddr()
+{
+	*SPICTRL = (*SPICTRL & ~0x007f0000) | 0x00670000;
+}
+
+void enable_flash_crm()
+{
+	*SPICTRL |= 0x00100000;
 }
 
 #define __stacktop ((uint32_t*)0x10FFFF00)
@@ -599,6 +633,13 @@ void main() {
 	uart_puts(UART0, "\n");
 
 	cmd_read_flash_id();
+
+	uart_puts(UART0, "Setting QSPI flag\n");
+	set_flash_qspi_flag();
+	uart_puts(UART0, "Entering quad mode\n");
+	set_flash_mode_quad();
+	uart_puts(UART0, "Done!\n");
+
 
 	csr_write(mtvec,    vexriscv_machine_mode_trap_entry);
 	csr_write(mscratch, ((uint32_t)__stacktop )- 32 * 4); // exception stack pointer
