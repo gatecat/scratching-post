@@ -638,7 +638,7 @@ void main() {
 	set_flash_qspi_flag();
 	uart_puts(UART0, "Entering quad mode\n");
 	set_flash_mode_quad();
-	uart_puts(UART0, "Done!\n");
+	uart_puts(UART0, "Flash configuration done!\n");
 
 
 	csr_write(mtvec,    vexriscv_machine_mode_trap_entry);

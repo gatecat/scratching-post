@@ -14,8 +14,13 @@ using namespace cxxrtl_design;
 int main(int argc, char **argv) {
     cxxrtl_design::p_sim__top top;
 
-    wb_mon_set_output(*top.cell_p_bus__mon, "build/wishbone_log.csv");
+    // wb_mon_set_output(*top.cell_p_bus__mon, "build/wishbone_log.csv");
     spiflash_load(*top.cell_p_flash, "../../vex-soc/software/bios.bin", 0x00100000U);
+
+    spiflash_load(*top.cell_p_flash, "../../vex-soc/linux/linux.dtb", 15*1024*1024 + 512*1024);
+    spiflash_load(*top.cell_p_flash, "/home/gatecat/linux/arch/riscv/boot/xipImage", 8*1024*1024);
+    spiflash_load(*top.cell_p_flash, "/home/gatecat/rootfs.bin", 2*1024*1024);
+
 
     top.step();
     auto tick = [&]() {
