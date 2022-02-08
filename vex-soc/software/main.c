@@ -56,6 +56,40 @@ void delay() {
 		;
 }
 
+extern uint32_t flashio_worker_begin;
+extern uint32_t flashio_worker_end;
+
+void flashio(uint8_t *data, int len, uint8_t wrencmd)
+{
+	volatile uint32_t func[&flashio_worker_end - &flashio_worker_begin];
+
+	uint32_t *src_ptr = &flashio_worker_begin;
+	volatile uint32_t *dst_ptr = func;
+
+	while (src_ptr != &flashio_worker_end)
+		*(dst_ptr++) = *(src_ptr++);
+
+	__asm__ volatile ("fence.i" : : : "memory");
+
+	((void(*)(uint8_t*, uint32_t, uint32_t))func)(data, len, wrencmd);
+}
+
+
+void cmd_read_flash_id()
+{
+	uint8_t buffer[5] = { 0x9F, /* zeros */ };
+	flashio(buffer, 5, 0);
+
+	uint32_t id = 0;
+	for (int i = 1; i <= 4; i++) {
+		id = id << 8U;
+		id |= buffer[i];
+	}
+	puts("Flash ID: ");
+	puthex(id);
+	puts("\n");
+}
+
 #define __stacktop ((uint32_t*)0x10FFFF00)
 
 __attribute__((naked)) static void vexriscv_machine_mode_trap_entry(void) {
@@ -563,6 +597,8 @@ void main() {
 	uart_puts(UART0, "SoC version: ");
 	uart_puthex(UART0, SOC_ID->version);
 	uart_puts(UART0, "\n");
+
+	cmd_read_flash_id();
 
 	csr_write(mtvec,    vexriscv_machine_mode_trap_entry);
 	csr_write(mscratch, ((uint32_t)__stacktop )- 32 * 4); // exception stack pointer

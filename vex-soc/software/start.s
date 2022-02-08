@@ -94,7 +94,7 @@ flashio_worker_begin:
 # a2 ... optional WREN cmd (0 = disable)
 
 # address of SPI ctrl reg
-li   t0, 0x02000000
+li   t0, 0xb0000000
 
 # Set CS high, IO0 is output
 li   t1, 0x120
@@ -145,6 +145,8 @@ flashio_worker_L3:
 # Back to MEMIO mode
 li   t1, 0x80
 sb   t1, 3(t0)
+
+fence.i
 
 ret
 

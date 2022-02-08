@@ -41,8 +41,7 @@ struct spiflash_model : public bb_p_spiflash__model {
             sn.addr = 0;
             sn.command = sn.curr_byte;
             if (sn.command == 0xab) {
-                log("flash: power up\n");
-            } else if (sn.command == 0x03 || sn.command == 0xff) {
+            } else if (sn.command == 0x03 || sn.command == 0x9f || sn.command == 0xff) {
                 // nothing to do
             } else {
                 log("flash: unknown command %02x\n", sn.command);
@@ -59,6 +58,11 @@ struct spiflash_model : public bb_p_spiflash__model {
                     sn.addr = (sn.addr + 1) & 0x00FFFFFF;
                 }
             }
+        }
+        if (sn.command == 0x9f) {
+            // Read ID
+            static const std::array<uint8_t, 4> flash_id{0xCA, 0x7C, 0xA7, 0xFF};
+            sn.out_buffer = flash_id.at(sn.byte_count % int(flash_id.size()));
         }
     }
 
