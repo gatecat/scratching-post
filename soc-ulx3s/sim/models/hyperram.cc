@@ -40,6 +40,7 @@ struct hyperram_model : public bb_p_hyperram__model {
     void handle_clk(bool posedge)
     {
         if (sn.clk_count < 6) {
+            p_rwds__i.set(1U); // 2x latency
             sn.ca |= uint64_t(p_dq__o.get<uint8_t>()) << ((5U - sn.clk_count) * 8U);
         } else if (sn.clk_count == 6) {
             sn.addr = ((((sn.ca & 0x0FFFFFFFFFULL) >> 16U) << 3) | (sn.ca & 0x7)) * 2; // *2 to convert word address to byte address

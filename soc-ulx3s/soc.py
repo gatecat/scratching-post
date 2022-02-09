@@ -27,6 +27,7 @@ class Ulx3sSoc(Ulx3sWrapper):
         self.uart_base = 0xb2000000
         self.timer_base = 0xb3000000
         self.soc_id_base = 0xb4000000
+        self.hram_ctrl_base = 0xb5000000
 
     def elaborate(self, platform):
         m = super().elaborate(platform)
@@ -43,7 +44,8 @@ class Ulx3sSoc(Ulx3sWrapper):
         self._decoder.add(self.rom.ctrl_bus, addr=self.spi_ctrl_base)
 
         self.hyperram = HyperRAM(pins=super().get_hram(m, platform))
-        self._decoder.add(self.hyperram.bus, addr=self.hyperram_base)
+        self._decoder.add(self.hyperram.data_bus, addr=self.hyperram_base)
+        self._decoder.add(self.hyperram.ctrl_bus, addr=self.hram_ctrl_base)
 
         self.gpio = GPIOPeripheral(pins=super().get_led_gpio(m, platform))
         self._decoder.add(self.gpio.bus, addr=self.led_gpio_base)
