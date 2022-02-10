@@ -24,17 +24,18 @@ start:
 
 	jal flush_dcache
 
-	lw a0, 0(t0)
+	li s2, 0x10f00000
+	lw a0, 0(s2)
 	jal uart_putbin
-	lw a0, 4(t0)
+	lw a0, 4(s2)
 	jal uart_putbin
-	lw a0, 8(t0)
+	lw a0, 8(s2)
 	jal uart_putbin
-	lw a0, 12(t0)
+	lw a0, 12(s2)
 	jal uart_putbin
-	lw a0, 16(t0)
+	lw a0, 16(s2)
 	jal uart_putbin
-	lw a0, 20(t0)
+	lw a0, 20(s2)
 	jal uart_putbin
 
 done:
