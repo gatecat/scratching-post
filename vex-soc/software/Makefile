@@ -18,6 +18,12 @@ bios.bin: bios.elf
 bios.prog: bios.bin
 	ecpprog -k 2 -o 1M bios.bin
 
+memtest.elf: sections.lds memtest.S
+	riscv64-linux-gnu-gcc -march=rv32ima -mabi=ilp32 -Wl,--build-id=none,-Bstatic,-T,sections.lds,--strip-debug -static -ffreestanding -nostdlib -o memtest.elf memtest.S
+
+memtest.bin: memtest.elf
+	riscv64-linux-gnu-objcopy -O binary memtest.elf memtest.bin
+
 
 .PHONY: blink.prog bios.prog
 
