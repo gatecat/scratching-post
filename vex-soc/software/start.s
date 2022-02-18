@@ -47,14 +47,21 @@ sw a1, 0(a0)
 
 # Configure RAM
 li a0, 0xb5000000
-li a1, 0x081E8 # chip 0, 3 clk latency, variable x1/x2
-sw a1, 4(a0)
-li a1, 0x181E8 # chip 1, 3 clk latency, variable x1/x2
-sw a1, 4(a0)
-li a1, 0x281E8 # chip 2, 3 clk latency, variable x1/x2
-sw a1, 4(a0)
-li a1, 0x381E8 # chip 3, 3 clk latency, variable x1/x2
-sw a1, 4(a0)
+li a2, 4 # number of chips
+1:
+addi a2, a2, -1
+li a1, 0x081E8 # 3 clk latency, fixed x2
+slli t0, a2, 16
+or a1, a1, t0 # chip select
+sw a1, 4(a0) # RAM config0 register write
+
+li a1, 100 # wait for write to take affect
+2:
+addi a1, a1, -1
+bnez a1, 2b
+
+bnez a2, 1b
+
 li a1, 3 # controller, 3 clk latency
 sw a1, 0(a0)
 
