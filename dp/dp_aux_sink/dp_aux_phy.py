@@ -123,7 +123,7 @@ class DPAuxPhy(Elaboratable):
                 with m.If(tx_strobe_next):
                     m.d.sync += [
                         tx_sr.eq(0),
-                        tx_bit_count.eq(26) # send 26 zeros
+                        tx_bit_count.eq(25) # send 26 zeros
                     ]
                     m.next = "PRECHARGE_SYNC"
             with m.State("PRECHARGE_SYNC"):
@@ -151,7 +151,7 @@ class DPAuxPhy(Elaboratable):
                         ]
                         m.next = "END"
             with m.State("END"):
-                with m.If(tx_bit_count == 0):
+                with m.If(tx_strobe_next & (tx_bit_count == 0)):
                     m.d.sync += [
                         self.aux_oe.eq(0),
                         tx_override.eq(0)
@@ -161,15 +161,18 @@ class DPAuxPhy(Elaboratable):
             m.d.comb += self.tx_busy.eq(~fsm.ongoing("IDLE"))
         return m
 
-def sim_rx():
+def get_golden_pat(idle_zeros = True):
     # Test pattern
-    pat = "0" * 10 # bus idle
+    pat = ("0" * 10 if idle_zeros else "") # bus idle
     pat += "01" * 26 # initial sync
     pat += "11110000" # SYNC end
     pat += "".join("10" if x == "1" else "01" for x in "1010010101011100") # data
     pat += "11110000" # data end
-    pat += "0" * 10 # bus idle
+    pat += ("0" * 10 if idle_zeros else "") # bus idle
+    return pat
 
+def sim_rx():
+    pat = get_golden_pat()
     sys_clk_freq = 48
     m = Module()
     m.submodules.phy = phy = DPAuxPhy(sys_clk_freq=sys_clk_freq)
@@ -235,7 +238,21 @@ def sim_tx():
                 tx_idx += 1
             yield
         for i in range(sys_clk_freq * 10): yield
+
+    def checker():
+        checker_pat = ""
+        while (yield phy.aux_oe == 0):
+            yield Delay(0.125e-6)
+            yield Settle()
+        yield Delay(0.25e-6)
+        while (yield phy.aux_oe == 1):
+            checker_pat += "1" if (yield phy.aux_o) else "0"
+            yield Delay(0.5e-6)
+        gold = get_golden_pat(idle_zeros=False)
+        assert checker_pat==gold, f"\ngold {gold}\ngot  {checker_pat}\n"
+
     sim.add_sync_process(process)
+    sim.add_process(checker)
     with sim.write_vcd("phy_tx.vcd", "phy_tx.gtkw", traces=[phy.aux_i, phy.aux_o]):
         sim.run()
 
