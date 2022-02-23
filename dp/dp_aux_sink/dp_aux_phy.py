@@ -8,10 +8,17 @@ class DPAuxPhy(Elaboratable):
         self.aux_i = Signal()
         self.aux_o = Signal()
         self.aux_oe = Signal()
+
         self.data_out = Signal(8)
-        self.data_strobe = Signal()
+        self.rx_strobe = Signal()
         self.stop_out = Signal()
-        self.idle_out = Signal()
+        self.rx_idle = Signal()
+
+        self.tx_begin = Signal()
+        self.data_in = Signal(8)
+        self.tx_valid = Signal()
+        self.tx_ack = Signal()
+        self.tx_busy = Signal()
 
     def elaborate(self, platform):
         m = Module()
@@ -19,13 +26,13 @@ class DPAuxPhy(Elaboratable):
         #  - Input synchronisation
         aux_i_sync = Signal()
         m.submodules += FFSynchronizer(i=self.aux_i, o=aux_i_sync)
-        data_sr = Signal(8)
-        bit_count = Signal(3)
+        rx_sr = Signal(8)
+        rx_bit_count = Signal(3)
 
         # Reference: https://www.infineon.com/dgdl/Infineon-AN2358_Manchester_Decoder_Using_PSoC_1-ApplicationNotes-v06_00-EN.pdf
         data_xor = Signal()
         data_xor_last = Signal()
-        m.d.comb += data_xor.eq(aux_i_sync ^ data_sr[0])
+        m.d.comb += data_xor.eq(aux_i_sync ^ rx_sr[0])
         m.d.sync += data_xor_last.eq(data_xor)
 
         # Sample timer
@@ -38,8 +45,8 @@ class DPAuxPhy(Elaboratable):
 
         m.d.sync += [
             self.stop_out.eq(0),
-            self.idle_out.eq(0),
-            self.data_strobe.eq(0),
+            self.rx_idle.eq(0),
+            self.rx_strobe.eq(0),
         ]
 
         with m.If(data_xor & ~data_xor_last):
@@ -47,7 +54,7 @@ class DPAuxPhy(Elaboratable):
                 # after a stop, we're already at the start of a bit
                 m.d.sync += [
                     samp_ctr.eq(T_samp),
-                    bit_count.eq(0),
+                    rx_bit_count.eq(0),
                 ]
                 with m.If(samp_ctr < T_stop_max):
                     m.d.sync += self.stop_out.eq(1)
@@ -56,18 +63,79 @@ class DPAuxPhy(Elaboratable):
         with m.Elif(samp_ctr < T_timeout):
             m.d.sync += samp_ctr.eq(samp_ctr + 1)
         with m.Else():
-            m.d.sync += self.idle_out.eq(1)
+            m.d.sync += self.rx_idle.eq(1)
         with m.If(samp_ctr == T_samp):
             m.d.sync += [
-                data_sr.eq(Cat(aux_i_sync, data_sr[:-1])),
-                Cat(bit_count, self.data_strobe).eq(bit_count + 1),
+                rx_sr.eq(Cat(aux_i_sync, rx_sr[:-1])),
+                Cat(rx_bit_count, self.rx_strobe).eq(rx_bit_count + 1),
             ]
 
-        m.d.comb += self.data_out.eq(data_sr)
+        m.d.comb += self.data_out.eq(rx_sr)
 
-        return m # TODO
+        # Manchester transmitter
+        tx_strobe = Signal()
+        tx_half_strobe = Signal()
+        tx_div = Signal(range(self.sys_clk_freq))
+        tx_bit_count = Signal(8)
+        tx_sr = Signal(8)
+        tx_override = Signal()
 
-def sim():
+        m.d.sync += [
+            tx_strobe.eq(0),
+            tx_half_strobe.eq(0),
+        ]
+
+        with m.If(tx_div == 0):
+            m.d.sync += [
+                tx_div.eq(self.sys_clk_freq - 1),
+                tx_strobe.eq(1),
+            ]
+        with m.Else():
+            with m.If(tx_div == ((self.sys_clk_freq // 2) - 1)):
+                m.d.sync += tx_half_strobe.eq(1)
+            m.d.sync += tx_div.eq(tx_div - 1)
+
+        # transmit
+        with m.If(tx_bit_count > 0):
+            with m.If(tx_strobe):
+                m.d.sync += [
+                    self.aux_o.eq(tx_sr[-1]),
+                    tx_sr.eq(Cat(tx_sr[-1], tx_sr[:-1])),
+                    tx_bit_count.eq(tx_bit_count - 1),
+                ]
+            with m.If(tx_half_strobe & ~tx_override):
+                m.d.sync += self.aux_o.eq(~self.aux_o)
+        with m.FSM() as fsm:
+            with m.State("IDLE"):
+                m.d.sync += [
+                    self.aux_oe.eq(0),
+                    tx_override.eq(0),
+                    tx_bit_count.eq(0),
+                ]
+                with m.If(tx_strobe & self.tx_begin):
+                    m.d.sync += self.aux_oe.eq(1)
+                    m.next = "BEGIN"
+            with m.State("BEGIN"):
+                with m.If(tx_strobe):
+                    m.d.sync += [
+                        tx_sr.eq(0),
+                        tx_bit_count.eq(26) # send 26 zeros
+                    ]
+                    m.next = "PRECHARGE_SYNC"
+            with m.State("PRECHARGE_SYNC"):
+                with m.If(tx_strobe & (tx_bit_count == 1)):
+                    m.d.sync += [
+                        tx_bit_count.eq(4),
+                        tx_sr.eq(0b11000000),
+                        tx_override.eq(1)
+                    ]
+                    m.next = "SYNC_END"
+            with m.State("SYNC_END"):
+                pass
+            m.d.comb += self.tx_busy.eq(~fsm.ongoing("IDLE"))
+        return m
+
+def sim_rx():
     # Test pattern
     pat = "0" * 10 # bus idle
     pat += "01" * 26 # initial sync
@@ -95,7 +163,7 @@ def sim():
         yield Passive()
         while True:
             yield
-            if (yield phy.data_strobe):
+            if (yield phy.rx_strobe):
                 dout = (yield phy.data_out)
                 if dout == 0x00 or dout == 0xFF:
                     got_sync = True
@@ -112,8 +180,26 @@ def sim():
 
     sim.add_process(process)
     sim.add_sync_process(checker)
-    with sim.write_vcd("phy.vcd", "phy.gtkw", traces=[phy.aux_i, phy.aux_o]):
+    with sim.write_vcd("phy_rx.vcd", "phy_rx.gtkw", traces=[phy.aux_i, phy.aux_o]):
+        sim.run()
+
+def sim_tx():
+    sys_clk_freq = 48
+    m = Module()
+    m.submodules.phy = phy = DPAuxPhy(sys_clk_freq=sys_clk_freq)
+    sim = Simulator(m)
+    sim.add_clock(1e-6 / sys_clk_freq) # 48MHz
+    def process():
+        for i in range(4): yield
+        yield phy.tx_begin.eq(1)
+        while (yield phy.tx_busy) == 0:
+            yield
+        yield phy.tx_begin.eq(0)
+        for i in range(sys_clk_freq * 100): yield
+    sim.add_sync_process(process)
+    with sim.write_vcd("phy_tx.vcd", "phy_tx.gtkw", traces=[phy.aux_i, phy.aux_o]):
         sim.run()
 
 if __name__ == '__main__':
-    sim()
+    # sim_rx()
+    sim_tx()
