@@ -83,6 +83,7 @@ class DPAuxPhy(Elaboratable):
         m.d.sync += [
             tx_strobe.eq(0),
             tx_half_strobe.eq(0),
+            self.tx_ack.eq(0),
         ]
 
         with m.If(tx_div == 0):
@@ -95,6 +96,9 @@ class DPAuxPhy(Elaboratable):
                 m.d.sync += tx_half_strobe.eq(1)
             m.d.sync += tx_div.eq(tx_div - 1)
 
+        tx_strobe_next = Signal()
+        m.d.comb += tx_strobe_next.eq(tx_div == 0)
+
         # transmit
         with m.If(tx_bit_count > 0):
             with m.If(tx_strobe):
@@ -103,8 +107,8 @@ class DPAuxPhy(Elaboratable):
                     tx_sr.eq(Cat(tx_sr[-1], tx_sr[:-1])),
                     tx_bit_count.eq(tx_bit_count - 1),
                 ]
-            with m.If(tx_half_strobe & ~tx_override):
-                m.d.sync += self.aux_o.eq(~self.aux_o)
+        with m.If(tx_half_strobe & ~tx_override & self.tx_busy):
+            m.d.sync += self.aux_o.eq(~self.aux_o)
         with m.FSM() as fsm:
             with m.State("IDLE"):
                 m.d.sync += [
@@ -112,26 +116,48 @@ class DPAuxPhy(Elaboratable):
                     tx_override.eq(0),
                     tx_bit_count.eq(0),
                 ]
-                with m.If(tx_strobe & self.tx_begin):
+                with m.If(tx_strobe_next & self.tx_begin):
                     m.d.sync += self.aux_oe.eq(1)
                     m.next = "BEGIN"
             with m.State("BEGIN"):
-                with m.If(tx_strobe):
+                with m.If(tx_strobe_next):
                     m.d.sync += [
                         tx_sr.eq(0),
                         tx_bit_count.eq(26) # send 26 zeros
                     ]
                     m.next = "PRECHARGE_SYNC"
             with m.State("PRECHARGE_SYNC"):
-                with m.If(tx_strobe & (tx_bit_count == 1)):
+                with m.If(tx_strobe_next & (tx_bit_count == 0)):
                     m.d.sync += [
                         tx_bit_count.eq(4),
                         tx_sr.eq(0b11000000),
                         tx_override.eq(1)
                     ]
-                    m.next = "SYNC_END"
-            with m.State("SYNC_END"):
-                pass
+                    m.next = "DATA"
+            with m.State("DATA"):
+                with m.If(tx_strobe_next & (tx_bit_count == 0)):
+                    with m.If(self.tx_valid):
+                        m.d.sync += [
+                            tx_bit_count.eq(8),
+                            tx_sr.eq(self.data_in),
+                            tx_override.eq(0),
+                            self.tx_ack.eq(1),
+                        ]
+                    with m.Else():
+                        m.d.sync += [
+                            tx_bit_count.eq(4),
+                            tx_sr.eq(0b11000000),
+                            tx_override.eq(1)
+                        ]
+                        m.next = "END"
+            with m.State("END"):
+                with m.If(tx_bit_count == 0):
+                    m.d.sync += [
+                        self.aux_oe.eq(0),
+                        tx_override.eq(0)
+                    ]
+                    m.next = "IDLE"
+
             m.d.comb += self.tx_busy.eq(~fsm.ongoing("IDLE"))
         return m
 
@@ -189,13 +215,26 @@ def sim_tx():
     m.submodules.phy = phy = DPAuxPhy(sys_clk_freq=sys_clk_freq)
     sim = Simulator(m)
     sim.add_clock(1e-6 / sys_clk_freq) # 48MHz
+
     def process():
+        tx_bytes = [0xA5, 0x5C]
+        tx_idx = 0
+
         for i in range(4): yield
         yield phy.tx_begin.eq(1)
         while (yield phy.tx_busy) == 0:
             yield
         yield phy.tx_begin.eq(0)
-        for i in range(sys_clk_freq * 100): yield
+        while (yield phy.tx_busy) == 1:
+            if tx_idx < len(tx_bytes):
+                yield phy.data_in.eq(tx_bytes[tx_idx])
+                yield phy.tx_valid.eq(1)
+            else:
+                yield phy.tx_valid.eq(0)
+            if (yield phy.tx_ack) == 1:
+                tx_idx += 1
+            yield
+        for i in range(sys_clk_freq * 10): yield
     sim.add_sync_process(process)
     with sim.write_vcd("phy_tx.vcd", "phy_tx.gtkw", traces=[phy.aux_i, phy.aux_o]):
         sim.run()
