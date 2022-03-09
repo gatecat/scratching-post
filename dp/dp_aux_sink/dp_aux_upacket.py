@@ -22,7 +22,6 @@ class DPAuxPacketHandler(Elaboratable):
         self.reg_r_data  = Signal(8)
         self.reg_w_stb   = Signal()
         self.reg_r_stb   = Signal()
-        self.reg_ack     = Signal()
 
         # I2C interface
         self.i2c_active  = Signal()
@@ -52,12 +51,20 @@ class DPAuxPacketHandler(Elaboratable):
         reply_hdr = Cat(nat_reply, i2c_reply, C(0, 4))
 
         byte_count = Signal(5)
+        length = Signal(8)
         with m.If(self.rx_idle_in):
             m.d.sync += byte_count.eq(0)
         with m.Elif(self.rx_strobe):
             m.d.sync += [
                 byte_count.eq(byte_count + 1),
             ]
+
+        m.d.sync += [
+            self.reg_r_stb.eq(0),
+            self.reg_w_stb.eq(0),
+            self.i2c_r_stb.eq(0),
+            self.i2c_w_stb.eq(0),
+        ]
 
         with m.FSM() as fsm:
             with m.State("IDLE"):
@@ -75,11 +82,51 @@ class DPAuxPacketHandler(Elaboratable):
                 with m.If(self.rx_strobe):
                     m.d.sync += header.eq(Cat(self.rx_data_in, header[:-8]))
                     with m.If(byte_count == 2):
-                        m.next = "GOT_HEADER"
+                        m.next = "GET_LENGTH"
                         m.d.sync += byte_count.eq(0)
-            with m.State("GOT_HEADER"):
+            with m.State("GET_LENGTH"):
+                # Update address latch from header
+                with m.If(is_i2c):
+                    pass # TODO
+                with m.Else():
+                    self.reg_adr.eq(addr)
+                # Determine next state
+                with m.If(self.rx_idle_in): # aborted early
+                    m.next = "IDLE"
+                with m.Elif(self.rx_stop_in): # no length field
+                    m.d.sync += length.eq(0)
+                    m.next = "BEGIN_REPLY"
+                with m.Elif(self.rx_strobe): # length field
+                    m.d.sync += [
+                        length.eq(self.rx_data_in),
+                        byte_count.eq(0),
+                    ]
+                    m.next = "GOT_LENGTH"
+            with m.State("GOT_LENGTH"):
+                with m.If((req == REQ_WSUR) | (req == REQ_RD) | (length == 0)):
+                    with m.If(self.rx_idle_in):
+                        m.next = "BEGIN_REPLY"
+                with m.Else():
+                    m.next = "RECV_DATA"
+            with m.State("RECV_DATA"):
+                with m.If(self.rx_idle_in):
+                    m.next = "BEGIN_REPLY"
+                with m.Elif(self.rx_strobe):
+                    with m.If(is_i2c):
+                        pass # TODO
+                    with m.Else():
+                        self.reg_w_data.eq(self.rx_data_in)
+                        self.reg_w_stb.eq(1)
+            with m.State("BEGIN_REPLY"):
                 pass
+
+        # Increment address latch one cycle later
+        with m.If(self.reg_w_stb | self.reg_r_stb):
+            m.d.sync += self.reg_adr.eq(self.reg_adr + 1)
+
         return m
+
+
 
 def sim_reg_read():
     rx_data = [
