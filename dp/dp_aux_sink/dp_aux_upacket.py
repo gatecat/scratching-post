@@ -49,7 +49,7 @@ class DPAuxPacketHandler(Elaboratable):
 
         nat_reply = Signal(2)
         i2c_reply = Signal(2)
-        reply_hdr = Cat(C(0, 4), i2c_reply, nat_reply)
+        reply_hdr = Cat(C(0, 4), nat_reply, i2c_reply)
 
         rx_byte_count = Signal(5)
         delay_count = Signal(5)
@@ -199,21 +199,21 @@ def sim_reg_read():
     sim = Simulator(m)
     sim.add_clock(1e-6 / sys_clk_freq) # 48MHz
 
-    def process():
+    def phy_process():
         def send(b):
-            for j in range(40): yield
+            for j in range(3): yield
             yield ph.rx_data_in.eq(b)
             yield ph.rx_strobe.eq(1)
             yield
             yield ph.rx_strobe.eq(0)
-            for j in range(20): yield
+            for j in range(3): yield
         def stop():
             yield ph.rx_stop_in.eq(1)
             yield
             yield ph.rx_stop_in.eq(0)
             yield
         yield ph.rx_idle_in.eq(1)
-        for i in range(10): yield
+        for i in range(5): yield
         yield ph.rx_idle_in.eq(0)
         for i in range(4):
             for x in send(0): yield x # SYNC
@@ -221,11 +221,40 @@ def sim_reg_read():
         for b in rx_data:
             for x in send(b): yield x
         for x in stop(): yield x
-        for i in range(10): yield
+        for i in range(5): yield
         yield ph.rx_idle_in.eq(1)
-        for i in range(10): yield
+        while (yield ph.tx_begin) == 0: yield
+        for i in range(5): yield
+        yield ph.tx_busy.eq(1)
+        for i in range(5): yield
+        resp_bytes = []
+        while (yield ph.tx_valid):
+            for i in range(5): yield
+            resp_bytes.append((yield ph.tx_data_out))
+            yield ph.tx_ack.eq(1)
+            yield
+            yield ph.tx_ack.eq(0)
+            yield
+        for i in range(5): yield
+        yield ph.tx_busy.eq(0)
+        for i in range(5): yield
+        assert resp_bytes == [0x00, 0xAA, 0x55], resp_bytes # ack, data
 
-    sim.add_sync_process(process)
+    def reg_process():
+        yield Passive()
+        yield ph.reg_adr_vld.eq(1)
+        while True:
+            yield
+            if (yield ph.reg_r_stb):
+                addr = (yield ph.reg_adr)
+                if addr == 0x0CA7: r_data = 0xAA
+                elif addr == 0x0CA8: r_data = 0x55
+                else: assert False, hex(addr)
+                yield
+                yield ph.reg_r_data.eq(r_data)
+
+    sim.add_sync_process(phy_process)
+    sim.add_sync_process(reg_process)
     with sim.write_vcd("upacket.vcd", "upacket.gtkw"):
         sim.run()
 
