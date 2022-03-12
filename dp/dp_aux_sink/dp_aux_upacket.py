@@ -25,7 +25,7 @@ class DPAuxPacketHandler(Elaboratable):
         self.reg_adr_vld = Signal() # should be deasserted as soon as reg_adr becomes invalid
 
         # pseudo-I2C interface
-        self.i2c_start   = Signal()  # strobe indicates I2C start condition
+        self.i2c_stop    = Signal()  # strobe indicates I2C start condition
         self.i2c_adr     = Signal(7) # current I2C address
         self.i2c_w_data  = Signal(8)
         self.i2c_r_data  = Signal(8)
@@ -68,7 +68,7 @@ class DPAuxPacketHandler(Elaboratable):
             self.reg_w_stb.eq(0),
             self.i2c_r_stb.eq(0),
             self.i2c_w_stb.eq(0),
-            self.i2c_start.eq(0),
+            self.i2c_stop.eq(0),
         ]
 
         with m.FSM() as fsm:
@@ -94,7 +94,6 @@ class DPAuxPacketHandler(Elaboratable):
                 with m.If(is_i2c):
                     m.d.sync += [
                         self.i2c_adr.eq(addr[:7]),
-                        self.i2c_start.eq(~mot),
                     ]
                 with m.Else():
                     m.d.sync += self.reg_adr.eq(addr)
@@ -168,7 +167,10 @@ class DPAuxPacketHandler(Elaboratable):
                 with m.If(self.tx_ack): # first byte or byte ready to send
                     with m.If(length == 0): # nothing more to send
                         m.d.sync += self.tx_valid.eq(0)
-                        m.next = "RESP_DONE"
+                        with m.If(is_i2c & ~mot):
+                            m.next = "I2C_STOP"
+                        with m.Else():
+                            m.next = "RESP_DONE"
                     with m.Else():
                         with m.If(is_i2c):
                             m.d.sync += self.i2c_r_stb.eq(1)
@@ -182,6 +184,9 @@ class DPAuxPacketHandler(Elaboratable):
                     with m.Else():
                         m.d.sync += self.tx_data_out.eq(self.reg_r_data)
                 m.d.sync += self.tx_begin.eq(0)
+            with m.State("I2C_STOP"):
+                m.d.sync += self.i2c_stop.eq(1)
+                m.next = "RESP_DONE"
             with m.State("RESP_DONE"):
                 with m.If(~self.tx_busy):
                     m.next = "IDLE"
@@ -192,7 +197,7 @@ class DPAuxPacketHandler(Elaboratable):
 
         return m
 
-def run_sim_check(name, rx_data, regs, exp_resp, i2c_process=None):
+def run_sim_check(name, rx_data, regs, exp_resp, i2c_data=None):
     sys_clk_freq = 48
     m = Module()
     m.submodules.ph = ph = DPAuxPacketHandler()
@@ -256,12 +261,42 @@ def run_sim_check(name, rx_data, regs, exp_resp, i2c_process=None):
                     regs[addr] = ph.reg_w_data
                     yield
 
+    def i2c_process():
+        yield Passive()
+        nonlocal seq
+        while True:
+            yield
+            addr = (yield ph.i2c_adr)
+            valid = (addr == exp_addr)
+            yield ph.i2c_ack.eq(valid)
+            if (yield ph.i2c_stop):
+                assert len(seq) > 0
+                assert seq[0] == ('s', ), seq[0]
+                seq = seq[1:]
+            if (yield ph.i2c_w_stb) and valid:
+                assert len(seq) > 0
+                cmd, exp_data = seq[0]
+                assert cmd == 'w', seq[0]
+                got_data = (yield ph.i2c_w_data)
+                assert (got_data == exp_data), f"{got_data:02x} {exp_data:02x}"
+                seq = seq[1:]
+            if (yield ph.i2c_r_stb) and valid:
+                assert len(seq) > 0
+                cmd, resp_data = seq[0]
+                assert cmd == 'r', seq[0]
+                yield
+                yield ph.i2c_r_data.eq(resp_data)
+                seq = seq[1:]
+
     sim.add_sync_process(phy_process)
     sim.add_sync_process(reg_process)
-    if i2c_process is not None:
+    if i2c_data is not None:
+        exp_addr, seq = i2c_data
         sim.add_sync_process(i2c_process)
     with sim.write_vcd(f"upacket_{name}.vcd", f"upacket_{name}.gtkw"):
         sim.run()
+    if i2c_data is not None:
+        assert len(seq) == 0, seq # all sequence consumed
 
 def sim_reg_read():
     rx_data = [
@@ -291,6 +326,42 @@ def sim_reg_nak():
     exp_resp = [0x10] # nak
     run_sim_check("reg_nak", rx_data, regs, exp_resp)
 
+def sim_i2c_write():
+    rx_data = [
+        0b00000000, # I2C write; address: 0x0; not MOT
+        0b00001100, # address: 0x00
+        0b00110101, # address: 0x35
+        0b00000010, # length: 2
+        0b10101010, # data: 0xAA
+        0b01010101, # data: 0x55
+    ]
+    exp_resp = [0x00] # ack
+    i2c_seq = [
+        ('w', 0xAA),
+        ('w', 0x55),
+        ('s', ),
+    ]
+    run_sim_check("i2c_write", rx_data, {}, exp_resp, (0x35, i2c_seq))
+
+def sim_i2c_mot():
+    rx_data = [
+        0b01000000, # I2C write; address: 0x0; MOT
+        0b00001100, # address: 0x00
+        0b00110101, # address: 0x35
+        0b00000010, # length: 2
+        0b10101010, # data: 0xAA
+        0b01010101, # data: 0x55
+    ]
+    exp_resp = [0x00] # ack
+    i2c_seq = [
+        ('w', 0xAA),
+        ('w', 0x55),
+    ]
+    run_sim_check("i2c_mot", rx_data, {}, exp_resp, (0x35, i2c_seq))
+
+
 if __name__ == '__main__':
     sim_reg_read()
     sim_reg_nak()
+    sim_i2c_write()
+    sim_i2c_mot()
