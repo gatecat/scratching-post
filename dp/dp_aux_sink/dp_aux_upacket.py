@@ -183,21 +183,13 @@ class DPAuxPacketHandler(Elaboratable):
 
         return m
 
-
-
-def sim_reg_read():
-    rx_data = [
-        0b10010000, # native read; address: 0x0
-        0b00001100, # address: 0x0C
-        0b10100111, # address: 0xA7
-        0b00000010, # length: 2
-    ]
-
+def run_sim_check(name, rx_data, regs, exp_resp, i2c_process=None):
     sys_clk_freq = 48
     m = Module()
     m.submodules.ph = ph = DPAuxPacketHandler()
     sim = Simulator(m)
     sim.add_clock(1e-6 / sys_clk_freq) # 48MHz
+
 
     def phy_process():
         def send(b):
@@ -238,26 +230,58 @@ def sim_reg_read():
         for i in range(5): yield
         yield ph.tx_busy.eq(0)
         for i in range(5): yield
-        assert resp_bytes == [0x00, 0xAA, 0x55], resp_bytes # ack, data
-
+        assert resp_bytes == exp_resp, " ".join(f"{b:02x}" for b in resp_bytes)
     def reg_process():
         yield Passive()
-        yield ph.reg_adr_vld.eq(1)
         while True:
             yield
-            if (yield ph.reg_r_stb):
-                addr = (yield ph.reg_adr)
-                if addr == 0x0CA7: r_data = 0xAA
-                elif addr == 0x0CA8: r_data = 0x55
-                else: assert False, hex(addr)
-                yield
-                yield ph.reg_r_data.eq(r_data)
+            addr = (yield ph.reg_adr)
+            valid = addr in regs
+            yield ph.reg_adr_vld.eq(valid)
+            if valid:
+                if (yield ph.reg_r_stb):
+                    yield
+                    yield ph.reg_r_data.eq(regs[addr])
+                if (yield ph.reg_w_stb):
+                    addr = (yield ph.reg_adr)
+                    regs[addr] = ph.reg_w_data
+                    yield
 
     sim.add_sync_process(phy_process)
     sim.add_sync_process(reg_process)
-    with sim.write_vcd("upacket.vcd", "upacket.gtkw"):
+    if i2c_process is not None:
+        sim.add_sync_process(i2c_process)
+    with sim.write_vcd(f"upacket_{name}.vcd", f"upacket_{name}.gtkw"):
         sim.run()
+
+def sim_reg_read():
+    rx_data = [
+        0b10010000, # native read; address: 0x0
+        0b00001100, # address: 0x0C
+        0b10100111, # address: 0xA7
+        0b00000010, # length: 2
+    ]
+    regs = {
+        0xCA7: 0xAA,
+        0xCA8: 0x55,
+    }
+    exp_resp = [0x00, 0xAA, 0x55] # ack, data
+    run_sim_check("reg_read", rx_data, regs, exp_resp)
+
+def sim_reg_nak():
+    rx_data = [
+        0b10010000, # native read; address: 0x0
+        0b00001100, # address: 0x0C
+        0b10101010, # address: 0xAA
+        0b00000010, # length: 2
+    ]
+    regs = {
+        0xCA7: 0xAA,
+        0xCA8: 0x55,
+    }
+    exp_resp = [0x10] # nak
+    run_sim_check("reg_nak", rx_data, regs, exp_resp)
 
 if __name__ == '__main__':
     sim_reg_read()
-
+    sim_reg_nak()
