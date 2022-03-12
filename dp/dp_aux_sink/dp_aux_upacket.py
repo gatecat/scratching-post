@@ -17,21 +17,21 @@ class DPAuxPacketHandler(Elaboratable):
         self.tx_busy     = Signal()
 
         # Native register interface
-        self.reg_adr     = Signal(24)
+        self.reg_adr     = Signal(20)
         self.reg_w_data  = Signal(8)
         self.reg_r_data  = Signal(8)
-        self.reg_w_stb   = Signal()
-        self.reg_r_stb   = Signal()
-        self.reg_adr_vld = Signal()
+        self.reg_w_stb   = Signal() # read w_data and perfom write on assertion
+        self.reg_r_stb   = Signal() # update r_data only after assertion
+        self.reg_adr_vld = Signal() # should be deasserted as soon as reg_adr becomes invalid
 
-        # I2C interface
-        self.i2c_active  = Signal()
-        self.i2c_adr     = Signal(8)
+        # pseudo-I2C interface
+        self.i2c_start   = Signal()  # strobe indicates I2C start condition
+        self.i2c_adr     = Signal(7) # current I2C address
         self.i2c_w_data  = Signal(8)
         self.i2c_r_data  = Signal(8)
         self.i2c_w_stb   = Signal()
         self.i2c_r_stb   = Signal()
-        self.i2c_ack     = Signal()
+        self.i2c_ack     = Signal()  # deassert as soon as NAK exists
 
     def elaborate(self, platform):
         m = Module()
@@ -68,6 +68,7 @@ class DPAuxPacketHandler(Elaboratable):
             self.reg_w_stb.eq(0),
             self.i2c_r_stb.eq(0),
             self.i2c_w_stb.eq(0),
+            self.i2c_start.eq(0),
         ]
 
         with m.FSM() as fsm:
@@ -91,7 +92,10 @@ class DPAuxPacketHandler(Elaboratable):
             with m.State("GET_LENGTH"):
                 # Update address latch from header
                 with m.If(is_i2c):
-                    pass # TODO
+                    m.d.sync += [
+                        self.i2c_adr.eq(addr[:7]),
+                        self.i2c_start.eq(~mot),
+                    ]
                 with m.Else():
                     m.d.sync += self.reg_adr.eq(addr)
                 # Determine next state
@@ -117,7 +121,10 @@ class DPAuxPacketHandler(Elaboratable):
                     m.next = "BEGIN_REPLY"
                 with m.Elif(self.rx_strobe):
                     with m.If(is_i2c):
-                        pass # TODO
+                        m.d.sync += [
+                            self.i2c_w_data.eq(self.rx_data_in),
+                            self.i2c_w_stb.eq(1),
+                        ]
                     with m.Else():
                         m.d.sync += [
                             self.reg_w_data.eq(self.rx_data_in),
@@ -129,7 +136,9 @@ class DPAuxPacketHandler(Elaboratable):
                     nat_reply.eq(0b00), # ACK
                     i2c_reply.eq(0b00), # ACK
                 ]
-                with m.If(req == REQ_WR):
+                with m.If((req == REQ_WR) | (req == REQ_WSUR)):
+                    # N.B. WSUR is irrelevant as we assume the pseudo-I2C interface
+                    # is fast enough that we'll always respond immediately
                     m.d.sync += length.eq(0) # no payload to a write reply
                 with m.If(is_i2c & ~self.i2c_ack):
                     m.d.sync += [
