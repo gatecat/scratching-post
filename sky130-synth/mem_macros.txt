@@ -1,0 +1,33 @@
+ram block $__SKY130_32X256 {
+	abits 8;
+	width 32;
+	byte 8;
+	cost 1536;
+	init none;
+	port srsw "A" {
+		clock posedge;
+		rdinit none;
+		rdwr undefined;
+		wrbe_separate;
+	}
+	port sr "B" {
+		clock posedge;
+		rdinit none;
+	}
+}
+
+ram block $__SKY130_8X1024 {
+	abits 10;
+	width 8;
+	cost 1536;
+	init none;
+	port srsw "A" {
+		clock posedge;
+		rdinit none;
+		rdwr undefined;
+	}
+	port sr "B" {
+		clock posedge;
+		rdinit none;
+	}
+}
