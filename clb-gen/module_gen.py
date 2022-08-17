@@ -69,7 +69,9 @@ class ModuleGen:
 		with open(filename, "w") as f:
 			print(f"module {self.module_name} (", file=f)
 			ports = []
+			# signals for which we don't need to create a wire
 			known_sigs = set()
+			# write ports
 			for i in self.inputs:
 				ports.append(f"\tinput wire [{i.width-1}:0] {i.name}" if i.width > 1 else f"\tinput wire {i.name}")
 				known_sigs.add(i.name)
@@ -79,6 +81,7 @@ class ModuleGen:
 			for o in self.outputs:
 				ports.append(f"\toutput wire [{o.width-1}:0] {o.name}" if o.width > 1 else f"\toutput wire {o.name}")
 				known_sigs.add(o.name)
+			# use join() to avoid trailing comma issues
 			print(",\n".join(ports), file=f)
 			print(");", file=f)
 			# auto determine signals
@@ -88,11 +91,19 @@ class ModuleGen:
 					s = sig.split('[')[0]
 					if s not in known_sigs:
 						sigs.add(s)
+			for pair in self.assigns:
+				for sig in pair:
+					s = sig.split('[')[0]
+					if s not in known_sigs:
+						sigs.add(s)
+			# write list of wires
 			for s in sorted(sigs):
 				print(f"\twire {s};", file=f)
 			print("", file=f)
+			# write instances
 			for inst in self.insts:
 				print(f"\t{inst.typ} {inst.name} ({', '.join(f'.{k}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]))});", file=f)
+			# write assigns
 			if len(self.assigns) > 0:
 				print("", file=f)
 				for dst, src in self.assigns:
@@ -100,6 +111,6 @@ class ModuleGen:
 			print("endmodule", file=f)
 			if append_cfg:
 				print("/** CONFIG **", file=f)
-				for i, b in enumerate(config_bits):
+				for i, b in enumerate(self.config_bits):
 					print(f"  {i:>4d} {b}", file=f)
 				print("**/", file=f)

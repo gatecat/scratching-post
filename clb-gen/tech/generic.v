@@ -18,8 +18,16 @@ module clb_and(input a, b, output x);
 	assign x = a & b;
 endmodule
 
+module clb_andnot(input a, b, output x);
+	assign x = a & ~b;
+endmodule
+
 module clb_or(input a, b, output x);
 	assign x = a | b;
+endmodule
+
+module clb_ornot(input a, b, output x);
+	assign x = a | ~b;
 endmodule
 
 module clb_xor(input a, b, output x);
