@@ -28,6 +28,9 @@ class ModuleGen:
 	def add_output(self, name, width=1):
 		self.outputs.append(ModulePort(name, width))
 
+	def add_assign(self, dst, src):
+		self.assigns += [(dst, src)]
+
 	def cfg(self, name, width=1):
 		idx = len(self.config_bits)
 		if width == 1:
@@ -61,21 +64,21 @@ class ModuleGen:
 			for b in mod.config_bits:
 				self.config_bits.append(f"{name}.{b}")
 			ports["cfg"] = f"cfg[{cfg_start+len(mod.config_bits)-1}:{cfg_start}]"
-		self.insts.append(Instance(name, mod.name, ports))
+		self.insts.append(Instance(name, mod.module_name, ports))
 	def finalise(self, filename, append_cfg=False):
 		with open(filename, "w") as f:
-			print(f"module {self.name} (", file=f)
+			print(f"module {self.module_name} (", file=f)
 			ports = []
 			known_sigs = set()
-			for i in inputs:
+			for i in self.inputs:
 				ports.append(f"\tinput wire [{i.width-1}:0] {i.name}" if i.width > 1 else f"\tinput wire {i.name}")
 				known_sigs.add(i.name)
-			if len(config_bits) > 0:
-				ports.append(f"\tinput wire [{len(config_bits)-1}:0] cfg")
+			if len(self.config_bits) > 0:
+				ports.append(f"\tinput wire [{len(self.config_bits)-1}:0] cfg")
 				known_sigs.add("cfg")
-			for o in outputs:
+			for o in self.outputs:
 				ports.append(f"\toutput wire [{o.width-1}:0] {o.name}" if o.width > 1 else f"\toutput wire {o.name}")
-				known_sigs.append(o.name)
+				known_sigs.add(o.name)
 			print(",\n".join(ports), file=f)
 			print(");", file=f)
 			# auto determine signals
@@ -89,7 +92,11 @@ class ModuleGen:
 				print(f"\twire {s};", file=f)
 			print("", file=f)
 			for inst in self.insts:
-				print(f"\t{inst.type} {inst.name} ({', '.join(f'.{k}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]))});", file=f)
+				print(f"\t{inst.typ} {inst.name} ({', '.join(f'.{k}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]))});", file=f)
+			if len(self.assigns) > 0:
+				print("", file=f)
+				for dst, src in self.assigns:
+					print(f"\tassign {dst} = {src};", file=f)
 			print("endmodule", file=f)
 			if append_cfg:
 				print("/** CONFIG **", file=f)
