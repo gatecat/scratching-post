@@ -56,28 +56,28 @@ vvcc vcc 0 dc 1.8
 vvss vss 0 0
 "}
 C {devices/gnd.sym} 120 10 0 0 {name=l1 lab=GND}
-C {sky130_stdcells/buf_4.sym} 210 -140 0 0 {name=x8 VGND=VGND VNB=VNB VPB=VPB VPWR=VPWR prefix=sky130_fd_sc_hd__ }
+C {sky130_stdcells/buf_1.sym} 210 -140 0 0 {name=x8 VGND=VGND VNB=VNB VPB=VPB VPWR=VPWR prefix=sky130_fd_sc_hd__ }
 C {devices/capa.sym} 290 -80 0 0 {name=C1
 m=1
-value=0.01p
+value=0.1p
 footprint=1206
 device="ceramic capacitor"}
 C {devices/gnd.sym} 290 10 0 0 {name=l3 lab=GND}
-C {sky130_stdcells/buf_4.sym} 370 -140 0 0 {name=x9 VGND=VGND VNB=VNB VPB=VPB VPWR=VPWR prefix=sky130_fd_sc_hd__ }
+C {sky130_stdcells/buf_1.sym} 370 -140 0 0 {name=x9 VGND=VGND VNB=VNB VPB=VPB VPWR=VPWR prefix=sky130_fd_sc_hd__ }
 C {devices/capa.sym} 450 -80 0 0 {name=C2
 m=1
-value=0.01p
+value=0.1p
 footprint=1206
 device="ceramic capacitor"}
 C {devices/gnd.sym} 450 10 0 0 {name=l4 lab=GND}
-C {sky130_stdcells/buf_4.sym} 540 -140 0 0 {name=x10 VGND=VGND VNB=VNB VPB=VPB VPWR=VPWR prefix=sky130_fd_sc_hd__ }
+C {sky130_stdcells/buf_1.sym} 540 -140 0 0 {name=x10 VGND=VGND VNB=VNB VPB=VPB VPWR=VPWR prefix=sky130_fd_sc_hd__ }
 C {devices/capa.sym} 620 -80 0 0 {name=C3
 m=1
-value=0.01p
+value=0.1p
 footprint=1206
 device="ceramic capacitor"}
 C {devices/gnd.sym} 620 10 0 0 {name=l5 lab=GND}
-C {sky130_stdcells/buf_4.sym} 710 -140 0 0 {name=x11 VGND=VGND VNB=VNB VPB=VPB VPWR=VPWR prefix=sky130_fd_sc_hd__ }
+C {sky130_stdcells/buf_1.sym} 710 -140 0 0 {name=x11 VGND=VGND VNB=VNB VPB=VPB VPWR=VPWR prefix=sky130_fd_sc_hd__ }
 C {devices/gnd.sym} 790 10 0 0 {name=l6 lab=GND}
 C {devices/res.sym} 790 -80 0 0 {name=R2
 value=100k
