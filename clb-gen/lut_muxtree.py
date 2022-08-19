@@ -14,7 +14,7 @@ def gen_lut(name, k, extra_taps=[]):
 	taps = extra_taps + [LUTTap("O", k, 0), ]
 	m = ModuleGen(name, inputs=[ModulePort("I", k)], outputs=[ModulePort(t.name, 1) for t in taps])
 	level = 0
-	layer = [m.cfg(f"INIT[{i}]") for i in range(2**k)]
+	layer = m.cfg(f"INIT", 2**k)
 	while True:
 		can_mux4 = True
 		for t in taps:

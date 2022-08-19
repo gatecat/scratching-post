@@ -21,6 +21,7 @@ class ModuleGen:
 		self.inst_autoidx = 0
 		self.sig_autoidx = 0
 		self.config_bits = []
+		self.config_tags = []
 
 	def add_input(self, name, width=1):
 		self.inputs.append(ModulePort(name, width))
@@ -31,16 +32,25 @@ class ModuleGen:
 	def add_assign(self, dst, src):
 		self.assigns += [(dst, src)]
 
-	def cfg(self, name, width=1):
+	def cfg(self, name):
 		idx = len(self.config_bits)
-		if width == 1:
-			self.config_bits.append(name)
-			return f"cfg[{idx}]"
-		else:
-			for i in range(width):
-				self.config_bits.append(f"{name}[{i}]")
-			return f"cfg[{idx+width-1}:{idx}]"
+		self.config_bits.append(name)
+		return f"cfg[{idx}]"
+			
+	def cfg(self, name, width):
+		idx = len(self.config_bits)
+		for i in range(width):
+			self.config_bits.append(f"{name}[{i}]")
+		return list(f"cfg[{idx+i}]" for i in range(width))
 
+	def add_tag(self, name, cbits):
+		bits = []
+		for bit in cbits:
+			if bit.startswith("cfg["):
+				bits.append(int(bit[4:-1]))
+			else:
+				bits.append(bit)
+		self.config_tags.append(tuple([name, ] + bits))
 	def autosig(self):
 		self.sig_autoidx += 1
 		return f"n{self.sig_autoidx}"
@@ -63,6 +73,8 @@ class ModuleGen:
 			cfg_start = len(self.config_bits)
 			for b in mod.config_bits:
 				self.config_bits.append(f"{name}.{b}")
+			for m, bits in mod.config_tags:
+				self.config_tags.append(tuple([f"{name}.{b}", ] + [b + cfg_start for b in bits]))
 			ports["cfg"] = f"cfg[{cfg_start+len(mod.config_bits)-1}:{cfg_start}]"
 		self.insts.append(Instance(name, mod.module_name, ports))
 	def finalise(self, filename, append_cfg=False):
@@ -113,4 +125,8 @@ class ModuleGen:
 				print("/** CONFIG **", file=f)
 				for i, b in enumerate(self.config_bits):
 					print(f"  {i:>4d} {b}", file=f)
+				print("**/", file=f)
+				print("/** TAGS **", file=f)
+				for t in enumerate(self.config_tags):
+					print(f"  {t[0]} {' '.join(str(b) for b in t[1:])}", file=f)
 				print("**/", file=f)
