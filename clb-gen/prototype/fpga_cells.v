@@ -10,6 +10,10 @@ module sky130_fd_sc_hd__nand2_1(input A, B, output Y);
 	assign Y = ~(A & B);
 endmodule
 
+module sky130_fd_sc_hd__inv_1(input A, output Y);
+	assign Y = ~A;
+endmodule
+
 module sky130_fd_sc_hd__xnor2_1(input A, B, output Y);
 	assign Y = ~(A ^ B);
 endmodule
@@ -27,3 +31,10 @@ module sky130_fd_sc_hd__dfsbp_1(input D, SET_B, CLK, output reg Q, output Q_N);
 	assign Q_N = ~Q;
 endmodule
 
+module sky130_fd_sc_hd__buf_4(input A, output X);
+	assign X = A;
+endmodule
+
+module sky130_fd_sc_hd__clkbuf_4(input A, output X);
+	assign X = A;
+endmodule
