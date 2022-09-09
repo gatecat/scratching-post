@@ -26,3 +26,8 @@ module fab_tb;
 		.s_data(s_data)
 	);
 endmodule
+
+module clk_buf(input A, output X);
+assign X = A;
+endmodule
+
