@@ -1,0 +1,4 @@
+*.hex
+*.vvp
+__pycache__
+*.vcd
