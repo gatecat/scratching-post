@@ -8,7 +8,7 @@ module fab_tb;
     reg CLK = 1'b0;
     reg SelfWriteStrobe = 1'b0;
     reg [31:0] SelfWriteData = 1'b0;
-    reg Rx = 1'b0;
+    reg Rx = 1'b1;
     wire ComActive;
     wire ReceiveLED;
     reg s_clk = 1'b0;
@@ -27,25 +27,24 @@ module fab_tb;
         .s_data(s_data)
     );
 
-    localparam MAX_BITWORDS = 4096;
-    reg [31:0] bitstream[0:MAX_BITWORDS-1];
+    localparam MAX_BITBYTES = 16384;
+    reg [7:0] bitstream[0:MAX_BITBYTES-1];
 
     always #5000 CLK = (CLK === 1'b0);
 
-    task bitbang_send;
-        input [31:0] data;
-        input [31:0] ctrl;
+    localparam UART_DIV = 8;
+
+    task uart_send;
+        input [7:0] data;
+        reg [10:0] bits;
         begin
-            for (j = 0; j < 32; j = j + 1'b1) begin
-                s_data = data[31-j];
-                #10000;
-                s_clk = 1'b1;
-                #10000;
-                s_data = ctrl[31-j];
-                #10000;
-                s_clk = 1'b0;
-                #10000;
+            bits = {2'b11, data, 1'b0}; // gap, stop, data, start
+            for (j = 0; j < 11; j = j + 1'b1) begin
+                Rx = bits[j];
+                repeat (UART_DIV) @(posedge CLK);
             end
+            Rx = 1'b1;
+            repeat (UART_DIV) @(posedge CLK);
         end
     endtask
 
@@ -57,8 +56,8 @@ module fab_tb;
         #10000;
         repeat (10) @(posedge CLK);
         #2500;
-        for (i = 0; i < MAX_BITWORDS; i = i + 1'b1) begin
-            bitbang_send(bitstream[i], 32'h0000FAB1);
+        for (i = 0; i < MAX_BITBYTES; i = i + 1'b1) begin
+            uart_send(bitstream[i]);
         end
         repeat (500) @(posedge CLK);
         $finish;

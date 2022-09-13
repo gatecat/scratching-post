@@ -10,19 +10,17 @@
 from sys import argv
 
 binfile = argv[1]
-nwords = int(argv[2])
+nbytes = int(argv[2])
 outfile = argv[3]
 
 with open(binfile, "rb") as f:
     bindata = f.read()
 
-assert len(bindata) < 4*nwords
-assert len(bindata) % 4 == 0
+assert len(bindata) <= nbytes
 
 with open(outfile, "w") as f:
-    for i in range(nwords):
-        if i < len(bindata) // 4:
-            w = bindata[4*i : 4*i+4]
-            print("%02x%02x%02x%02x" % (w[0], w[1], w[2], w[3]), file=f)
+    for i in range(nbytes):
+        if i < len(bindata):
+            print(f"{bindata[i]:02x}", file=f)
         else:
             print("0", file=f)
