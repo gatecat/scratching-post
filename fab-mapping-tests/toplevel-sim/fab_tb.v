@@ -59,6 +59,10 @@ module fab_tb;
         for (i = 0; i < MAX_BITBYTES; i = i + 1'b1) begin
             uart_send(bitstream[i]);
         end
+        repeat (100) @(posedge CLK);
+        O_top = {28{1'b1}}; // reset will be one of these....
+        repeat (5) @(posedge CLK);
+        O_top = {28{1'b0}};
         repeat (500) @(posedge CLK);
         $finish;
     end
