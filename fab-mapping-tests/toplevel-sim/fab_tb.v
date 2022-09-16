@@ -37,6 +37,7 @@ module fab_tb;
     task uart_send;
         input [7:0] data;
         reg [10:0] bits;
+        integer j;
         begin
             bits = {2'b11, data, 1'b0}; // gap, stop, data, start
             for (j = 0; j < 11; j = j + 1'b1) begin
@@ -48,6 +49,7 @@ module fab_tb;
         end
     endtask
 
+
     integer i, j;
     initial begin
         $dumpfile("fab_tb.vcd");
@@ -56,8 +58,13 @@ module fab_tb;
         #10000;
         repeat (10) @(posedge CLK);
         #2500;
-        for (i = 0; i < MAX_BITBYTES; i = i + 1'b1) begin
-            uart_send(bitstream[i]);
+        for (i = 0; i < MAX_BITBYTES; i = i + 4) begin
+            SelfWriteData <= {bitstream[i], bitstream[i+1], bitstream[i+2], bitstream[i+3]};
+            repeat (2) @(posedge CLK);
+            SelfWriteStrobe <= 1'b1;
+            @(posedge CLK);
+            SelfWriteStrobe <= 1'b0;
+            repeat (2) @(posedge CLK);
         end
         repeat (100) @(posedge CLK);
         O_top = {28{1'b1}}; // reset will be one of these....

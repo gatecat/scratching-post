@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -ex
-BITSTREAM=$HOME/test/fab/inv.bit
+BITSTREAM=$HOME/test/fab/inv.bin
 PRJ=$HOME/FABulous-refactor/test_prj
 MAX_BITBYTES=16384
 
