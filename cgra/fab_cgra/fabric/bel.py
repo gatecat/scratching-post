@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from amaranth import *
 from amaranth.hdl.rec import Layout
 from dataclasses import dataclass
@@ -17,6 +19,15 @@ class PortSpec:
     shape: int|Shape|Layout = 1
     external: bool = False
     shared: bool = False
+    tile_wire: str|None = None # for manually wiring complex stuff
+
+    def get_wire(self, bel: Bel):
+        if self.tile_wire is not None:
+            return self.tile_wire
+        elif self.external:
+            return self.name
+        else:
+            return f"{bel.prefix}_{self.name}"
 
 class BelConfig:
     name: str
@@ -24,11 +35,12 @@ class BelConfig:
     tags: list[tuple[str, int]]
 
 class Bel(Elaboratable):
-    def __init__(self):
+    def __init__(self, name, prefix):
+        self.name = name
+        self.prefix = prefix
         self.cfg_bits: list[BelConfig] = []
     def get_ports(self) -> list[PortSpec]:
         assert False
-
     def cfg_bit(self, name: str) -> Signal:
         sig = Signal(name=f"cfg_{name}")
         self.cfg_bits.append(BelConfig(name=name, sig=sig, tags=[("", 1)]))
@@ -48,4 +60,4 @@ class Bel(Elaboratable):
     def cfg_count(self) -> int:
         return sum(len(cfg.sig) for cfg in self.cfg_bits)
     def cfg_bits(self):
-        return Cat(*(cfg.sig for cfg in self.cfg_bits))
+        return Cat(*(cfg.sig for cfg in self.cfg_bits))        
