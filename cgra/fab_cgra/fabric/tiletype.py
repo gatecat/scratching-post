@@ -48,6 +48,8 @@ class _TileConfig(Elaboratable):
         return m
 
 def _expand_matrix_entry(switch_matrix):
+    # expand a classic FABulous style switch matrix entry
+    # foo_[a|b][0|1] -> (foo_a0, foo_a1, foo_b0, foo_b1)
     result = []
     did_something = False
     while did_something:
@@ -68,25 +70,29 @@ def _expand_matrix_entry(switch_matrix):
         result = expanded_result
     return result
 
-def _parse_switch_matrix(switch_matrix):
-    result = {}
-    for entry in switch_matrix:
-        if isinstance(entry, tuple):
-            assert isinstance(entry[0], str), entry
-            assert isinstance(entry[1], list), entry
-            for src in entry[1]:
-                if entry[0] not in result: result[entry[0]] = []
-                result[entry[0]].append(src)
+def _parse_fab_switch_matrix(entry):
+    # if it's a classic FABulous style string, expand it
+    dst_str, _, src_str = entry.partition(",")
+    dsts = _expand_matrix_entry(dst_str)
+    srcs = _expand_matrix_entry(src_str)
+    return (dsts, srcs)
+
+class SwitchMatrix:
+    def __init__(self):
+        self.matrix = {}
+    def add(self, entry, srcs=None):
+        # add an entry to the switch matrix, either classic FABulous style as a single string or str being the dst and rhs being the list of sources
+        if srcs is not None:
+            for src in srcs:
+                self.add_pip(entry, src)
         else:
-            assert isinstance(entry, str), entry
-            # if it's a classic FABulous style string, expand it
-            dst_str, _, src_str = entry.partition(",")
-            dsts = _expand_matrix_entry(dst_str)
-            srcs = _expand_matrix_entry(src_str)
-            for dst, src in zip(dsts, srcs):
-                if dst not in result: result[dst] = []
-                result[dst].append(src)
-    return result
+            for dst, src in zip(*_parse_fab_switch_matrix(entry))
+                self.add_pip(dst, src)
+    def add_pip(self, dst, src):
+        if dst not in self.matrix:
+            self.matrix[dst] = []
+        if src not in self.matrix[dst]
+            self.matrix[dst].append(src)
 
 class _TileSwitchMatrix(Elaboratable, Configurable):
     def __init__(self, t: Tile):
@@ -95,7 +101,7 @@ class _TileSwitchMatrix(Elaboratable, Configurable):
 
 # TODO: work out how to do nice strongly typed switch matrix
 class Tile(Elaboratable, Configurable):
-    def __init__(self, name: str, fcfg: FabricConfig, ports: list[TilePort], bels: list[Bel], switch_matrix):
+    def __init__(self, name: str, fcfg: FabricConfig, ports: list[TilePort], bels: list[Bel], switch_matrix: SwitchMatrix):
         self.name = name
         self.fcfg = fcfg
         self.route_ports = ports
