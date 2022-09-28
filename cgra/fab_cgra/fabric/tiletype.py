@@ -37,7 +37,8 @@ class _TileConfig(Elaboratable):
     def __init__(self, fcfg: FabricConfig, total_size: int):
         self.fcfg = fcfg
         self.total_size = total_size
-        self.frame_count = (self.total_size + (fcfg.row_bits_per_frame - 1)) // fcfg.row_bits_per_frame
+        self.bpf = fcfg.row_bits_per_frame
+        self.frame_count = (self.total_size + (self.bpf - 1)) // self.bpf
         self.frame_strobe = Signal(self.frame_count)
         self.frame_data = Signal(fcfg.row_bits_per_frame)
         self.config_bits = Signal(total_size)
@@ -45,6 +46,12 @@ class _TileConfig(Elaboratable):
 
     def elaborate(self, platform):
         m = Module()
+        t = self.fcfg.tech
+        for (i, bit) in enumerate(self.config_bits):
+            t.add_latch(m=m,
+                d=self.frame_data[i % self.bpf], e=self.frame_strobe[i // self.bpf], q=self.config_bits[i],
+                name=f"cfg{i}"
+            )
         return m
 
 def _expand_matrix_entry(switch_matrix):
@@ -97,16 +104,30 @@ class SwitchMatrix:
 class _TileSwitchMatrix(Elaboratable, Configurable):
     def __init__(self, t: Tile):
         self.t = t
-        self.route_graph = _parse_switch_matrix(t.switch_matrix)
+        # Prepare the config bit layout
+        self.dst2bits = {}
+        for dst, srcs in self.t.switch_matrix.items():
+            # use split_mux to get the bit pattern enum
+            self.dst2bits[dst] = self.cfg_enum(dst,
+                self.t.tech.split_mux(m=None, inputs=[(None, src) for src in srcs], sel=None, y=None, dry_run=True))
+    def elaborate(self, platform):
+        m = Module()
+        for dst, srcs in self.t.switch_matrix.items():
+            sel = self.dst2bits[dst]
+            self.t.tech.split_mux(m=m,
+                inputs=[(self.t.wires[src], src) for src in srcs], sel=sel, y=self.t.wires[dst],
+                dry_run=False, name=f"cfg_{dst}")
+        return m
 
 # TODO: work out how to do nice strongly typed switch matrix
 class Tile(Elaboratable, Configurable):
     def __init__(self, name: str, fcfg: FabricConfig, ports: list[TilePort], bels: list[Bel], switch_matrix: SwitchMatrix):
         self.name = name
         self.fcfg = fcfg
+        self.tech = fcfg.tech
         self.route_ports = ports
         self.bels = bels
-        self.switch_matrix_desc = switch_matrix
+        self.switch_matrix = switch_matrix
         self.config_bits = []
         self.wires = {}
         # create signals
@@ -119,8 +140,14 @@ class Tile(Elaboratable, Configurable):
         for port in self.route_ports:
             for wire in (p.src, p.dst):
                 if wire is not None and not hasattr(self, wire):
-                    port_width = port.width * (abs(port.dx) + abs(port.dy))
-                    setattr(self, wire, Signal(shape=layout_width(port.shape)*port_width))
+                    wire_len = max(1, abs(port.dx) + abs(port.dy))
+                    port_width = port.width * wire_len
+                    sig = Signal(name=wire, shape=layout_width(port.shape)*port_width)
+                    setattr(self, wire, sig)
+                    # sub-wires
+                    for i in range(port.width):
+                        ofs = (wire_len - 1) * port.width if (wire == p.src) else 0
+                        self.wires[f"{wire}{i}"] = sig[(ofs+i)*layout_width(port.shape) : (ofs+i+1)*layout_width(port.shape)]
         # setup config bits...
         #  - bel config
         for bel in bels:
@@ -129,7 +156,14 @@ class Tile(Elaboratable, Configurable):
                 tile_wire = port.get_wire(bel)
                 if tile_wire not in self.wires:
                     self.wires[tile_wire] = Signal(shape=port.shape, name=tile_wire)
-        # - TODO: routing....
+        # prepare submodules
+        self.sb_i = _TileSwitchMatrix(self)
+        if self.cfg_count() > 0:
+            self.cfg_i = _TileConfig(self.fcfg, self.cfg_count())
+            self.cfg_datai = Signal(fcfg.row_bits_per_frame)
+            self.cfg_strbi = Signal(len(self.cfg_i.frame_strobe))
+            self.cfg_datao = Signal(fcfg.row_bits_per_frame)
+            self.cfg_strbo = Signal(len(self.cfg_i.frame_strobe))
     def toplevel_ports(self): # (name, signal, edge)
         # hardcoded ports that we might have
         def_ports = [
@@ -152,3 +186,27 @@ class Tile(Elaboratable, Configurable):
                 top_ports.append((p.dst, getattr(self, p.dst), p.dir.opposite())) # TODO: check directions
                 seen_ports.add(p.dst)
         return top_ports
+    def elaborate(self, platform):
+        m = Module()
+        # add submodule instances
+        for b in self.bels:
+            setattr(m.submodules, f"bel_{bel.name}", b)
+            # connect bel ports to tile wires
+            for port in b.get_ports():
+                # TODO: record ports
+                if port.direction == PortDir.OUT:
+                    m.d.comb += self.wires[port.tile_wire()].eq(getattr(b, port.name))
+                else:
+                    m.d.comb += getattr(b, port.name).eq(self.wires[port.tile_wire()])
+            if hasattr(b, "gclocki"):
+                m.d.comb += getattr(b, "gclocki").eq(self.gclocki)
+        m.submodules.sb_i = self.sb_i
+        if self.cfg_count() > 0:
+            # add config memory and connect up
+            m.submodules.cfg_i = self.cfg_i
+            m.d.comb += [
+                self.cfg_i.frame_data.eq(self.cfg_datai),
+                self.cfg_i.frame_strobe.eq(self.cfg_strbi),
+                self.cfg_bits().eq(self.cfg_i.config_bits),
+            ]
+        return m
