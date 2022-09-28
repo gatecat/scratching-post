@@ -86,12 +86,12 @@ class SwitchMatrix:
             for src in srcs:
                 self.add_pip(entry, src)
         else:
-            for dst, src in zip(*_parse_fab_switch_matrix(entry))
+            for dst, src in zip(*_parse_fab_switch_matrix(entry)):
                 self.add_pip(dst, src)
     def add_pip(self, dst, src):
         if dst not in self.matrix:
             self.matrix[dst] = []
-        if src not in self.matrix[dst]
+        if src not in self.matrix[dst]:
             self.matrix[dst].append(src)
 
 class _TileSwitchMatrix(Elaboratable, Configurable):
@@ -119,7 +119,8 @@ class Tile(Elaboratable, Configurable):
         for port in self.route_ports:
             for wire in (p.src, p.dst):
                 if wire is not None and not hasattr(self, wire):
-                    setattr(self, wire, Signal(shape=layout_width(port.shape)*))
+                    port_width = port.width * (abs(port.dx) + abs(port.dy))
+                    setattr(self, wire, Signal(shape=layout_width(port.shape)*port_width))
         # setup config bits...
         #  - bel config
         for bel in bels:

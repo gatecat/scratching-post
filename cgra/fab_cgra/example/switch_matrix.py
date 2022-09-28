@@ -1,4 +1,4 @@
-from ..fabric.tile import SwitchMatrix
+from ..fabric.tiletype import SwitchMatrix
 
 # Generate a derivative of the default FABulous switch matrix. Currently this is optimised for a roughly LUT4 arch
 # More flexible switch matrix generation based on what it's connecting to is a problem for a future myrtle cat...
@@ -22,6 +22,36 @@ def def_switch_matrix(inputs=[], ce_inputs=[], sr_inputs=[], sel_inputs=[], outp
     for i, inp in enumerate(sel_inputs):
         result.add(inp, [f"J{d}2END{(i + 4) % 8}" for d in "NESW"])
     # output-associated routing
+    #   output->double
+    if len(outputs) > 0:
+        for i in range(8):
+            o = [outputs[(8*i + j) % len(outputs)] for j in range(8) if j != si]
+            for d in "NESW":
+                result.add(f"J{d}2BEG{i}", o)
+                # TODO: this does permute them a bit different to the original matrix
+                #  does that matter? for future cat
+                if len(mux_outputs) > 0:
+                    result.add(f"J{d}2BEG{i}", [mux_outputs[i % len(mux_outputs)], ])
+        for i in range(4):
+            # random permutation attempt
+            result.add(f"N1BEG{i}", outputs[(11+i) % len(outputs)])
+            result.add(f"E1BEG{i}", outputs[(3+i) % len(outputs)])
+            result.add(f"S1BEG{i}", outputs[(4+i) % len(outputs)])
+            result.add(f"W1BEG{i}", outputs[(13+i) % len(outputs)])
+
+            result.add(f"N4BEG{i}", outputs[(4+i) % len(outputs)])
+            result.add(f"S4BEG{i}", outputs[(0+i) % len(outputs)])
+
+            for d in ("NN", "SS", "EE", "WW"):
+                ofs = 8 if d in ("NN", "EE") else 0
+                result.add(f"N4BEG{i}", outputs[(4+i+ofs) % len(outputs)])
+                result.add(f"S4BEG{i}", outputs[(0+i+ofs) % len(outputs)])
+        for i in range(2):
+            result.add(f"E6BEG{i}", [outputs[(8*i + j) % len(outputs)] for j in range(8)])
+            result.add(f"W6BEG{i}", [outputs[(8*i + j) % len(outputs)] for j in range(8)])
+            if len(mux_outputs) > 0:
+                result.add(f"E6BEG{i}", [outputs[(2*i + j) % len(mux_outputs)] for j in range(2)])
+                result.add(f"W6BEG{i}", [outputs[(2*i + j) % len(mux_outputs)] for j in range(2)])
     return result
 
 # General hardcoded parts from FABulous example
@@ -142,4 +172,61 @@ _base_matrix = [
     "JW2BEG[5|5|5|5|5|5|5|5],[S1END0|N2END6|E2END6|S2END6|N1END2|E1END2|S1END2|W1END2]",
     "JW2BEG[6|6|6|6|6|6|6|6],[S1END1|N2END7|E2END7|S2END7|N1END3|E1END3|S1END3|W1END3]",
     "JW2BEG[7|7|7|7|7|7|7|7],[S1END2|NN4END0|E2END0|S2END0|N1END0|E1END0|S1END0|W1END0]",
+
+    "N1BEG[0|0|0|0],[J_l_CD_END1|JW2END3|J2MID_CDb_END3]",
+    "N1BEG[1|1|1|1],[J_l_EF_END2|JW2END0|J2MID_EFb_END0]",
+    "N1BEG[2|2|2|2],[J_l_GH_END3|JW2END1|J2MID_GHb_END1]",
+    "N1BEG[3|3|3|3],[J_l_AB_END0|JW2END2|J2MID_ABb_END2]",
+
+    "E1BEG[0|0|0|0],[J_l_CD_END1|JN2END3|J2MID_CDb_END3]",
+    "E1BEG[1|1|1|1],[J_l_EF_END2|JN2END0|J2MID_EFb_END0]",
+    "E1BEG[2|2|2|2],[J_l_GH_END3|JN2END1|J2MID_GHb_END1]",
+    "E1BEG[3|3|3|3],[J_l_AB_END0|JN2END2|J2MID_ABb_END2]",
+
+    "S1BEG[0|0|0|0],[J_l_CD_END1|JE2END3|J2MID_CDb_END3]",
+    "S1BEG[1|1|1|1],[J_l_EF_END2|JE2END0|J2MID_EFb_END0]",
+    "S1BEG[2|2|2|2],[J_l_GH_END3|JE2END1|J2MID_GHb_END1]",
+    "S1BEG[3|3|3|3],[J_l_AB_END0|JE2END2|J2MID_ABb_END2]",
+
+    "W1BEG[0|0|0|0],[J_l_CD_END1|JS2END3|J2MID_CDb_END3]",
+    "W1BEG[1|1|1|1],[J_l_EF_END2|JS2END0|J2MID_EFb_END0]",
+    "W1BEG[2|2|2|2],[J_l_GH_END3|JS2END1|J2MID_GHb_END1]",
+    "W1BEG[3|3|3|3],[J_l_AB_END0|JS2END2|J2MID_ABb_END2]",
+
+    "N4BEG[0|0|0|0],[N4END1|N2END2|E6END1]",
+    "N4BEG[1|1|1|1],[N4END2|N2END3|E6END0]",
+    "N4BEG[2|2|2|2],[N4END3|N2END0|W6END1]",
+    "N4BEG[3|3|3|3],[N4END0|N2END1|W6END0]",
+
+    "S4BEG[0|0|0|0],[S4END1|S2END2|E6END1]",
+    "S4BEG[1|1|1|1],[S4END2|S2END3|E6END0]",
+    "S4BEG[2|2|2|2],[S4END3|S2END0|W6END1]",
+    "S4BEG[3|3|3|3],[S4END0|S2END1|W6END0]",
+
+    "EE4BEG[0|0|0|0|0|0|0|0],[J2MID_ABb_END1|J2MID_CDb_END1|J2END_GH_END0|N1END2|S1END2|E1END2]",
+    "EE4BEG[1|1|1|1|1|1|1|1],[J2MID_ABa_END2|J2MID_CDa_END2|J2END_EF_END0|N1END3|S1END3|E1END3]",
+    "EE4BEG[2|2|2|2|2|2|2|2],[J2MID_EFb_END1|J2MID_GHb_END1|J2END_CD_END0|N1END0|S1END0|E1END0]",
+    "EE4BEG[3|3|3|3|3|3|3|3],[J2MID_EFa_END2|J2MID_GHa_END2|J2END_AB_END0|N1END1|S1END1|E1END1]",
+
+    "WW4BEG[0|0|0|0|0|0|0|0],[J2MID_ABb_END1|J2MID_CDb_END1|J2END_GH_END2|N1END2|S1END2|W1END2]",
+    "WW4BEG[1|1|1|1|1|1|1|1],[J2MID_ABa_END2|J2MID_CDa_END2|J2END_EF_END2|N1END3|S1END3|W1END3]",
+    "WW4BEG[2|2|2|2|2|2|2|2],[J2MID_EFb_END1|J2MID_GHb_END1|J2END_CD_END2|N1END0|S1END0|W1END0]",
+    "WW4BEG[3|3|3|3|3|3|3|3],[J2MID_EFa_END2|J2MID_GHa_END2|J2END_AB_END2|N1END1|S1END1|W1END1]",
+
+    "NN4BEG[0|0|0|0|0|0|0|0],[J2MID_ABb_END1|J2MID_CDb_END1|J2END_GH_END1|E1END2|W1END2|N1END2]",
+    "NN4BEG[1|1|1|1|1|1|1|1],[J2MID_ABa_END2|J2MID_CDa_END2|J2END_EF_END1|E1END3|W1END3|N1END3]",
+    "NN4BEG[2|2|2|2|2|2|2|2],[J2MID_EFb_END1|J2MID_GHb_END1|J2END_CD_END1|E1END0|W1END0|N1END0]",
+    "NN4BEG[3|3|3|3|3|3|3|3],[J2MID_EFa_END2|J2MID_GHa_END2|J2END_AB_END1|E1END1|W1END1|N1END1]",
+
+    "SS4BEG[0|0|0|0|0|0|0|0],[J2MID_ABb_END1|J2MID_CDb_END1|J2END_GH_END3|E1END2|W1END2|N1END2]",
+    "SS4BEG[1|1|1|1|1|1|1|1],[J2MID_ABa_END2|J2MID_CDa_END2|J2END_EF_END3|E1END3|W1END3|N1END3]",
+    "SS4BEG[2|2|2|2|2|2|2|2],[J2MID_EFb_END1|J2MID_GHb_END1|J2END_CD_END3|E1END0|W1END0|N1END0]",
+    "SS4BEG[3|3|3|3|3|3|3|3],[J2MID_EFa_END2|J2MID_GHa_END2|J2END_AB_END3|E1END1|W1END1|N1END1]",
+
+    "E6BEG[0|0|0|0|0|0|0|0],[J2MID_ABb_END1|J2MID_CDb_END1|J2MID_EFb_END1|J2MID_GHb_END1|E1END3|W1END3]",
+    "E6BEG[1|1|1|1|1|1|1|1],[J2MID_ABa_END2|J2MID_CDa_END2|J2MID_EFa_END2|J2MID_GHa_END2|E1END2|W1END2]",
+
+    "W6BEG[0|0|0|0|0|0|0|0],[J2MID_ABb_END1|J2MID_CDb_END1|J2MID_EFb_END1|J2MID_GHb_END1|E1END3|W1END3]",
+    "W6BEG[1|1|1|1|1|1|1|1],[J2MID_ABa_END2|J2MID_CDa_END2|J2MID_EFa_END2|J2MID_GHa_END2|E1END2|W1END2]",
+
 ]

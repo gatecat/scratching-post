@@ -8,7 +8,7 @@ from enum import Enum, IntEnum
 
 from ..core.util import *
 
-__all__ = ["Bel", "ConfigBit", "PortSpec", "PortDir"]
+__all__ = ["Bel", "Configurable", "ConfigBit", "PortSpec", "PortDir"]
 
 class PortDir(Enum):
     IN = 0

@@ -22,7 +22,7 @@ class BaseTech:
         inst = Instance(f"generic_{typ}",
             **{f'{"o" if p in ("x", "y", "q") else "i"}_{p}': q for p, q in ports}
         )
-        self._add_submod(m: Module, name, inst)
+        self._add_submod(m, name, inst)
 
     def avail_mux_sizes():
         return (2, 4, 8, 16)
