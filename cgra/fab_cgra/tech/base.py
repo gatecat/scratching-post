@@ -24,7 +24,7 @@ class BaseTech:
         )
         self._add_submod(m, name, inst)
 
-    def avail_mux_sizes():
+    def avail_mux_sizes(self):
         return (2, 4, 8, 16)
 
     def add_latch(self, m: Module, d: PortVal, e: PortVal, q: PortVal, name=None):
@@ -52,10 +52,13 @@ class BaseTech:
         # CGRA routing
         # returns an IntEnum containing the config bitmap of the mux -- running with dry_run gets the bitmap without
         # creating any logic
-        assert len(sel) == len(inputs).bit_length()
+        if dry_run:
+            sel = C(0, len(inputs).bit_length())
+        else:
+            assert len(sel) == len(inputs).bit_length()
         autoidx = 0
         bitmap = dict()
-        if name is None:
+        if name is None and not dry_run:
             name = y.name
         def recursive_muxgen(inp_sigs, sel_bits, hot_bits):
             nonlocal autoidx
@@ -65,7 +68,7 @@ class BaseTech:
                 bitmap[inp_sigs[0][1]] = hot_bits
                 return inp_sigs[0][0]
             else:
-                for mux_size in sorted(avail_mux_sizes):
+                for mux_size in sorted(self.avail_mux_sizes()):
                     if mux_size >= len(inp_sigs):
                         break
                 mux_depth = mux_size.bit_length()
@@ -82,7 +85,7 @@ class BaseTech:
                 for i in range(len(chunks)):
                     autoidx += 1
                     chunks[i] = recursive_muxgen(chunks[i], sel_bits[:-mux_depth],
-                        hot_bits + list(((len(bits) - mux_depth) + j) for j in range(mux_depth) if i & (1 << j)))
+                        hot_bits + list(((len(inp_sigs) - mux_depth) + j) for j in range(mux_depth) if i & (1 << j)))
                 if not dry_run:
                     # the mux part
                     out_sig = Signal(name=f"{name}_n{autoidx}", shape=y.shape)
@@ -96,7 +99,8 @@ class BaseTech:
         result = recursive_muxgen(inputs, list(sel[i] for i in range(len(sel))), []) 
         if not dry_run:
             m.d.comb += y.eq(result)
-        e = IntEnum({
+        e = IntEnum(f"{name}_settings", {
             k: sum((1 << j) for j in v) for k, v in bitmap.items()
         })
+        print(e)
         return e

@@ -11,14 +11,14 @@ class LogicCell(Bel):
 
         self.tech = tech
         self._k = 4
-        self._lut_init = self.cfg_word("INIT", 2**k)
-        self._ff_used = self.cfg_bit("FF")
+        self._lut_init = self.cfg.word("INIT", 2**self._k)
+        self._ff_used = self.cfg.bit("FF")
 
     def elaborate(self, platform):
         m = Module()
         lut_out = Signal()
         self.split_mux(m=m,
-            inputs=[self._lut_init[i] for i in range(2**k)],
+            inputs=[self._lut_init[i] for i in range(2**self._k)],
             sel=Cat(self.A, self.B, self.C, self.D),
             y=lut_out,
             name="lut_mux",
@@ -55,7 +55,7 @@ if __name__ == '__main__':
             bels = [
                 LogicCell(f"L{n}", f"L{n}_", cfg.tech) for n in "ABCDEFGH"
             ]
-            super().__init__(name="LogicTile", fcfg=cfg, ports=ports, bels=bels, switch_matrix=switch_matrix)
+            super().__init__(name="LogicTile", fcfg=cfg, ports=ports, bels=bels, switch_matrix=matrix)
 
         def elaborate(self, platform):
             super().elaborate(platform)

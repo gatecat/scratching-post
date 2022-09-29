@@ -73,7 +73,7 @@ def base_switch_matrix(inputs=[], ce_inputs=[], sr_inputs=[], sel_inputs=[], out
     #   output->double
     if len(outputs) > 0:
         for i in range(8):
-            o = [outputs[(8*i + j) % len(outputs)] for j in range(8) if j != si]
+            o = [outputs[(8*i + j) % len(outputs)] for j in range(8) if j != i]
             for d in "NESW":
                 result.add(f"J{d}2BEG{i}", o)
                 # TODO: this does permute them a bit different to the original matrix
