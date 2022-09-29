@@ -17,11 +17,11 @@ class GridDir(Enum):
     W = 3
     J = 4 # JUMP
     def opposite(self):
-        if self == N: return S
-        if self == E: return W
-        if self == S: return N
-        if self == W: return E
-        if self == J: return J
+        if self == GridDir.N: return GridDir.S
+        if self == GridDir.E: return GridDir.W
+        if self == GridDir.S: return GridDir.N
+        if self == GridDir.W: return GridDir.E
+        if self == GridDir.J: return GridDir.J
 
 @dataclass
 class TilePort:
@@ -93,6 +93,7 @@ class SwitchMatrix:
             for src in srcs:
                 self.add_pip(entry, src)
         else:
+            assert not isinstance(srcs, str), srcs
             for dst, src in zip(*_parse_fab_switch_matrix(entry)):
                 self.add_pip(dst, src)
     def add_pip(self, dst, src):
@@ -155,15 +156,15 @@ class Tile(Elaboratable):
         # setup config bits...
         #  - bel config
         for bel in bels:
-            self.cfg.inst(bel.name, bel.cfg)
+            self.cfg.inst(f"{bel.name}.", bel.cfg)
             for port in bel.get_ports():
                 tile_wire = port.get_wire(bel)
                 if tile_wire not in self.wires:
                     self.wires[tile_wire] = Signal(shape=port.shape, name=tile_wire)
         # prepare submodules
         self.sb_i = _TileSwitchMatrix(self)
-        self.cfg.inst(self.sb_i.cfg)
-        if self.cfg_count() > 0:
+        self.cfg.inst("", self.sb_i.cfg)
+        if self.cfg.count() > 0:
             self.cfgmem_i = _TileConfig(self.fcfg, self.cfg.count())
             self.cfg_datai = Signal(fcfg.row_bits_per_frame)
             self.cfg_strbi = Signal(len(self.cfgmem_i.frame_strobe))
@@ -193,21 +194,22 @@ class Tile(Elaboratable):
         return top_ports
     def elaborate(self, platform):
         m = Module()
-        m.d.comb += ClockSignal().eq(gclocki[0])
+        if self.fcfg.num_clocks > 0:
+            m.d.comb += ClockSignal().eq(self.gclocki[0])
         # add submodule instances
         for b in self.bels:
-            setattr(m.submodules, f"bel_{bel.name}", b)
+            setattr(m.submodules, f"bel_{b.name}", b)
             # connect bel ports to tile wires
             for port in b.get_ports():
                 # TODO: record ports
                 if port.dir == PortDir.OUT:
-                    m.d.comb += self.wires[port.tile_wire()].eq(getattr(b, port.name))
+                    m.d.comb += self.wires[port.get_wire(b)].eq(getattr(b, port.name))
                 else:
-                    m.d.comb += getattr(b, port.name).eq(self.wires[port.tile_wire()])
+                    m.d.comb += getattr(b, port.name).eq(self.wires[port.get_wire(b)])
             if hasattr(b, "gclocki"):
                 m.d.comb += getattr(b, "gclocki").eq(self.gclocki)
         m.submodules.sb_i = self.sb_i
-        if self.cfg_count() > 0:
+        if self.cfg.count() > 0:
             # add config memory and connect up
             m.submodules.cfgmem_i = self.cfgmem_i
             m.d.comb += [

@@ -12,15 +12,15 @@ class BaseTech:
         if name is None:
             name = f'i{self.autoidx}'
             self.autoidx += 1
-        assert not hasattr(self.submodules, name)
-        setattr(self.m.submodules, name, inst)
+        assert not hasattr(m.submodules, name)
+        setattr(m.submodules, name, inst)
 
     def add_gate(self, m: Module, typ: str, name: str|None=None, **ports: dict[str, PortVal]):
         # TODO: gate golfing
-        assert name in ("and2", "nand2", "or2", "nor2", "xor2", "xnor2",
-            "mux2", "mux4", "mux8", "mux16", "buf", "clkbuf")
+        assert typ in ("and2", "nand2", "or2", "nor2", "xor2", "xnor2",
+            "mux2", "mux4", "mux8", "mux16", "buf", "clkbuf"), typ
         inst = Instance(f"generic_{typ}",
-            **{f'{"o" if p in ("x", "y", "q") else "i"}_{p}': q for p, q in ports}
+            **{f'{"o" if p in ("x", "y", "q") else "i"}_{p}': q for p, q in ports.items()}
         )
         self._add_submod(m, name, inst)
 
@@ -29,20 +29,20 @@ class BaseTech:
 
     def add_latch(self, m: Module, d: PortVal, e: PortVal, q: PortVal, name=None):
         inst = Instance(f"generic_lat",
-            d=d, e=e, q=q
+            i_d=d, i_e=e, o_q=q
         )
         self._add_submod(m, name, inst)
 
     def add_dff(self, m: Module, d: PortVal, clk: PortVal, q: PortVal, name=None):
         inst = Instance(f"generic_dff",
-            d=d, clk=clk, q=q
+            i_d=d, i_clk=clk, o_q=q
         )
         self._add_submod(m, name, inst)
 
     def add_mux(self, m: Module, inputs: list[PortVal], sel: list[PortVal], y: PortVal, name=None):
         assert len(inputs) in self.avail_mux_sizes()
-        assert len(sel) == len(inputs).bit_length()
-        add_gate(m=m, type=f"mux{len(inputs)}", y=y, 
+        assert 2**len(sel) == len(inputs), (len(sel), len(inputs))
+        self.add_gate(m=m, typ=f"mux{len(inputs)}", y=y, 
             **{f"i{i}": s for i, s in enumerate(inputs)},
             **{f"s{i}": s for i, s in enumerate(sel)}
         )
@@ -54,8 +54,6 @@ class BaseTech:
         # creating any logic
         if dry_run:
             sel = C(0, len(inputs).bit_length())
-        else:
-            assert len(sel) == len(inputs).bit_length()
         autoidx = 0
         bitmap = dict()
         if name is None and not dry_run:
@@ -71,7 +69,7 @@ class BaseTech:
                 for mux_size in sorted(self.avail_mux_sizes()):
                     if mux_size >= len(inp_sigs):
                         break
-                mux_depth = mux_size.bit_length()
+                mux_depth = mux_size.bit_length()-1
                 # TODO: check this dividing is correct
                 chunks = []
                 chunk_start = 0
@@ -88,11 +86,11 @@ class BaseTech:
                         hot_bits + list(((len(inp_sigs) - mux_depth) + j) for j in range(mux_depth) if i & (1 << j)))
                 if not dry_run:
                     # the mux part
-                    out_sig = Signal(name=f"{name}_n{autoidx}", shape=y.shape)
+                    out_sig = Signal(name=f"{name}_n{autoidx}", shape=y.shape())
                     # might be switching multiple bits at once for CGRA interconnect...
-                    for i in len(out_sig):
+                    for i in range(len(out_sig)):
                         self.add_mux(m, inputs=([c[i] for c in chunks] + [0 for j in range(mux_size - len(chunks))]),
-                            sel=sel_bits, y=out_sig[i], name=f"{name}_m{autoidx}")
+                            sel=sel_bits[-mux_depth:], y=out_sig[i], name=f"{name}_m{autoidx}")
                     return out_sig
                 else:
                     return None
@@ -102,5 +100,4 @@ class BaseTech:
         e = IntEnum(f"{name}_settings", {
             k: sum((1 << j) for j in v) for k, v in bitmap.items()
         })
-        print(e)
         return e

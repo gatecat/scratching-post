@@ -43,9 +43,15 @@ def base_ports():
         TilePort(dir=GridDir.J, src="J2END_GH_BEG", dst="J2END_GH_END", width=4),
 
         TilePort(dir=GridDir.J, src="JN2BEG", dst="JN2END", width=8),
-        TilePort(dir=GridDir.J, src="JE2BEG", dst="JE2BEG", width=8),
-        TilePort(dir=GridDir.J, src="JS2BEG", dst="JS2BEG", width=8),
-        TilePort(dir=GridDir.J, src="JW2BEG", dst="JW2BEG", width=8),
+        TilePort(dir=GridDir.J, src="JE2BEG", dst="JE2END", width=8),
+        TilePort(dir=GridDir.J, src="JS2BEG", dst="JS2END", width=8),
+        TilePort(dir=GridDir.J, src="JW2BEG", dst="JW2END", width=8),
+
+        TilePort(dir=GridDir.J, src="J_l_AB_BEG", dst="J_l_AB_END", width=4),
+        TilePort(dir=GridDir.J, src="J_l_CD_BEG", dst="J_l_CD_END", width=4),
+        TilePort(dir=GridDir.J, src="J_l_EF_BEG", dst="J_l_EF_END", width=4),
+        TilePort(dir=GridDir.J, src="J_l_GH_BEG", dst="J_l_GH_END", width=4),
+
     ]
 
 # Generate a derivative of the default FABulous switch matrix. Currently this is optimised for a roughly LUT4 arch
@@ -82,18 +88,18 @@ def base_switch_matrix(inputs=[], ce_inputs=[], sr_inputs=[], sel_inputs=[], out
                     result.add(f"J{d}2BEG{i}", [mux_outputs[i % len(mux_outputs)], ])
         for i in range(4):
             # random permutation attempt
-            result.add(f"N1BEG{i}", outputs[(11+i) % len(outputs)])
-            result.add(f"E1BEG{i}", outputs[(3+i) % len(outputs)])
-            result.add(f"S1BEG{i}", outputs[(4+i) % len(outputs)])
-            result.add(f"W1BEG{i}", outputs[(13+i) % len(outputs)])
+            result.add(f"N1BEG{i}", [outputs[(11+i) % len(outputs)]])
+            result.add(f"E1BEG{i}", [outputs[(3+i) % len(outputs)]])
+            result.add(f"S1BEG{i}", [outputs[(4+i) % len(outputs)]])
+            result.add(f"W1BEG{i}", [outputs[(13+i) % len(outputs)]])
 
-            result.add(f"N4BEG{i}", outputs[(4+i) % len(outputs)])
-            result.add(f"S4BEG{i}", outputs[(0+i) % len(outputs)])
+            result.add(f"N4BEG{i}", [outputs[(4+i) % len(outputs)]])
+            result.add(f"S4BEG{i}", [outputs[(0+i) % len(outputs)]])
 
             for d in ("NN", "SS", "EE", "WW"):
                 ofs = 8 if d in ("NN", "EE") else 0
-                result.add(f"N4BEG{i}", outputs[(4+i+ofs) % len(outputs)])
-                result.add(f"S4BEG{i}", outputs[(0+i+ofs) % len(outputs)])
+                result.add(f"N4BEG{i}", [outputs[(4+i+ofs) % len(outputs)]])
+                result.add(f"S4BEG{i}", [outputs[(0+i+ofs) % len(outputs)]])
         for i in range(2):
             result.add(f"E6BEG{i}", [outputs[(8*i + j) % len(outputs)] for j in range(8)])
             result.add(f"W6BEG{i}", [outputs[(8*i + j) % len(outputs)] for j in range(8)])

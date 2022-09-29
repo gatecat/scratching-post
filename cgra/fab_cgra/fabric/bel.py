@@ -47,7 +47,7 @@ class Configurable:
         return sig
     def enum(self, name: str, e: IntEnum) -> Signal:
         sig = Signal(shape=e, name=f"cfg_{name}")
-        self.cfg_bits.append(ConfigBit(name=name, sig=sig, tags=[(k, v) for k, v in sorted(e, key=lambda x:x[1])]))
+        self.cfg_bits.append(ConfigBit(name=name, sig=sig, tags=[(x.name, x.value) for x in sorted(e, key=lambda x:x.value)]))
         return sig
     def word(self, name: str, w: int) -> Signal:
         sig = Signal(shape=w, name=f"cfg_{name}")
@@ -56,7 +56,7 @@ class Configurable:
     def inst(self, sub_name: str, sub_inst):
         # Add a child of this, importing it's bit meanings into ours with a prefix
         for cfg in sub_inst.cfg_bits:
-            self.cfg_bits.append(ConfigBit(name=f"{sub_name}.{cfg.name}", sig=cfg.sig, tags=cfg.tags))
+            self.cfg_bits.append(ConfigBit(name=f"{sub_name}{cfg.name}", sig=cfg.sig, tags=cfg.tags))
 
     def count(self) -> int:
         return sum(len(cfg.sig) for cfg in self.cfg_bits)
