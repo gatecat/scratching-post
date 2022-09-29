@@ -2,3 +2,4 @@ __pycache__
 *.gen.v
 *.tmp
 *.log
+work/

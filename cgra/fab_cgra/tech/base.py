@@ -6,7 +6,6 @@ __all__ = ["BaseTech"]
 
 class BaseTech:
     def __init__(self):
-        self.m = m
         self.autoidx = 0
 
     def _add_submod(self, m: Module, name: str, inst: Instance):
@@ -31,6 +30,12 @@ class BaseTech:
     def add_latch(self, m: Module, d: PortVal, e: PortVal, q: PortVal, name=None):
         inst = Instance(f"generic_lat",
             d=d, e=e, q=q
+        )
+        self._add_submod(m, name, inst)
+
+    def add_dff(self, m: Module, d: PortVal, clk: PortVal, q: PortVal, name=None):
+        inst = Instance(f"generic_dff",
+            d=d, clk=clk, q=q
         )
         self._add_submod(m, name, inst)
 

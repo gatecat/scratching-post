@@ -17,7 +17,7 @@ class PortDir(Enum):
 @dataclass
 class PortSpec:
     name: str
-    direction: PortDir
+    dir: PortDir
     shape: PortShape = 1
     external: bool = False
     shared: bool = False
@@ -29,7 +29,7 @@ class PortSpec:
         elif self.external:
             return self.name
         else:
-            return f"{bel.prefix}_{self.name}"
+            return f"{bel.prefix}{self.name}"
 
 class ConfigBit:
     name: str
@@ -63,8 +63,9 @@ class Configurable:
         return Cat(*(cfg.sig for cfg in self.cfg_bits))
 
 class Bel(Elaboratable, Configurable):
-    def __init__(self, name, prefix):
+    def __init__(self, name, bel_type, prefix):
         self.name = name
+        self.bel_type
         self.prefix = prefix
     def get_ports(self) -> list[PortSpec]:
         assert False

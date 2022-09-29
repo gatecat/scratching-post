@@ -1,8 +1,56 @@
-from ..fabric.tiletype import SwitchMatrix
+from ..fabric.tiletype import GridDir, TilePort, SwitchMatrix
+
+# Generate the set of ports for the default switch matrix, more ports can be added if needed
+def base_ports():
+    return [
+        TilePort(dir=GridDir.N, src="N1BEG", dy=-1, dst="N1END", width=4),
+        TilePort(dir=GridDir.N, src="N2BEG", dy=-1, dst="N2MID", width=8),
+        TilePort(dir=GridDir.N, src="N2BEGb", dy=-1, dst="N2END", width=8),
+        TilePort(dir=GridDir.N, src="N4BEG", dy=-4, dst="N4END", width=4),
+        TilePort(dir=GridDir.N, src="NN4BEG", dy=-4, dst="NN4END", width=4),
+
+        TilePort(dir=GridDir.E, src="E1BEG", dy=1, dst="E1END", width=4),
+        TilePort(dir=GridDir.E, src="E2BEG", dy=1, dst="E2MID", width=8),
+        TilePort(dir=GridDir.E, src="E2BEGb", dy=1, dst="E2END", width=8),
+        TilePort(dir=GridDir.E, src="EE4BEG", dy=4, dst="EE4END", width=4),
+        TilePort(dir=GridDir.E, src="E6BEG", dy=6, dst="E6END", width=2),
+
+        TilePort(dir=GridDir.S, src="S1BEG", dy=1, dst="S1END", width=4),
+        TilePort(dir=GridDir.S, src="S2BEG", dy=1, dst="S2MID", width=8),
+        TilePort(dir=GridDir.S, src="S2BEGb", dy=1, dst="S2END", width=8),
+        TilePort(dir=GridDir.S, src="S4BEG", dy=4, dst="S4END", width=4),
+        TilePort(dir=GridDir.S, src="SS4BEG", dy=4, dst="SS4END", width=4),
+
+        TilePort(dir=GridDir.W, src="W1BEG", dy=-1, dst="W1END", width=4),
+        TilePort(dir=GridDir.W, src="W2BEG", dy=-1, dst="W2MID", width=8),
+        TilePort(dir=GridDir.W, src="W2BEGb", dy=-1, dst="W2END", width=8),
+        TilePort(dir=GridDir.W, src="WW4BEG", dy=-4, dst="WW4END", width=4),
+        TilePort(dir=GridDir.W, src="W6BEG", dy=-6, dst="W6END", width=2),
+
+        TilePort(dir=GridDir.J, src="J2MID_ABa_BEG", dst="J2MID_ABa_END", width=4),
+        TilePort(dir=GridDir.J, src="J2MID_CDa_BEG", dst="J2MID_CDa_END", width=4),
+        TilePort(dir=GridDir.J, src="J2MID_EFa_BEG", dst="J2MID_EFa_END", width=4),
+        TilePort(dir=GridDir.J, src="J2MID_GHa_BEG", dst="J2MID_GHa_END", width=4),
+
+        TilePort(dir=GridDir.J, src="J2MID_ABb_BEG", dst="J2MID_ABb_END", width=4),
+        TilePort(dir=GridDir.J, src="J2MID_CDb_BEG", dst="J2MID_CDb_END", width=4),
+        TilePort(dir=GridDir.J, src="J2MID_EFb_BEG", dst="J2MID_EFb_END", width=4),
+        TilePort(dir=GridDir.J, src="J2MID_GHb_BEG", dst="J2MID_GHb_END", width=4),
+
+        TilePort(dir=GridDir.J, src="J2END_AB_BEG", dst="J2END_AB_END", width=4),
+        TilePort(dir=GridDir.J, src="J2END_CD_BEG", dst="J2END_CD_END", width=4),
+        TilePort(dir=GridDir.J, src="J2END_EF_BEG", dst="J2END_EF_END", width=4),
+        TilePort(dir=GridDir.J, src="J2END_GH_BEG", dst="J2END_GH_END", width=4),
+
+        TilePort(dir=GridDir.J, src="JN2BEG", dst="JN2END", width=8),
+        TilePort(dir=GridDir.J, src="JE2BEG", dst="JE2BEG", width=8),
+        TilePort(dir=GridDir.J, src="JS2BEG", dst="JS2BEG", width=8),
+        TilePort(dir=GridDir.J, src="JW2BEG", dst="JW2BEG", width=8),
+    ]
 
 # Generate a derivative of the default FABulous switch matrix. Currently this is optimised for a roughly LUT4 arch
 # More flexible switch matrix generation based on what it's connecting to is a problem for a future myrtle cat...
-def def_switch_matrix(inputs=[], ce_inputs=[], sr_inputs=[], sel_inputs=[], outputs=[], mux_outputs=[]):
+def base_switch_matrix(inputs=[], ce_inputs=[], sr_inputs=[], sel_inputs=[], outputs=[], mux_outputs=[]):
     result = SwitchMatrix()
     for base in _base_matrix:
         result.add(base)

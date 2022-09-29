@@ -188,13 +188,14 @@ class Tile(Elaboratable, Configurable):
         return top_ports
     def elaborate(self, platform):
         m = Module()
+        m.d.comb += ClockSignal().eq(gclocki[0])
         # add submodule instances
         for b in self.bels:
             setattr(m.submodules, f"bel_{bel.name}", b)
             # connect bel ports to tile wires
             for port in b.get_ports():
                 # TODO: record ports
-                if port.direction == PortDir.OUT:
+                if port.dir == PortDir.OUT:
                     m.d.comb += self.wires[port.tile_wire()].eq(getattr(b, port.name))
                 else:
                     m.d.comb += getattr(b, port.name).eq(self.wires[port.tile_wire()])
@@ -210,3 +211,4 @@ class Tile(Elaboratable, Configurable):
                 self.cfg_bits().eq(self.cfg_i.config_bits),
             ]
         return m
+
