@@ -3,17 +3,16 @@ from ..fabric.bel import *
 from ..fabric.fabric import *
 from itertools import product
 
-base_width = 12
-sig_width = base_width + 1 # +1 for the valid signal
-
 
 class CgraElem(Bel):
-    def __init__(self, name, prefix, tech, standalone=False):
+    def __init__(self, name, prefix, tech, base_width, standalone=False):
         super().__init__(name, "CgraElem", prefix)
-        self.a = Signal(sig_width)
-        self.b = Signal(sig_width)
-        self.q = Signal(sig_width)
-        self.clr = Signal()
+        self.base_width = base_width
+        sig_width = self.base_width + 1
+        self.A = Signal(sig_width)
+        self.B = Signal(sig_width)
+        self.Q = Signal(sig_width)
+        self.CLR = Signal()
 
         self._a_reg = self.cfg.bit("A_REG")
         self._b_reg = self.cfg.bit("B_REG")
@@ -28,45 +27,54 @@ class CgraElem(Bel):
         if standalone:
             self.mode = Signal(self.cfg.count())
 
+    def get_ports(self):
+        return [
+            PortSpec(name="A", dir=PortDir.IN, shape=self.base_width+1),
+            PortSpec(name="B", dir=PortDir.IN),
+            PortSpec(name="CLR", dir=PortDir.IN, shape=self.base_width+1),
+            PortSpec(name="Q", dir=PortDir.OUT, shape=self.base_width+1),
+        ]
+
     def elaborate(self, m):
+        sig_width = self.base_width + 1
         m = Module()
         a_q = Signal(sig_width)
         b_q = Signal(sig_width)
-        with m.If(self.clr):
+        with m.If(self.CLR):
             m.d.sync += [
                 a_q.eq(0),
                 b_q.eq(0),
             ]
         with m.Else():
             m.d.sync += [
-                a_q.eq(self.a),
-                b_q.eq(self.b),
+                a_q.eq(self.A),
+                b_q.eq(self.B),
             ]
         a_i = Signal(sig_width)
         b_i = Signal(sig_width)
         m.d.comb += [
-            a_i.eq(Mux(self._a_reg, self.a, a_q)),
-            b_i.eq(Mux(self._b_reg, self.b, b_q)),
+            a_i.eq(Mux(self._a_reg, self.A, a_q)),
+            b_i.eq(Mux(self._b_reg, self.B, b_q)),
         ]
 
-        a_data = Signal(signed(base_width))
+        a_data = Signal(signed(self.base_width))
         a_valid = Signal()
-        b_data = Signal(signed(base_width))
+        b_data = Signal(signed(self.base_width))
         b_valid = Signal()
 
         m.d.comb += [
-            a_data.eq(a_i[:base_width]),
+            a_data.eq(a_i[:self.base_width]),
             a_valid.eq(a_i[-1]),
-            b_data.eq(Mux(self._b_const, b_i[:base_width], self._const_val)),
+            b_data.eq(Mux(self._b_const, b_i[:self.base_width], self._const_val)),
             b_valid.eq(Mux(self._b_const, b_i[-1], 1)),
         ]
 
-        mult_res = Signal(signed(base_width))
-        add_a = Signal(signed(base_width))
-        add_b = Signal(signed(base_width))
-        add_res = Signal(signed(base_width))
-        res_d = Signal(signed(base_width))
-        res_q = Signal(signed(base_width))
+        mult_res = Signal(signed(self.base_width))
+        add_a = Signal(signed(self.base_width))
+        add_b = Signal(signed(self.base_width))
+        add_res = Signal(signed(self.base_width))
+        res_d = Signal(signed(self.base_width))
+        res_q = Signal(signed(self.base_width))
         valid_d = Signal()
         valid_q = Signal()
 
@@ -79,7 +87,7 @@ class CgraElem(Bel):
             valid_d.eq(Mux(self._mult_byp & self._add_acc, a_valid & b_valid, a_valid)),
         ]
 
-        with m.If(self.clr):
+        with m.If(self.CLR):
             m.d.sync += [
                 res_q.eq(0),
                 valid_q.eq(0),
@@ -90,7 +98,7 @@ class CgraElem(Bel):
                 valid_q.eq(valid_d),
             ]
 
-        m.d.comb += self.q.eq(Cat(res_q, valid_q))
+        m.d.comb += self.Q.eq(Cat(res_q, valid_q))
         if self.standalone:
             m.d.comb += self.cfg.sigs().eq(self.mode)
         return m
@@ -101,7 +109,7 @@ if __name__ == '__main__':
     from ..tech.base import BaseTech
 
     tech = BaseTech()
-    elem = CgraElem("CgraElem", "A", tech, standalone=True)
+    elem = CgraElem("CgraElem", "A", tech, base_width=12, standalone=True)
     with open(sys.argv[1], "w") as f:
         f.write(verilog.convert(elem, name="cgra_mul_tile", ports=[elem.clr, elem.mode, elem.a, elem.b, elem.q]))
 
