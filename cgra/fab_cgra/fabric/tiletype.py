@@ -112,15 +112,20 @@ class _TileSwitchMatrix(Elaboratable):
         self.dst2bits = {}
         for dst, srcs in self.t.switch_matrix.items():
             # use split_mux to get the bit pattern enum
+            if len(srcs) == 1:
+                continue
             self.dst2bits[dst] = self.cfg.enum(dst,
                 self.t.tech.split_mux(m=None, inputs=[(None, src) for src in srcs], sel=None, y=None, dry_run=True, name=f"cfg_{dst}"))
     def elaborate(self, platform):
         m = Module()
         for dst, srcs in self.t.switch_matrix.items():
-            sel = self.dst2bits[dst]
-            self.t.tech.split_mux(m=m,
-                inputs=[(self.t.wires[src], src) for src in srcs], sel=sel, y=self.t.wires[dst],
-                dry_run=False, name=f"cfg_{dst}")
+            if len(srcs) == 1:
+                m.d.comb += self.t.wires[dst].eq(self.t.wires[srcs[0]])
+            else:
+                sel = self.dst2bits[dst]
+                self.t.tech.split_mux(m=m,
+                    inputs=[(self.t.wires[src], src) for src in srcs], sel=sel, y=self.t.wires[dst],
+                    dry_run=False, name=f"cfg_{dst}")
         return m
 
 # TODO: work out how to do nice strongly typed switch matrix

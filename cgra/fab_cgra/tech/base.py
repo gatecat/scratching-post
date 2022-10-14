@@ -52,8 +52,9 @@ class BaseTech:
         # CGRA routing
         # returns an IntEnum containing the config bitmap of the mux -- running with dry_run gets the bitmap without
         # creating any logic
+        sel_length = (len(inputs) - 1).bit_length()
         if dry_run:
-            sel = C(0, len(inputs).bit_length())
+            sel = C(0, sel_length)
         autoidx = 0
         bitmap = dict()
         if name is None and not dry_run:
@@ -83,7 +84,7 @@ class BaseTech:
                 for i in range(len(chunks)):
                     autoidx += 1
                     chunks[i] = recursive_muxgen(chunks[i], sel_bits[:-mux_depth],
-                        hot_bits + list(((len(inp_sigs) - mux_depth) + j) for j in range(mux_depth) if i & (1 << j)))
+                        hot_bits + list(((sel_length - mux_depth) + j) for j in range(mux_depth) if i & (1 << j)))
                 if not dry_run:
                     # the mux part
                     out_sig = Signal(name=f"{name}_n{autoidx}", shape=y.shape())

@@ -56,3 +56,5 @@ if __name__ == '__main__':
     tile_ports = [x[1] for x in tile.toplevel_ports()]
     with open(sys.argv[1], "w") as f:
         f.write(verilog.convert(tile, name="cgra_mul_tile", ports=tile_ports))
+    with open(f"{sys.argv[1]}.features", "w") as f:
+       tile.cfg.write_bitmap(f)

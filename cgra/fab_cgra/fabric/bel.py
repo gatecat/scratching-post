@@ -47,7 +47,7 @@ class Configurable:
         return sig
     def enum(self, name: str, e: IntEnum) -> Signal:
         sig = Signal(shape=e, name=f"cfg_{name}")
-        self.cfg_bits.append(ConfigBit(name=name, sig=sig, tags=[(x.name, x.value) for x in sorted(e, key=lambda x:x.value)]))
+        self.cfg_bits.append(ConfigBit(name=name, sig=sig, tags=[(f".{x.name}", x.value) for x in sorted(e, key=lambda x:x.value)]))
         return sig
     def word(self, name: str, w: int) -> Signal:
         sig = Signal(shape=w, name=f"cfg_{name}")
@@ -62,6 +62,18 @@ class Configurable:
         return sum(len(cfg.sig) for cfg in self.cfg_bits)
     def sigs(self):
         return Cat(*(cfg.sig for cfg in self.cfg_bits))
+
+    def write_bitmap(self, file):
+        idx = 0
+        for b in self.cfg_bits:
+            width = len(b.sig)
+            for tag, bitmap in b.tags:
+                set_bits = ""
+                for j in range(width):
+                    if (bitmap >> j) & 1 == 1:
+                        set_bits += f" {idx+j}"
+                print(f"{b.name}{tag}{set_bits}", file=file)
+            idx += width
 
 class Bel(Elaboratable, Configurable):
     def __init__(self, name, bel_type, prefix):

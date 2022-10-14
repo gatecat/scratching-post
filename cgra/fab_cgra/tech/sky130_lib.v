@@ -3,11 +3,12 @@
 `endif
 
 module generic_lat(input wire d, e, output reg q, qn);
-    always @*
-        if (e) begin
-            q <= `UNIT_DELAY d;
-            qn <= `UNIT_DELAY ~d;
-        end
+  sky130_fd_sc_hd__dlxbp_1 lat_i (
+    .D(d),
+    .GATE(e),
+    .Q(q),
+    .Q_N(qn)
+  );
 endmodule
 
 module generic_mux2(input wire i0, i1, s0, output wire y);
