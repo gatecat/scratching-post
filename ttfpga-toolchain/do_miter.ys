@@ -1,0 +1,4 @@
+read_verilog model/*.v
+read_verilog -sv miter.sv
+prep -top miter -flatten
+qbfsat -write-solution solved.bit.txt

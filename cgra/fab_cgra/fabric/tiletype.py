@@ -219,7 +219,9 @@ class Tile(Elaboratable):
             m.submodules.cfgmem_i = self.cfgmem_i
             m.d.comb += [
                 self.cfgmem_i.frame_data.eq(self.cfg_datai),
+                self.cfg_datao.eq(self.cfg_datai),
                 self.cfgmem_i.frame_strobe.eq(self.cfg_strbi),
+                self.cfg_strbo.eq(self.cfg_strbi),
                 self.cfg.sigs().eq(self.cfgmem_i.config_bits),
             ]
         return m
