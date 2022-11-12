@@ -11,7 +11,7 @@ class MacGenerator:
         self.b_width = b_width
         self.c_width = c_width
         self.with_acc = self.c_width > 0
-        self.out_width = max(self.a_width + self.b_width, self.c_width)
+        self.q_width = max(self.a_width + self.b_width, self.c_width)
         if self.with_acc:
             self.params = ["A_reg", "B_reg", "C_reg", "ACC", "signExtension", "ACCout"]
         else:
@@ -28,7 +28,7 @@ class MacGenerator:
             if self.with_acc:
                 for c in range(self.c_width-1, -1, -1):
                     ports.append(("input", f"C{c}"))
-            for b in range(self.out_width-1, -1, -1):
+            for b in range(self.q_width-1, -1, -1):
                 ports.append(("output", f"Q{b}"))
             if self.with_acc:
                 ports.append(("input", "clr"))
@@ -54,11 +54,26 @@ class MacGenerator:
             if self.with_acc:
                 operands.append(("C", self.c_width))
             for op, w in operands:
-                print(f"    wire [{w-1}:0] {op}, OP{op};", file=f)
-                print(f"    reg [{w-1}:0] {op}_q;", file=f)
-                print(f"    assign {op} = {{{', '.join(f'{op}{i}' for i in range(w-1,-1,-1))}}};", file=f)
-                print(f"    assign OP{op} = {op}_reg ? {op}_q : {op};", file=f)
-                print("", file=f)
+                print(f"    wire [{w-1}:0] {op} = {{{', '.join(f'{op}{i}' for i in range(w-1,-1,-1))}}};", file=f)
+            print(f"    wire [{self.q_width-1}:0] Q;", file=f)
+            print(f"    assign {{{', '.join(f'Q{i}' for i in range(self.q_width-1,-1,-1))}}} = Q;", file=f)
+            print("", file=f)
+            print(f"    {prim_name}_impl #(", file=f)
+            print(f"        .A_WIDTH({self.a_width}),", file=f)
+            print(f"        .B_WIDTH({self.b_width}),", file=f)
+            print(f"        .C_WIDTH({self.c_width}),", file=f)
+            print(f"        .Q_WIDTH({self.q_width})", file=f)
+            print(f"    ) impl (", file=f)
+            for p in self.params:
+                print(f"        .{p}({p}),", file=f)
+            print("        .A(A),", file=f)
+            print("        .B(B),", file=f)
+            if self.with_acc:
+                print("        .C(C),", file=f)
+                print("        .clr(clr),", file=f)
+            print(f"        .CLK({'CLK' if for_sim else 'UserCLK'}),", file=f)
+            print("        .Q(Q)", file=f)
+            print("    );", file=f)
             print("endmodule", file=f)
     def generate_wrap(self, filename):
         pass
