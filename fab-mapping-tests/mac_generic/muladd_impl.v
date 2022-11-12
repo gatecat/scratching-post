@@ -13,7 +13,7 @@ module MULADDB_impl #(
     input [C_WIDTH-1:0] C,
     input clr,
     input CLK,
-    output [Q_WITDH-1:0] Q
+    output [Q_WIDTH-1:0] Q
 );
     reg [A_WIDTH-1:0] A_q;
     reg [B_WIDTH-1:0] B_q;
