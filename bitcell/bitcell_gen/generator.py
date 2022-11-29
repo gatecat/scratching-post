@@ -14,7 +14,7 @@ L_MET1     = (34, 0)
 L_MET1_LB  = (34, 10)
 L_V5_XTOR  = (112, 1)
 
-prim_size  = (560*20, 3920)
+prim_size  = (560*15, 3920)
 
 via_size = (220, 220)
 well_extent = (430, 430)
@@ -176,6 +176,28 @@ def add_logic(cell):
     tx = (tx0 + tx1) // 2
     _rect(cell, (tx - tg_gw // 2, ny0 - tg_ge), (tx + tg_gw // 2, ny0 + ncw + tg_ge), L_POLY2)
     _rect(cell, (tx - tg_gw // 2, py1 - pcw - tg_ge), (tx + tg_gw // 2, py1 + tg_ge), L_POLY2)
+    # transmission gate straps
+    qp_sy = 1800
+    qp_sw = 200
+    # QP strap access
+    _rect(cell, (tx - tg_gw // 2, ny0 + ncw + tg_ge), (tx + tg_gw // 2, qp_sy - qp_sw // 2), L_POLY2)
+    # QP strap endpoint
+    qp_sx0 = i_xp + i_gdx + i_gnw
+    _rect(cell, (qp_sx0, qp_sy - qp_sw // 2), (tx + tg_gw // 2, qp_sy + qp_sw // 2), L_POLY2)
+    # QN strap upper
+    qn_sy0 = py1 + tg_ge + 150
+    qn_sx0 = qnx + 900
+    _rect(cell, (tx - tg_gw // 2, py1 - pcw - tg_ge), (tx + tg_gw // 2, qn_sy0), L_POLY2)
+    _rect(cell, (qn_sx0, qn_sy0), (tx + tg_gw // 2, qn_sy0 + qp_sw), L_POLY2)
+    # QN strap down
+    qn_sdw = 400
+    qn_sde = 300
+    _rect(cell, (qn_sx0, py - qn_sde), (qn_sx0 + qn_sdw, qn_sy0), L_POLY2)
+    # QN via
+    _via(cell, qn_sx0 + qn_sdw // 2, py)
+    # QN met1
+    qn_m1w = 400
+    _rect(cell, (qnx - q_w//2, py + q_dy - qn_m1w), (qn_sx0 + qn_sdw, py + q_dy), L_MET1)
 
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
