@@ -138,6 +138,44 @@ def add_logic(cell):
     for i_gx0 in (i_xp - i_gdx - i_gnw, i_xp + i_gdx):
         _rect(cell, (i_gx0, i_gy0), (i_gx0 + i_gnw, i_gym), L_POLY2)
         _rect(cell, (i_gx0 + (i_gnw - i_gpw), i_gym), (i_gx0 + i_gnw, i_gy1), L_POLY2)
+    # inverter strap
+    i_sdy = 300
+    i_sw = 330
+    i_sgdx = 400
+    i_sym = (ny + py) // 2
+    for i in (0, 1): # QP -> QN or QN -> QP
+        i_sx0 = (qnx - q_w//2) if i == 1 else (qpx + q_w//2)
+        i_sx1 = (i_xp - i_gdx - i_sgdx) if i == 1 else (i_xp + i_gdx + i_sgdx)
+        i_sy = i_sym + i_sdy if i == 1 else i_sym - i_sdy
+        # strap on metal1 from output
+        _rect(cell, (i_sx0, i_sy - i_sw // 2), (i_sx1, i_sy + i_sw // 2), L_MET1)
+        # contact to poly2 of other gate
+        _via(cell, (i_sx1 + i_sgdx // 2) if i == 1 else (i_sx1 - i_sgdx // 2), i_sy)
+    # transmission gate
+    tg_space = 360
+    tg_width = 2000
+    tx0 = bx1 + tg_space
+    tx1 = tx0 + tg_width
+    # transistor stripes for the gate part
+    _rect(cell, (tx0, ny0), (tx1, ny0+ncw), L_COMP) # Ndiff
+    _rect(cell, (tx0, py1-pcw), (tx1, py1), L_COMP) # Pdiff
+    t_iow = 360
+    # transmission gate IO
+    _rect(cell, (tx0, ny0), (tx0+t_iow, py1), L_MET1) # I
+    _label(cell, (tx0 + t_iow // 2, (ny0 + py1) // 2), "I", L_MET1_LB)
+    _rect(cell, (tx1, ny0), (tx1-t_iow, py1), L_MET1) # O
+    _label(cell, (tx1 - t_iow // 2, (ny0 + py1) // 2), "O", L_MET1_LB)
+    # transmission gate contacts
+    _via(cell, tx0 + t_iow // 2, ny)
+    _via(cell, tx0 + t_iow // 2, py)
+    _via(cell, tx1 - t_iow // 2, ny)
+    _via(cell, tx1 - t_iow // 2, py)
+    # transmission gate gates
+    tg_gw = 600
+    tg_ge = 220
+    tx = (tx0 + tx1) // 2
+    _rect(cell, (tx - tg_gw // 2, ny0 - tg_ge), (tx + tg_gw // 2, ny0 + ncw + tg_ge), L_POLY2)
+    _rect(cell, (tx - tg_gw // 2, py1 - pcw - tg_ge), (tx + tg_gw // 2, py1 + tg_ge), L_POLY2)
 
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
