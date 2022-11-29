@@ -76,7 +76,7 @@ def add_logic(cell):
     py = (py1 - pcw // 2)
 
     bitpass_width = 1100 
-    twoinv_width = 2400
+    twoinv_width = 3000
     bx1 = bx0 + bitpass_width * 2 + twoinv_width
 
     _rect(cell, (bx0, ny0), (bx0+bitpass_width*2+twoinv_width, ny0+ncw), L_COMP) # Ndiff
@@ -128,6 +128,16 @@ def add_logic(cell):
     i_xp = (i_x0 + i_x1) // 2
     _pwr_conn(cell, "VSS", i_xp, ny)
     _pwr_conn(cell, "VDD", i_xp, py)
+    # inverter gates
+    i_gdx = 300
+    i_gnw = 600
+    i_gpw = 500
+    i_gy0 = ny0 - 220
+    i_gym = 1930
+    i_gy1 = py1 + 220
+    for i_gx0 in (i_xp - i_gdx - i_gnw, i_xp + i_gdx):
+        _rect(cell, (i_gx0, i_gy0), (i_gx0 + i_gnw, i_gym), L_POLY2)
+        _rect(cell, (i_gx0 + (i_gnw - i_gpw), i_gym), (i_gx0 + i_gnw, i_gy1), L_POLY2)
 
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
