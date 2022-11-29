@@ -3,5 +3,6 @@
 *.gen.lvs
 *.gen.log
 *.lef
+*.ext
 *.gen.v
 __pycache__

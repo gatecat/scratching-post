@@ -19,6 +19,7 @@ prim_size  = (560*20, 3920)
 via_size = (220, 220)
 well_extent = (430, 430)
 dgt_extent = (280, 280)
+pls_extent = (200, 200)
 nw_start = 1760
 
 rail_width = 600
@@ -39,6 +40,8 @@ def add_outline(cell):
     # Wells
     _rect(cell, (-well_extent[0], -well_extent[1]), (prim_size[0] + well_extent[0], nw_start), L_LVPWELL)
     _rect(cell, (-well_extent[0], nw_start), (prim_size[0] + well_extent[0], prim_size[1] + well_extent[1]), L_NWELL)
+    _rect(cell, (-pls_extent[0], -pls_extent[1]), (prim_size[0] + pls_extent[0], nw_start), L_NPLUS)
+    _rect(cell, (-pls_extent[0], nw_start), (prim_size[0] + pls_extent[0], prim_size[1] + pls_extent[1]), L_PPLUS)
     # Dualgate
     _rect(cell, (-dgt_extent[0], -dgt_extent[1]), (prim_size[0] + dgt_extent[0], prim_size[1] + dgt_extent[1]), L_DUALGATE)
     # Markers
@@ -53,13 +56,13 @@ def _via(cell, x, y):
 
 def _pwr_conn(cell, rail, x, y, w=230, ext=60):
     y0 = (rail_width//2) if rail == "VSS" else (prim_size[1] - rail_width//2)
-    y1 = y + (via_size[1]//2) + ext
+    y1 = y + (via_size[1]//2 + ext) if rail == "VSS"  else y - (via_size[1]//2 + ext) 
     _rect(cell, (x-w//2, y0), (x+w//2, y1), L_MET1)
     _via(cell, x, y)
 
-def _port(cell, x, y, name, ext=(120, 120)):
+def _port(cell, x, y, name, ext=(200, 200, 200, 200)):
     _via(cell, x, y)
-    _rect(cell, (x-ext[0], y-ext[1]), (x+ext[0], y+ext[1]), L_MET1)
+    _rect(cell, (x-ext[0], y-ext[1]), (x+ext[2], y+ext[3]), L_MET1)
     _label(cell, (x, y), name, L_MET1_LB)
 
 def add_logic(cell):
@@ -69,8 +72,10 @@ def add_logic(cell):
     py1 = 3140
     ncw =  380
     pcw =  660
+    ny = (ny0 + ncw // 2)
+    py = (py1 - pcw // 2)
 
-    bitpass_width = 1000 
+    bitpass_width = 1100 
     twoinv_width = 2400
     bx1 = bx0 + bitpass_width * 2 + twoinv_width
 
@@ -81,7 +86,7 @@ def add_logic(cell):
     # TODO: use gdspy polygons?
     wl_y0 = 120
     wl_y1 = 1440
-    wl_gx = 700 # gate x-offset
+    wl_gx = 800 # gate x-offset
     wl_gw = 600 # gate width
     wl_rw = 200 # route width
     wl_ry1 = wl_y0 + wl_rw
@@ -93,15 +98,36 @@ def add_logic(cell):
     _rect(cell, (wl_x0, wl_ry1), (wl_x0 + wl_gw, wl_y1), L_POLY2) # left (BL+)
     _rect(cell, (wl_x1 - wl_gw, wl_ry1), (wl_x1, wl_y1), L_POLY2) # right (BL-)
     # bitline contacts
-    wl_bcx = 120
+    wl_bcx = 180
     _port(cell, bx0 + wl_bcx, ny0 + ncw // 2, "BLP")
     _port(cell, bx1 - wl_bcx, ny0 + ncw // 2, "BLN")
     # wordline contact
-    wl_wcx = 200
+    wl_wcx = 300
     wl_wcy = 80
-    wl_wcext = 200
+    wl_wcext = 350
     _rect(cell, (wl_x0, wl_y1), (wl_x0 + wl_gw, wl_y1 + wl_wcext), L_POLY2) # left (BL+)
-    _port(cell, wl_x0 + wl_wcx, wl_y1 + wl_wcy, "WL")
+    _port(cell, wl_x0 + wl_wcx, wl_y1 + wl_wcy, "WL", ext=(200, 160, 200, 300))
+    # the actual inverters
+    i_x0 = bx0 + bitpass_width
+    i_x1 = i_x0 + twoinv_width
+    q_w = 330
+    q_dx = 340
+    q_dy = 200
+    qpx  = i_x0 + q_dx
+    qnx  = i_x1 - q_dx
+    # Q signals and contacts
+    _rect(cell, (qpx - q_w//2, ny - q_dy), (qpx + q_w//2, py + q_dy), L_MET1) # QP
+    _label(cell, (qpx, ny), "QP", L_MET1_LB)
+    _via(cell, qpx, ny)
+    _via(cell, qpx, py)
+    _rect(cell, (qnx - q_w//2, ny - q_dy), (qnx + q_w//2, py + q_dy), L_MET1) # QN
+    _label(cell, (qnx, ny), "QN", L_MET1_LB)
+    _via(cell, qnx, ny)
+    _via(cell, qnx, py)
+    # inverter power
+    i_xp = (i_x0 + i_x1) // 2
+    _pwr_conn(cell, "VSS", i_xp, ny)
+    _pwr_conn(cell, "VDD", i_xp, py)
 
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
