@@ -48,10 +48,51 @@ def add_outline(cell):
     add_rail(cell, 0, "VSS")
     add_rail(cell, prim_size[1], "VDD")
 
+def _via(cell, x, y):
+    _rect(cell, (x - via_size[0] // 2, y - via_size[0] // 2), (x + via_size[0] // 2, y + via_size[0] // 2), L_CONT)
+
+def _pwr_conn(cell, rail, x, y, w=230, ext=60):
+    y0 = (rail_width//2) if rail == "VSS" else (prim_size[1] - rail_width//2)
+    y1 = y + (via_size[1]//2) + ext
+    _rect(cell, (x-w//2, y0), (x+w//2, y1), L_MET1)
+    _via(cell, x, y)
+
+def add_logic(cell):
+    # transistor stripes for the bitcell part
+    bx0 =  180
+    ny0 =  780
+    py1 = 3140
+    ncw =  380
+    pcw =  660
+
+    bitpass_width = 1000 
+    twoinv_width = 2400
+    bx1 = bx0 + bitpass_width * 2 + twoinv_width
+
+    _rect(cell, (bx0, ny0), (bx0+bitpass_width*2+twoinv_width, ny0+ncw), L_COMP) # Ndiff
+    _rect(cell, (bx0+bitpass_width, py1-pcw), (bx0+bitpass_width+twoinv_width, py1), L_COMP) # Pdiff
+
+    # wordline and access transistors
+    # TODO: use gdspy polygons?
+    wl_y0 = 120
+    wl_y1 = 1440
+    wl_gx = 600 # gate x-offset
+    wl_gw = 600 # gate width
+    wl_rw = 200 # route width
+    wl_ry1 = wl_y0 + wl_rw
+    wl_x0 = bx0 + (wl_gx - wl_gw // 2)
+    wl_x1 = bx1 - (wl_gx - wl_gw // 2)
+    # routing part
+    _rect(cell, (wl_x0, wl_y0), (wl_x1, wl_ry1), L_POLY2)
+    # gates
+    _rect(cell, (wl_x0, wl_ry1), (wl_x0 + wl_gw, wl_y1), L_POLY2) # left (BL+)
+    _rect(cell, (wl_x1 - wl_gw, wl_ry1), (wl_x1, wl_y1), L_POLY2) # right (BL-)
+
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
     cell = lib.new_cell("gf180mcu_fpga_bitmux")
     add_outline(cell)
+    add_logic(cell)
     lib.write_gds("gf180mcu_fpga_bitmux.gds")
 
 if __name__ == '__main__':
