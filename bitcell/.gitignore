@@ -1,0 +1,7 @@
+*.gds
+*.gen.spice
+*.gen.lvs
+*.gen.log
+*.lef
+*.gen.v
+__pycache__
