@@ -57,6 +57,11 @@ def _pwr_conn(cell, rail, x, y, w=230, ext=60):
     _rect(cell, (x-w//2, y0), (x+w//2, y1), L_MET1)
     _via(cell, x, y)
 
+def _port(cell, x, y, name, ext=(120, 120)):
+    _via(cell, x, y)
+    _rect(cell, (x-ext[0], y-ext[1]), (x+ext[0], y+ext[1]), L_MET1)
+    _label(cell, (x, y), name, L_MET1_LB)
+
 def add_logic(cell):
     # transistor stripes for the bitcell part
     bx0 =  180
@@ -76,7 +81,7 @@ def add_logic(cell):
     # TODO: use gdspy polygons?
     wl_y0 = 120
     wl_y1 = 1440
-    wl_gx = 600 # gate x-offset
+    wl_gx = 700 # gate x-offset
     wl_gw = 600 # gate width
     wl_rw = 200 # route width
     wl_ry1 = wl_y0 + wl_rw
@@ -87,6 +92,16 @@ def add_logic(cell):
     # gates
     _rect(cell, (wl_x0, wl_ry1), (wl_x0 + wl_gw, wl_y1), L_POLY2) # left (BL+)
     _rect(cell, (wl_x1 - wl_gw, wl_ry1), (wl_x1, wl_y1), L_POLY2) # right (BL-)
+    # bitline contacts
+    wl_bcx = 120
+    _port(cell, bx0 + wl_bcx, ny0 + ncw // 2, "BLP")
+    _port(cell, bx1 - wl_bcx, ny0 + ncw // 2, "BLN")
+    # wordline contact
+    wl_wcx = 200
+    wl_wcy = 80
+    wl_wcext = 200
+    _rect(cell, (wl_x0, wl_y1), (wl_x0 + wl_gw, wl_y1 + wl_wcext), L_POLY2) # left (BL+)
+    _port(cell, wl_x0 + wl_wcx, wl_y1 + wl_wcy, "WL")
 
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
