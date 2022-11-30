@@ -1,8 +1,9 @@
 *.gds
-*.gen.spice
+gf180mcu_fpga_bitmux.spice
 *.gen.lvs
 *.gen.log
 *.lef
 *.ext
 *.gen.v
+*.mag
 __pycache__
