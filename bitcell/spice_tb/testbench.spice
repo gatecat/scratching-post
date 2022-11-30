@@ -1,0 +1,31 @@
+.lib /home/gatecat/mpw0gf/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice typical
+.include ../gf180mcu_fpga_bitmux.spice
+
+.param
++  sw_stat_global = 1
++  sw_stat_mismatch = 1
++ mc_skew = 3
++ res_mc_skew = 3
++ cap_mc_skew = 3
++  fnoicor = 0
+
+
+.title bitmux_tb
+V1 vdd 0 dc 5
+Vw wl 0 dc 0 ac 1 PULSE (0 5 1n 1n 1n 100n 1u)
+Vp blp 0 dc 0 ac 1 PULSE (0 5 1n 1n 1n 100n 1.5u)
+Vn bln 0 dc 0 ac 1 PULSE (5 0 1n 1n 1n 100n 1.5u)
+
+Vi i 0 dc 0 ac 1 PULSE (5 0 50n 1n 1n 100n 200n)
+
+Xmux bln blp i o qn qp vdd vss wl vdd vss gf180mcu_fpga_bitmux
+
+R o 0 100k
+
+.tran 100p 20u
+
+.control
+	run
+	plot wl blp bln i qn qp o
+.end
+.endc

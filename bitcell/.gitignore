@@ -7,3 +7,4 @@ gf180mcu_fpga_bitmux.spice
 *.gen.v
 *.mag
 __pycache__
+*.raw
