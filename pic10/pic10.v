@@ -87,18 +87,18 @@ module pic10(input clock, reset, output reg [3:0] prog_adr, input [11:0] prog_da
 	end
 
 	wire [7:0] reg_rdata;
-	wire [7:0] regf_data[0:3];
-	assign reg_rdata = reg_addr[4] ? {4'b0000, gpi} : regf_data[reg_addr[1:0]];
+	wire [7:0] regf_data[0:7];
+	assign reg_rdata = reg_addr[4] ? {4'b0000, gpi} : regf_data[reg_addr[2:0]];
 
 	// register file
 	wire regf_we = phase[1] & reg_we & !skip;
 
 	generate
 		genvar ii, jj;
-		for (ii = 0; ii < 4; ii = ii + 1'b1) begin:word
+		for (ii = 0; ii < 8; ii = ii + 1'b1) begin:word
 			for (jj = 0; jj < 8; jj = jj + 1'b1) begin:bits
 				sky130_fd_sc_hd__dlrtp_1 rfbit_i (
-					.GATE(regf_we && (reg_addr[1:0] == ii)),
+					.GATE(regf_we && (reg_addr[2:0] == ii)),
 					.RESET_B(reset),
 					.D(result[jj]),
 					.Q(regf_data[ii][jj])
