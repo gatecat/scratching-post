@@ -30,7 +30,7 @@ class CgraElem(Bel):
     def get_ports(self):
         return [
             PortSpec(name="A", dir=PortDir.IN, shape=self.base_width+1),
-            PortSpec(name="B", dir=PortDir.IN),
+            PortSpec(name="B", dir=PortDir.IN, shape=self.base_width+1),
             PortSpec(name="CLR", dir=PortDir.IN, shape=self.base_width+1),
             PortSpec(name="Q", dir=PortDir.OUT, shape=self.base_width+1),
         ]
@@ -53,8 +53,8 @@ class CgraElem(Bel):
         a_i = Signal(sig_width)
         b_i = Signal(sig_width)
         m.d.comb += [
-            a_i.eq(Mux(self._a_reg, self.A, a_q)),
-            b_i.eq(Mux(self._b_reg, self.B, b_q)),
+            a_i.eq(Mux(self._a_reg, a_q, self.A)),
+            b_i.eq(Mux(self._b_reg, b_q, self.B)),
         ]
 
         a_data = Signal(signed(self.base_width))
@@ -65,8 +65,8 @@ class CgraElem(Bel):
         m.d.comb += [
             a_data.eq(a_i[:self.base_width]),
             a_valid.eq(a_i[-1]),
-            b_data.eq(Mux(self._b_const, b_i[:self.base_width], self._const_val)),
-            b_valid.eq(Mux(self._b_const, b_i[-1], 1)),
+            b_data.eq(Mux(self._b_const, self._const_val, b_i[:self.base_width])),
+            b_valid.eq(Mux(self._b_const, 1, b_i[-1])),
         ]
 
         mult_res = Signal(signed(self.base_width))
@@ -80,11 +80,11 @@ class CgraElem(Bel):
 
         m.d.comb += [
             mult_res.eq(a_data * b_data),
-            add_a.eq(Mux(self._mult_byp, mult_res, a_data)),
-            add_b.eq(Mux(self._add_acc, b_data, res_q)),
+            add_a.eq(Mux(self._mult_byp, a_data, mult_res)),
+            add_b.eq(Mux(self._add_acc, res_q, mult_res)),
             add_res.eq(add_a + add_b),
-            res_d.eq(Mux(self._add_byp, add_res, mult_res)),
-            valid_d.eq(Mux(self._mult_byp & self._add_acc, a_valid & b_valid, a_valid)),
+            res_d.eq(Mux(self._add_byp, mult_res, add_res)),
+            valid_d.eq(Mux(self._mult_byp & self._add_acc, a_valid, a_valid & b_valid)),
         ]
 
         with m.If(self.CLR):

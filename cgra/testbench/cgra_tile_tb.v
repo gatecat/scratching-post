@@ -9,7 +9,7 @@ module testbench;
     reg clr = 1'b0;
 
     reg [N:0] N1END0 = 0, N1END1 = 0, S1END0 = 0, S1END1 = 0, W1END0 = 0, W1END1 = 0, E1END0 = 0, E1END1 = 0;
-    wire [N:0] N1BEG0 = 0, N1BEG1 = 0, S1BEG0 = 0, S1BEG1 = 0, W1BEG0 = 0, W1BEG1 = 0, E1BEG0 = 0, E1BEG1 = 0;
+    wire [N:0] N1BEG0, N1BEG1, S1BEG0, S1BEG1, W1BEG0, W1BEG1, E1BEG0, E1BEG1;
     reg clk = 1'b0;
 
     cgra_mul_tile tile_i (
@@ -25,7 +25,7 @@ module testbench;
 
     reg [FW-1:0] bitstream[0:FH-1];
 
-    task do_test(input [11:0] a, b);
+    task do_test(input [N-1:0] a, b);
         begin
             E1END0 = {1'b1, a}; // todo: valid
             W1END1 = {1'b1, b};
@@ -34,13 +34,15 @@ module testbench;
             #10;
             clk = 1'b0;
             #5;
-            $display("a=%d b=%d q=%d ar=%d", a, b, S1BEG1, S1BEG0);
+            $display("a=%d b=%d q=%d ar=%d", a, b, S1BEG1[N-1:0], S1BEG0[N-1:0]);
         end
     endtask
 
     integer i;
     initial begin
         // load bitstream
+        $dumpfile("testbench/work/fpga_tb.fst");
+        $dumpvars(0, testbench);
         $readmemb("testbench/work/mul_and_route.bin", bitstream);
         #5;
         for (i = 0; i < FH; i = i + 1'b1) begin
