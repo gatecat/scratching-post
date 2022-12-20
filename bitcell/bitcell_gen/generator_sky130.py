@@ -224,12 +224,103 @@ def add_logic(cell):
     _rect(cell, (r_gx - r_gw // 2, inv_gmy[0] - inv_gw // 2), (inv_gxn[0] - inv_gw // 2, inv_gmy[0] + inv_gw // 2), L_POLY)
     _rect(cell, (r_gx - r_gw // 2, inv_gmy[0] + inv_gw // 2), (r_gx + r_gw // 2, r_gy1), L_POLY)
 
+def add_buf(cell):
+    # inverter and level restorer part
+    ix0 =  180
+    ny0 =  235
+    py1 = 2485
+    ncw =  420
+    pcw =  420
+    ny = (ny0 + ncw // 2)
+    py = (py1 - pcw // 2)
+
+    lr_width = 700
+    inv_width = 550
+    ix1 = ix0 + lr_width + inv_width
+    inv_sdx = 125
+    _rect(cell, (ix0, ny0), (ix1, ny0+ncw), L_DIFF) # Ndiff
+    _rect(cell, (ix0 + lr_width - inv_sdx, py1-pcw), (ix1, py1), L_DIFF) # Pdiff
+    # inverter power
+    _pwr_conn(cell, "VGND", ix0 + lr_width, ny)
+    _pwr_conn(cell, "VPWR", ix0 + lr_width, py)
+    # inverter output
+    ri_bcx = 125
+    ri_bc_ext = 330 // 2
+    ri_w = 170
+    _cont(cell, ix1 - ri_bcx, ny)
+    _cont(cell, ix1 - ri_bcx, py)
+    _rect(cell, (ix1 - ri_bcx - ri_w // 2, ny - ri_bc_ext), (ix1 - ri_bcx + ri_w // 2, py + ri_bc_ext), L_LI1)
+    # inverter gate
+    ri_gw = 150
+    ri_gy0 = 105
+    ri_gy1 = 2615
+    ri_gx = ((ix0 + lr_width) + (ix1 - ri_bcx)) // 2
+    _rect(cell, (ri_gx - ri_gw // 2, ri_gy0), (ri_gx + ri_gw // 2, ri_gy1), L_POLY)
+    # input to restorer output
+    lri_y0 = 1400
+    lri_h = 330
+    lri_w = 170
+    _rect(cell, (ix0 - 50, lri_y0), (ri_gx - ri_gw // 2, lri_y0 + lri_h), L_POLY)
+    # input contact
+    _liport(cell, (ix0 + ri_bcx, lri_y0 + lri_h // 2), "I", (lri_w, lri_h))
+    # restorer SD
+    _rect(cell, (ix0 + ri_bcx - lri_w // 2, lri_y0), (ix0 + ri_bcx + lri_w // 2, ny - ri_bc_ext), L_LI1)
+    _cont(cell, ix0 + ri_bcx, ny)
+    # restorer gate
+    lri_gy1 = 1150
+    r_gx = ((ix0 + ri_bcx) + (ix0 + lr_width)) // 2
+    lri_gdx = 210
+    lri_gcx = 70
+    _rect(cell, (r_gx - ri_gw // 2, ri_gy0), (r_gx + ri_gw // 2, lri_gy1), L_POLY)
+    _rect(cell, (r_gx + ri_gw // 2, lri_gy1 - lri_h), (r_gx + lri_gdx, lri_gy1), L_POLY)
+    _cont(cell, r_gx + lri_gcx, lri_gy1 - lri_h // 2)
+    # restorer gate to inverter output
+    _rect(cell, (r_gx + lri_gcx - 170 // 2, lri_gy1 - lri_h // 2 - 330 // 2), (ix1 - ri_bcx - ri_w // 2, lri_gy1 - lri_h // 2 + 330 // 2), L_LI1)
+    # enableable driver
+    drv_width = 1200
+    dx0 = ix1 + 270
+    dx1 = dx0 + drv_width
+    _rect(cell, (dx0, ny0), (dx1, ny0+ncw), L_DIFF) # Ndiff
+    _rect(cell, (dx0, py1-pcw), (dx1, py1), L_DIFF) # Pdiff
+    d_bcx = 125
+    d_ncx = d_bcx + 200
+    # driver power straps
+    _pwr_conn(cell, "VGND", dx0 + d_ncx, ny)
+    _pwr_conn(cell, "VPWR", dx0 + d_bcx, py)
+    # enable gate
+    pg_gx = dx0 + d_bcx + 220
+    pg_y0 = 1400
+    pg_gdx = 210
+    pg_gcx = 70
+    _rect(cell, (pg_gx - ri_gw // 2, ri_gy1), (pg_gx + ri_gw // 2, pg_y0), L_POLY)
+    _rect(cell, (pg_gx - pg_gdx, pg_y0 + lri_h), (pg_gx - ri_gw // 2, pg_y0), L_POLY)
+    _liport(cell, (pg_gx - pg_gcx, pg_y0 + lri_h // 2), "OEB", (lri_w, lri_h))
+
+    # driver gate
+    dg_gx = pg_gx + 360
+    _rect(cell, (dg_gx - ri_gw // 2, ri_gy0), (dg_gx + ri_gw // 2, ri_gy1), L_POLY)
+    # driver gate contact
+    dc_y0 = 820
+    dc_h = 330
+    _rect(cell, (dg_gx - ri_gw // 2, dc_y0), (dg_gx - ri_gw // 2 - pg_gdx, dc_y0 + dc_h), L_POLY)
+    _cont(cell, dg_gx - ri_gw // 2 - pg_gcx, dc_y0 + dc_h // 2)
+    _rect(cell, (dg_gx - ri_gw // 2 + 170 // 2, dc_y0 + dc_h // 2 - 330 // 2), (ix1 - ri_bcx + ri_w // 2, dc_y0 + dc_h // 2 + 330 // 2), L_LI1)
+    # driver output
+    _cont(cell, dx1 - d_bcx, ny)
+    _cont(cell, dx1 - d_bcx, py)
+    _rect(cell, (dx1 - d_bcx - ri_w // 2, ny - ri_bc_ext), (dx1 - d_bcx + ri_w // 2, py + ri_bc_ext), L_LI1)
+    _port(cell, (dx1 - d_bcx, (ny + py // 2)), "O", [L_LI1_PIN], L_LI1_LB)
 
 def main():
+    global prim_size # yada yada ya
     lib = gdspy.GdsLibrary(unit=1e-09)
     cell = lib.new_cell("sky130_fpga_bitmux")
     add_outline(cell)
     add_logic(cell)
+    cell = lib.new_cell("sky130_fpga_routebuf")
+    prim_size   = (460*7, 2720) # TODO: make the buffer smaller if possible...
+    add_outline(cell)
+    add_buf(cell)
     lib.write_gds("sky130_fpga_bitmux.gds")
 
 if __name__ == '__main__':
