@@ -34,7 +34,7 @@ nw_start = 1305
 nsdm_end = 1015
 psdm_start = 1935
 hvt_start = 1250
-npc_pos = (975, 1925)
+npc_pos = (685, 1925)
 
 rail_m1width  = 480
 rail_liwidth  = 170
@@ -87,55 +87,102 @@ def add_outline(cell):
     add_rail(cell, prim_size[1], "VPWR")
 
 
-def _pwr_conn(cell, rail, x, y, w=230, ext=60):
-    y0 = (rail_width//2) if rail == "VGND" else (prim_size[1] - rail_width//2)
-    y1 = y + (via_size[1]//2 + ext) if rail == "VGND"  else y - (via_size[1]//2 + ext) 
-    _rect(cell, (x-w//2, y0), (x+w//2, y1), L_MET1)
-    _via(cell, x, y)
+def _pwr_conn(cell, rail, x, y, w=170, ext=80):
+    y0 = (rail_liwidth//2) if rail == "VGND" else (prim_size[1] - rail_liwidth//2)
+    y1 = y + (livia_size[1]//2 + ext) if rail == "VGND"  else y - (livia_size[1]//2 + ext) 
+    _rect(cell, (x-w//2, y0), (x+w//2, y1), L_LI1)
+    _cont(cell, x, y)
+
+def _liport(cell, p, name, ext):
+    _rect(cell, (p[0] - ext[0] // 2, p[1] - ext[1] // 2), (p[0] + ext[0] // 2, p[1] + ext[1] // 2), L_LI1)
+    _port(cell, p, name, [L_LICON1, L_LI1_PIN], L_LI1_LB)
+
 
 def add_logic(cell):
     bx0 =  180
-    ny0 =  405
+    ny0 =  235
     py1 = 2485
     ncw =  420
     pcw =  420
     ny = (ny0 + ncw // 2)
     py = (py1 - pcw // 2)
 
-    rtpass_width = 500
+    rtpass_width = 700
     rtpass_gap = 360
-    bitpass_width = 500 
-    twoinv_width = 2000
+    bitpass_width = 550 
+    twoinv_width = 1000
+    inv_sdx = 125
+
     bx1 = bx0 + bitpass_width * 2 + twoinv_width
     bxp = bx0 + rtpass_width + rtpass_gap
 
     # diffusion for transistors
     _rect(cell, (bx0, ny0), (bx0+bitpass_width*2+twoinv_width, ny0+ncw), L_DIFF) # Ndiff
-    _rect(cell, (bxp, py1-pcw), (bxp+twoinv_width, py1), L_DIFF) # Pdiff
+    _rect(cell, (bxp, py1-pcw), (bxp+twoinv_width+ inv_sdx * 2, py1), L_DIFF) # Pdiff
     # HVTP for bitcell but not mux...
     _rect(cell, (bxp - rtpass_gap // 2, npc_pos[0]), (prim_size[0], npc_pos[1]), L_HVTP)
 
     wl_y0 = 105
-    wl_y1 = 955
+    wl_y1 = 800
     wl_gx = 335 # gate x-offset
     wl_gw = 150 # gate width
-    wl_rw = 150 # route width
-    wl_ry1 = wl_y0 + wl_rw
     wl_x0 = bx0 + (wl_gx - wl_gw // 2)
     wl_x1 = bx1 - (wl_gx - wl_gw // 2)
-    # routing part
-    _rect(cell, (wl_x0, wl_y0), (wl_x1, wl_ry1), L_POLY)
     # gates
-    _rect(cell, (wl_x0, wl_ry1), (wl_x0 + wl_gw, wl_y1), L_POLY) # left (BL+)
-    _rect(cell, (wl_x1 - wl_gw, wl_ry1), (wl_x1, wl_y1), L_POLY) # right (BL-)
+    _rect(cell, (wl_x0, wl_y0), (wl_x0 + wl_gw, wl_y1), L_POLY) # left (BL+)
+    _rect(cell, (wl_x1 - wl_gw, wl_y0), (wl_x1, wl_y1), L_POLY) # right (BL-)
     # bitline contacts
     wl_bcx = 125
-    wl_cw = 170
-    wl_ch = 330
-    _rect(cell, (bx0 + wl_bcx - wl_cw // 2, ny0 + ncw // 2 - wl_ch // 2), (bx0 + wl_bcx + wl_cw // 2, ny0 + ncw // 2 + wl_ch // 2), L_LI1)
-    _port(cell, (bx0 + wl_bcx, ny0 + ncw // 2), "BLP", [L_LICON1, L_LI1_PIN], L_LI1_LB)
-    _rect(cell, (bx1 - wl_bcx - wl_cw // 2, ny0 + ncw // 2 - wl_ch // 2), (bx1 - wl_bcx + wl_cw // 2, ny0 + ncw // 2 + wl_ch // 2), L_LI1)
-    _port(cell, (bx1 - wl_bcx, ny0 + ncw // 2), "BLN", [L_LICON1, L_LI1_PIN], L_LI1_LB)
+    _liport(cell, (bx0 + wl_bcx, ny0 + ncw // 2), "BLP", (170, 330))
+    _liport(cell, (bx1 - wl_bcx, ny0 + ncw // 2), "BLN", (170, 330))
+    # wordline contacts
+    wl_wcw = 285
+    wl_wcy = 165
+    wl_wcext = 330
+    _rect(cell, (wl_x0 + wl_gw // 2 - wl_wcw // 2, wl_y1), (wl_x0 + wl_gw // 2 + wl_wcw // 2, wl_y1 + wl_wcext), L_POLY) # left 
+    _liport(cell, (wl_x0 + wl_gw // 2, wl_y1 + wl_wcy), "WLA", (170, 330))
+    _rect(cell, (wl_x1 - wl_gw // 2 - wl_wcw // 2, wl_y1), (wl_x1 - wl_gw // 2 + wl_wcw // 2, wl_y1 + wl_wcext), L_POLY) # right 
+    _liport(cell, (wl_x1 - wl_gw // 2, wl_y1 + wl_wcy), "WLB", (170, 330))
+
+
+    # inverter SD
+    invnx0 = bx0 + bitpass_width
+    invnx1 = bx1 - bitpass_width
+    invpx1 = bxp + twoinv_width + inv_sdx * 2
+    inv_spc = 420
+    # SD N
+    _cont(cell, invnx0, ny)
+    invnxm = (invnx0 + invnx1) // 2
+    _pwr_conn(cell, "VGND", invnxm, ny)
+    _cont(cell, invnx1, ny)
+    # SD P
+    _cont(cell, invpx1-inv_sdx, py)
+    invpxm = (invpx1 + bxp) // 2
+    _pwr_conn(cell, "VPWR", invpxm, py)
+    _cont(cell, bxp+inv_sdx, py)
+    inv_gy0 = 105
+    inv_gy1 = 2615
+    inv_gw = 150
+    inv_gmy = [1850, 1480]
+    inv_gxn = [(3 * invnx0 + invnx1) // 4, (invnx0 + 3 * invnx1) // 4]
+    inv_gxp = [(2 * (bxp+inv_sdx) + (invpx1 + bxp)) // 4, (2 * (invpx1-inv_sdx) + (invpx1 + bxp)) // 4]
+    inv_qw = 170
+    inv_qs = 170
+    inv_qcm = [invnx0, invnx1]
+    inv_qcw = 330
+    inv_qrxn = [(invnxm - 370), (invnxm + 370)]
+
+    inv_qmy = [1700, 1400]
+    inv_qvy = [(wl_y1 + wl_wcy)]
+
+    for i in range(2):
+        # inverter gate
+        _rect(cell, (inv_gxn[i] - inv_gw // 2, inv_gy0), (inv_gxn[i] + inv_gw // 2, inv_gmy[i] - inv_gw // 2), L_POLY)
+        _rect(cell, (inv_gxn[i] - inv_gw // 2, inv_gmy[i] - inv_gw // 2), (inv_gxp[i] + inv_gw // 2, inv_gmy[i] + inv_gw // 2), L_POLY)
+        _rect(cell, (inv_gxp[i] - inv_gw // 2, inv_gmy[i] + inv_gw // 2), (inv_gxp[i] + inv_gw // 2, inv_gy1), L_POLY)
+        # inverter Q (N part)
+        _rect(cell, (inv_qcm[i] + (inv_qw // 2 if i == 1 else -inv_qw // 2), ny - inv_qcw // 2), (inv_qrxn[i] + (inv_qw // 2 if i == 1 else -inv_qw // 2), ny + inv_qcw // 2), L_LI1)
+        _rect(cell, (inv_qrxn[i] - inv_qw // 2, ny - inv_qcw // 2), (inv_qrxn[i] + inv_qw // 2, inv_qmy[i] - inv_qw // 2), L_LI1)
 
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
