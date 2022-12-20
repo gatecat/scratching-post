@@ -173,7 +173,7 @@ def add_logic(cell):
     inv_qrxn = [(invnxm - 440), (invnxm + 440)]
     inv_qrxp = [(bxp+inv_sdx), (invpx1-inv_sdx)]
 
-    inv_qmy = [2000, 1685]
+    inv_qmy = [1950, 1685]
 
     for i in (0, 1):
         # inverter gate
@@ -205,6 +205,25 @@ def add_logic(cell):
         _rect(cell, (inv_qdx0[i] + inv_qdxc[i] - ((inv_qw // 2) * (1-2*i)), inv_qdy[i] - inv_qcw // 2),  (inv_qdx0[i] + inv_qdxc[i] + ((inv_qw // 2) * (1-2*i)), inv_qdy[i] + inv_qcw // 2), L_LI1)
         # cross-brace
         _rect(cell, (inv_qdx0[i] + inv_qdxc[i] + ((inv_qw // 2) * (1-2*i)), inv_qdy[i] - inv_qcw // 2),  (inv_qrxn[1-i] - ((inv_qw // 2) * (1-2*i)), inv_qdy[i] + inv_qcw // 2), L_LI1)
+
+    # pass pmos
+    rx0 = 180
+    rx1 = rx0 + rtpass_width
+    r_bcx = 125
+    r_lw = 330
+    r_lh = 170
+    ry = py1 - 190
+    _rect(cell, (rx0, py1-pcw), (rx1, py1), L_DIFF) # Pdiff
+    # ports
+    _liport(cell, (rx0 + r_bcx, ry), "I", (170, 330))
+    _liport(cell, (rx1 - r_bcx, ry), "O", (330, 170))
+    r_gx = (rx0 + rx1) // 2
+    r_gw = inv_gw
+    r_gy1 = inv_gy1
+    # gate
+    _rect(cell, (r_gx - r_gw // 2, inv_gmy[0] - inv_gw // 2), (inv_gxn[0] - inv_gw // 2, inv_gmy[0] + inv_gw // 2), L_POLY)
+    _rect(cell, (r_gx - r_gw // 2, inv_gmy[0] + inv_gw // 2), (r_gx + r_gw // 2, r_gy1), L_POLY)
+
 
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
