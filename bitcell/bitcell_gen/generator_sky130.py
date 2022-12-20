@@ -173,9 +173,8 @@ def add_logic(cell):
     inv_qrxn = [(invnxm - 370), (invnxm + 370)]
 
     inv_qmy = [1700, 1400]
-    inv_qvy = [(wl_y1 + wl_wcy)]
 
-    for i in range(2):
+    for i in (0, 1):
         # inverter gate
         _rect(cell, (inv_gxn[i] - inv_gw // 2, inv_gy0), (inv_gxn[i] + inv_gw // 2, inv_gmy[i] - inv_gw // 2), L_POLY)
         _rect(cell, (inv_gxn[i] - inv_gw // 2, inv_gmy[i] - inv_gw // 2), (inv_gxp[i] + inv_gw // 2, inv_gmy[i] + inv_gw // 2), L_POLY)
@@ -183,6 +182,16 @@ def add_logic(cell):
         # inverter Q (N part)
         _rect(cell, (inv_qcm[i] + (inv_qw // 2 if i == 1 else -inv_qw // 2), ny - inv_qcw // 2), (inv_qrxn[i] + (inv_qw // 2 if i == 1 else -inv_qw // 2), ny + inv_qcw // 2), L_LI1)
         _rect(cell, (inv_qrxn[i] - inv_qw // 2, ny - inv_qcw // 2), (inv_qrxn[i] + inv_qw // 2, inv_qmy[i] - inv_qw // 2), L_LI1)
+    # inverter x-over
+    inv_qdx0 = [inv_gxn[0] + inv_gw // 2, inv_gxn[1] - inv_gw // 2]
+    inv_qdxc = [100, -100]
+    inv_qdxr = [140, -140]
+    inv_qdy = [1700, 970]
+    inv_qh = 300
+    for i in (0, 1):
+        _rect(cell, (inv_qdx0[i], inv_qdy[i] - inv_qh // 2), (inv_qdx0[i] + inv_qdxr[i], min(inv_qdy[i] + inv_qh // 2, inv_gmy[i] - inv_gw // 2)), L_POLY)
+        _cont(cell, inv_qdx0[i] + inv_qdxc[i], inv_qdy[i])
+        _rect(cell, (inv_qdx0[i] + inv_qdxc[i] - ((170 // 2) * (1-2*i)), inv_qdy[i] - 330 // 2),  (inv_qdx0[i] + inv_qdxc[i] + ((170 // 2) * (1-2*i)), inv_qdy[i] + 330 // 2), L_LI1)
 
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
