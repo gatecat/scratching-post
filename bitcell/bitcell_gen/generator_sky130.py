@@ -24,7 +24,7 @@ L_MET1      = (68, 20)
 L_MET1_PIN  = (68, 20)
 L_MET1_LB   = (68, 5)
 
-prim_size   = (460*15, 2720)
+prim_size   = (460*6, 2720)
 
 livia_size = (170, 170)
 m1via_size = (170, 170)
@@ -113,12 +113,12 @@ def add_logic(cell):
     twoinv_width = 1000
     inv_sdx = 125
 
-    bx1 = bx0 + bitpass_width * 2 + twoinv_width
+    bx1 = prim_size[0] - bx0
     bxp = bx0 + rtpass_width + rtpass_gap
 
     # diffusion for transistors
-    _rect(cell, (bx0, ny0), (bx0+bitpass_width*2+twoinv_width, ny0+ncw), L_DIFF) # Ndiff
-    _rect(cell, (bxp, py1-pcw), (bxp+twoinv_width+ inv_sdx * 2, py1), L_DIFF) # Pdiff
+    _rect(cell, (bx0, ny0), (bx1, ny0+ncw), L_DIFF) # Ndiff
+    _rect(cell, (bxp, py1-pcw), (bx1, py1), L_DIFF) # Pdiff
     # HVTP for bitcell but not mux...
     _rect(cell, (bxp - rtpass_gap // 2, npc_pos[0]), (prim_size[0], npc_pos[1]), L_HVTP)
 
@@ -163,16 +163,17 @@ def add_logic(cell):
     inv_gy0 = 105
     inv_gy1 = 2615
     inv_gw = 150
-    inv_gmy = [1850, 1480]
+    inv_gmy = [1840, 1480]
     inv_gxn = [(3 * invnx0 + invnx1) // 4, (invnx0 + 3 * invnx1) // 4]
     inv_gxp = [(2 * (bxp+inv_sdx) + (invpx1 + bxp)) // 4, (2 * (invpx1-inv_sdx) + (invpx1 + bxp)) // 4]
     inv_qw = 170
     inv_qs = 170
     inv_qcm = [invnx0, invnx1]
     inv_qcw = 330
-    inv_qrxn = [(invnxm - 370), (invnxm + 370)]
+    inv_qrxn = [(invnxm - 440), (invnxm + 440)]
+    inv_qrxp = [(bxp+inv_sdx), (invpx1-inv_sdx)]
 
-    inv_qmy = [1700, 1400]
+    inv_qmy = [2000, 1685]
 
     for i in (0, 1):
         # inverter gate
@@ -182,16 +183,28 @@ def add_logic(cell):
         # inverter Q (N part)
         _rect(cell, (inv_qcm[i] + (inv_qw // 2 if i == 1 else -inv_qw // 2), ny - inv_qcw // 2), (inv_qrxn[i] + (inv_qw // 2 if i == 1 else -inv_qw // 2), ny + inv_qcw // 2), L_LI1)
         _rect(cell, (inv_qrxn[i] - inv_qw // 2, ny - inv_qcw // 2), (inv_qrxn[i] + inv_qw // 2, inv_qmy[i] - inv_qw // 2), L_LI1)
+        # inverter Q (across part)
+        _rect(cell, (inv_qrxn[i] - inv_qw // 2, inv_qmy[i] - inv_qw // 2), (inv_qrxp[i] + inv_qw // 2, inv_qmy[i] + inv_qw // 2), L_LI1)
+        # inverter Q (P part)
+        _rect(cell, (inv_qrxp[i] - inv_qw // 2, inv_qmy[i] + inv_qw // 2), (inv_qrxp[i] + inv_qw // 2, py + inv_qcw // 2), L_LI1)
+        # pins
+        _port(cell, (inv_qrxn[i], inv_qmy[i]), "QP" if i == 0 else "QN", [L_LI1_PIN], L_LI1_LB)
+
     # inverter x-over
     inv_qdx0 = [inv_gxn[0] + inv_gw // 2, inv_gxn[1] - inv_gw // 2]
-    inv_qdxc = [100, -100]
-    inv_qdxr = [140, -140]
-    inv_qdy = [1700, 970]
-    inv_qh = 300
+    inv_qdxc = [150, -150]
+    inv_qdxr = [285, -285]
+    inv_qdy = [1520, 970]
+    inv_qh = 340
     for i in (0, 1):
-        _rect(cell, (inv_qdx0[i], inv_qdy[i] - inv_qh // 2), (inv_qdx0[i] + inv_qdxr[i], min(inv_qdy[i] + inv_qh // 2, inv_gmy[i] - inv_gw // 2)), L_POLY)
+        y1 = inv_qdy[i] + inv_qh // 2
+        if y1 >= (inv_gmy[i] - inv_gw // 2 - 210):
+            y1 = inv_gmy[i] - inv_gw // 2
+        _rect(cell, (inv_qdx0[i], inv_qdy[i] - inv_qh // 2), (inv_qdx0[i] + inv_qdxr[i], y1), L_POLY)
         _cont(cell, inv_qdx0[i] + inv_qdxc[i], inv_qdy[i])
-        _rect(cell, (inv_qdx0[i] + inv_qdxc[i] - ((170 // 2) * (1-2*i)), inv_qdy[i] - 330 // 2),  (inv_qdx0[i] + inv_qdxc[i] + ((170 // 2) * (1-2*i)), inv_qdy[i] + 330 // 2), L_LI1)
+        _rect(cell, (inv_qdx0[i] + inv_qdxc[i] - ((inv_qw // 2) * (1-2*i)), inv_qdy[i] - inv_qcw // 2),  (inv_qdx0[i] + inv_qdxc[i] + ((inv_qw // 2) * (1-2*i)), inv_qdy[i] + inv_qcw // 2), L_LI1)
+        # cross-brace
+        _rect(cell, (inv_qdx0[i] + inv_qdxc[i] + ((inv_qw // 2) * (1-2*i)), inv_qdy[i] - inv_qcw // 2),  (inv_qrxn[1-i] - ((inv_qw // 2) * (1-2*i)), inv_qdy[i] + inv_qcw // 2), L_LI1)
 
 def main():
     lib = gdspy.GdsLibrary(unit=1e-09)
