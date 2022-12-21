@@ -142,8 +142,15 @@ def optimise_onehot(reader):
                 x1 = max(x1, px)
                 y0 = min(y0, py)
                 y1 = max(y1, py)
+        for bt in net.getBTerms():
+            good, px, py = bt.getFirstPinLocation()
+            if good:
+                x0 = min(x0, px)
+                x1 = max(x1, px)
+                y0 = min(y0, py)
+                y1 = max(y1, py)
         return abs(y1 - y0) + abs(x1 - x0)
-    def total_hpwl():
+    def total_config_hpwl():
         hpwl = 0
         for wl in wordline_signals.values():#
             hpwl += net_hpwl(wl)
@@ -151,12 +158,113 @@ def optimise_onehot(reader):
             hpwl += net_hpwl(blp)
             hpwl += net_hpwl(bln)
         return hpwl
+    def total_route_hpwl():
+        seen = set()
+        hpwl = 0
+        for mux in bit_to_mux.values():
+            if mux is None:
+                continue
+            i = mux.findITerm("I").getNet()
+            o = mux.findITerm("O").getNet()
+            for net in (i, o):
+                if net.getName() in seen:
+                    continue
+                hpwl += net_hpwl(net)
+                seen.add(net.getName())
+        return hpwl
 
+    def get_driver(net):
+        return net.getFirstOutput().getInst()
+
+    def spread_everywhere():
+        # poor poor detail placer ^^
+        # determine the bounding box
+        i = 0
+        for mux in bit_to_mux.values():
+            if mux is None:
+                continue
+            x, y = mux.getLocation()
+            if i == 0:
+                x0 = x1 = x
+                y0 = y1 = y
+            else:
+                x0 = min(x0, x)
+                x1 = max(x1, x)
+                y0 = min(y0, y)
+                y1 = max(y1, y)
+            i += 1
+        # spread muxes
+        kx = (x1 - x0) / len(bitline_signals)
+        ky = (y1 - y0) / len(wordline_signals)
+        for (word, bit), mux in bit_to_mux.items():
+            if mux is None:
+                continue
+            mux.setLocation(int(x0 + kx * word), int(y0 + ky * bit))
+        # spread bitline drivers
+        for i, bls in bitline_signals.items():
+            for j, sig in enumerate(bls):
+                get_driver(sig).setLocation(x0, int(y0 + ky * (i + 0.5 * j)))
+        # spread wordline drivers
+        for i, wl in wordline_signals.items():
+            get_driver(wl).setLocation(int(x0 + kx * i), y0)
+        replace_outbufs()
+
+    def replace_outbufs():
+        for instance in instances:
+            if instance.getMaster().getName() == "sky130_fpga_routebuf":
+                i = instance.findITerm("I").getNet()
+                cx = cy = 0
+                n = 0
+                for iterm in i.getITerms():
+                    mux = iterm.getInst()
+                    if mux.getMaster().getName() != "sky130_fpga_bitmux":
+                        continue
+                    mx, my = mux.getLocation()
+                    cx += mx
+                    cy += my
+                    n += 1
+                if n > 0:
+                    instance.setLocation(int(cx / n), int(cy / n))
     r  = Random(1)
     temperature = 1
     n_accept = 0
     n_moves = 0
-    def move_mux(mux, word, bit):
+
+    def swap_routing(muxa, muxb):
+        for p in ("I", "O"):
+            ita = muxa.findITerm(p)
+            itb = muxb.findITerm(p)
+            na = ita.getNet()
+            nb = itb.getNet()
+            ita.disconnect()
+            itb.disconnect()
+            ita.connect(nb)
+            itb.connect(na)
+
+    def anneal_swap(muxa, muxb):
+        nonlocal n_moves, n_accept
+        n_moves += 1
+        wires = []
+        for mux in (muxa, muxb):
+            for p in ("I", "O"):
+                w = mux.findITerm(p).getNet()
+                if any(w1.getName() == w.getName() for w1 in wires):
+                    continue
+                wires.append(w)
+        # perform swap and compute new HPW
+        old_hpwl = sum(net_hpwl(w) for w in wires)
+        swap_routing(muxa, muxb)
+        new_hpwl = sum(net_hpwl(w) for w in wires)
+        delta = new_hpwl - old_hpwl
+        if delta < 0 or (temperature > 1e-8 and (r.random() / 2) <= math.exp(-delta/temperature)):
+            # accept
+            n_accept += 1
+        else:
+            # revert
+            swap_routing(muxb, muxa)
+
+
+    def swizzle_mux(mux, word, bit):
         for wli in ("WLA", "WLB"):
             wl = mux.findITerm(wli)
             wl.disconnect()
@@ -168,7 +276,7 @@ def optimise_onehot(reader):
         bit_to_mux[(word, bit)] = mux
         mux_to_bit[mux.getName()] = (word, bit)
 
-    def anneal_swap(mux, word, bit):
+    def anneal_swizzle(mux, word, bit):
         nonlocal n_moves, n_accept
         n_moves += 1
         old_word, old_bit = mux_to_bit[mux.getName()]
@@ -183,9 +291,9 @@ def optimise_onehot(reader):
         other_mux = bit_to_mux.get((word, bit), None)
         old_hpwl = sum(net_hpwl(w) for w in wires)
         # perform swap and compute new HPWL
-        move_mux(mux, word, bit)
+        swizzle_mux(mux, word, bit)
         if other_mux:
-            move_mux(other_mux, old_word, old_bit)
+            swizzle_mux(other_mux, old_word, old_bit)
         else:
             bit_to_mux[(old_word, old_bit)] = None
         new_hpwl = sum(net_hpwl(w) for w in wires)
@@ -195,41 +303,82 @@ def optimise_onehot(reader):
             n_accept += 1
         else:
             # revert
-            move_mux(mux, old_word, old_bit)
+            swizzle_mux(mux, old_word, old_bit)
             if other_mux:
-                move_mux(other_mux, word, bit)
+                swizzle_mux(other_mux, word, bit)
             else:
                 bit_to_mux[(word, bit)] = None
+            assert sum(net_hpwl(w) for w in wires) == old_hpwl
 
+    def optimise_mux_plc():
+        nonlocal n_moves, n_accept, temperature
+        print("optimising mux placement...")
+        radius = len(wordline_signals)
+        i = 0
+        avg_hpwl = total_route_hpwl()
+        while temperature >= 1e-7 and radius > 1:
+            print(f"i={i} rhpwl={total_route_hpwl()} T={temperature:.2f} R={radius}")
+            for j in range(10):
+                for (word, bit), mux in r.sample(list(bit_to_mux.items()), k=len(bit_to_mux)):
+                    if mux is None:
+                        continue
+                    new_word = word + r.randint(-radius, radius)
+                    new_bit = bit + r.randint(-radius, radius)
+                    if (new_word == word) and (new_bit == bit):
+                        continue
+                    other = bit_to_mux.get((new_word, new_bit), None)
+                    if other is None:
+                        continue
+                    anneal_swap(mux, other)
+                replace_outbufs()
+            r_accept = n_accept / n_moves
+            curr_hpwl = total_route_hpwl()
+            if curr_hpwl < (0.95 * avg_hpwl):
+                avg_hpwl = 0.8 * avg_hpwl + 0.2 * curr_hpwl
+            else:
+                radius = max(1, min(len(wordline_signals)//2, int(radius * (1.0 - 0.44 + r_accept) + 0.5)))
+                if r_accept > 0.96: temperature *= 0.5
+                elif r_accept > 0.8: temperature *= 0.9
+                elif r_accept > 0.15 and radius > 1: temperature *= 0.95
+                else: temperature *= 0.8
+            n_accept = 0
+            n_moves = 0
+            i += 1
 
-    radius = len(wordline_signals)
-    i = 0
-    avg_hpwl = total_hpwl()
-    while temperature >= 1e-7 and radius > 2:
-        print(f"i={i} hpwl={total_hpwl()} T={temperature:.2f} R={radius}")
-        for j in range(10):
-            for (word, bit), mux in r.sample(list(bit_to_mux.items()), k=len(bit_to_mux)):
-                if mux is None:
-                    continue
-                new_word = word + r.randint(-radius, radius)
-                new_bit = bit + r.randint(-radius, radius)
-                if new_word < 0 or new_word >= len(wordline_signals) or new_bit < 0 or new_bit >= len(bitline_signals):
-                    # oob
-                    continue
-                anneal_swap(mux, new_word, new_bit)
-        r_accept = n_accept / n_moves
-        curr_hpwl = total_hpwl()
-        if curr_hpwl < (0.95 * avg_hpwl):
-            avg_hpwl = 0.8 * avg_hpwl + 0.2 * curr_hpwl
-        else:
-            radius = max(1, min(len(wordline_signals)//2, int(radius * (1.0 - 0.44 + r_accept) + 0.5)))
-            if r_accept > 0.96: temperature *= 0.5
-            elif r_accept > 0.8: temperature *= 0.9
-            elif r_accept > 0.15 and radius > 1: temperature *= 0.95
-            else: temperature *= 0.8
-        n_accept = 0
-        n_moves = 0
-        i += 1
+    def optimise_mux_bits():
+        nonlocal n_moves, n_accept, temperature
+        print("optimising bit layout...")
+        radius = len(wordline_signals)
+        i = 0
+        avg_hpwl = total_config_hpwl()
+        while temperature >= 1e-7 and radius > 2:
+            print(f"i={i} chpwl={total_config_hpwl()} T={temperature:.2f} R={radius}")
+            for j in range(10):
+                for (word, bit), mux in r.sample(list(bit_to_mux.items()), k=len(bit_to_mux)):
+                    if mux is None:
+                        continue
+                    new_word = word + r.randint(-radius, radius)
+                    new_bit = bit + r.randint(-radius, radius)
+                    if new_word < 0 or new_word >= len(wordline_signals) or new_bit < 0 or new_bit >= len(bitline_signals):
+                        # oob
+                        continue
+                    anneal_swizzle(mux, new_word, new_bit)
+            r_accept = n_accept / n_moves
+            curr_hpwl = total_config_hpwl()
+            if curr_hpwl < (0.95 * avg_hpwl):
+                avg_hpwl = 0.8 * avg_hpwl + 0.2 * curr_hpwl
+            else:
+                radius = max(1, min(len(wordline_signals)//2, int(radius * (1.0 - 0.44 + r_accept) + 0.5)))
+                if r_accept > 0.96: temperature *= 0.5
+                elif r_accept > 0.8: temperature *= 0.9
+                elif r_accept > 0.15 and radius > 1: temperature *= 0.95
+                else: temperature *= 0.8
+            n_accept = 0
+            n_moves = 0
+            i += 1
+    spread_everywhere()
+    optimise_mux_plc()
+    optimise_mux_bits()
 
 
 if __name__ == "__main__":
