@@ -94,12 +94,15 @@ def _pwr_conn(cell, rail, x, y, w=170, ext=80):
     _cont(cell, x, y)
 
 def _liport(cell, p, name, ext):
-    _rect(cell, (p[0] - ext[0] // 2, p[1] - ext[1] // 2), (p[0] + ext[0] // 2, p[1] + ext[1] // 2), L_LI1)
+    if len(ext) == 2:
+        _rect(cell, (p[0] - ext[0] // 2, p[1] - ext[1] // 2), (p[0] + ext[0] // 2, p[1] + ext[1] // 2), L_LI1)
+    elif len(ext) == 4:
+        _rect(cell, (p[0] - ext[0], p[1] - ext[1]), (p[0] + ext[2], p[1] + ext[3]), L_LI1)
     _port(cell, p, name, [L_LICON1, L_LI1_PIN], L_LI1_LB)
 
 
 def add_logic(cell):
-    bx0 =  180+460
+    bx0 =  180+360
     ny0 =  235
     py1 = 2485
     ncw =  420
@@ -108,12 +111,12 @@ def add_logic(cell):
     py = (py1 - pcw // 2)
 
     rtpass_width = 700
-    rtpass_gap = 820
+    rtpass_gap = 700
     bitpass_width = 550 
     twoinv_width = 1000
     inv_sdx = 125
 
-    bx1 = prim_size[0] - 180
+    bx1 = prim_size[0] - 280
     bxp = 180 + rtpass_width + rtpass_gap
 
     # diffusion for transistors
@@ -133,16 +136,16 @@ def add_logic(cell):
     _rect(cell, (wl_x1 - wl_gw, wl_y0), (wl_x1, wl_y1), L_POLY) # right (BL-)
     # bitline contacts
     wl_bcx = 125
-    _liport(cell, (bx0 + wl_bcx, ny0 + ncw // 2), "BLP", (170, 330))
-    _liport(cell, (bx1 - wl_bcx, ny0 + ncw // 2), "BLN", (170, 330))
+    _liport(cell, (bx0 + wl_bcx, ny0 + ncw // 2), "BLP", (420, 165, 85, 165))
+    _liport(cell, (bx1 - wl_bcx, ny0 + ncw // 2), "BLN", (85, 165, 240, 165))
     # wordline contacts
     wl_wcw = 285
     wl_wcy = 165
     wl_wcext = 330
     _rect(cell, (wl_x0 + wl_gw // 2 - wl_wcw // 2, wl_y1), (wl_x0 + wl_gw // 2 + wl_wcw // 2, wl_y1 + wl_wcext), L_POLY) # left 
-    _liport(cell, (wl_x0 + wl_gw // 2, wl_y1 + wl_wcy), "WLA", (170, 330))
+    _liport(cell, (wl_x0 + wl_gw // 2, wl_y1 + wl_wcy), "WLA", (330, 165, 85, 165))
     _rect(cell, (wl_x1 - wl_gw // 2 - wl_wcw // 2, wl_y1), (wl_x1 - wl_gw // 2 + wl_wcw // 2, wl_y1 + wl_wcext), L_POLY) # right 
-    _liport(cell, (wl_x1 - wl_gw // 2, wl_y1 + wl_wcy), "WLB", (170, 330))
+    _liport(cell, (wl_x1 - wl_gw // 2, wl_y1 + wl_wcy), "WLB", (85, 165, 330, 165))
 
 
     # inverter SD
@@ -215,8 +218,8 @@ def add_logic(cell):
     ry = py1 - 190
     _rect(cell, (rx0, py1-pcw), (rx1, py1), L_DIFF) # Pdiff
     # ports
-    _liport(cell, (rx0 + r_bcx, ry), "I", (170, 330))
-    _liport(cell, (rx1 - r_bcx, ry), "O", (170, 330))
+    _liport(cell, (rx0 + r_bcx, ry), "I", (120, 800, 85, 165))
+    _liport(cell, (rx1 - r_bcx, ry), "O", (85, 800, 200, 165))
     r_gx = (rx0 + rx1) // 2
     r_gw = inv_gw
     r_gy1 = inv_gy1
