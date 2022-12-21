@@ -18,6 +18,8 @@ import os
 import sys
 import inspect
 import functools
+import math
+from random import Random
 
 import click
 
@@ -101,6 +103,7 @@ def optimise_onehot(reader):
     muxes = []
 
     bit_to_mux = dict()
+    mux_to_bit = dict()
     wordline_signals = dict()
     bitline_signals = dict()
 
@@ -123,6 +126,7 @@ def optimise_onehot(reader):
             bitline_signals[bit] = (blp, bln)
             assert (word, bit) not in bit_to_mux
             bit_to_mux[(word, bit)] = instance
+            mux_to_bit[instance.getName()] = (word, bit)
 
     def net_hpwl(net):
         for i, it in enumerate(net.getITerms()):
@@ -147,8 +151,86 @@ def optimise_onehot(reader):
             hpwl += net_hpwl(blp)
             hpwl += net_hpwl(bln)
         return hpwl
-    print(f"found {len(muxes)} muxes")
-    print(f"pre opt config hpwl: {total_hpwl()}")
+
+    r  = Random(1)
+    temperature = 1
+    n_accept = 0
+    n_moves = 0
+    def move_mux(mux, word, bit):
+        for wli in ("WLA", "WLB"):
+            wl = mux.findITerm(wli)
+            wl.disconnect()
+            wl.connect(wordline_signals[word])
+        for bli, sig in zip(("BLP", "BLN"), bitline_signals[bit]):
+            bl = mux.findITerm(bli)
+            bl.disconnect()
+            bl.connect(sig)
+        bit_to_mux[(word, bit)] = mux
+        mux_to_bit[mux.getName()] = (word, bit)
+
+    def anneal_swap(mux, word, bit):
+        nonlocal n_moves, n_accept
+        n_moves += 1
+        old_word, old_bit = mux_to_bit[mux.getName()]
+        if word == old_word and bit == old_bit:
+            return
+        wires = [wordline_signals[word], bitline_signals[bit][0], bitline_signals[bit][1]]
+        if word != old_word:
+            wires.append(wordline_signals[old_word])
+        if bit != old_bit:
+            wires += bitline_signals[old_bit]
+        # see if position we are swapping to is occupied
+        other_mux = bit_to_mux.get((word, bit), None)
+        old_hpwl = sum(net_hpwl(w) for w in wires)
+        # perform swap and compute new HPWL
+        move_mux(mux, word, bit)
+        if other_mux:
+            move_mux(other_mux, old_word, old_bit)
+        else:
+            bit_to_mux[(old_word, old_bit)] = None
+        new_hpwl = sum(net_hpwl(w) for w in wires)
+        delta = new_hpwl - old_hpwl
+        if delta < 0 or (temperature > 1e-8 and (r.random() / 2) <= math.exp(-delta/temperature)):
+            # accept
+            n_accept += 1
+        else:
+            # revert
+            move_mux(mux, old_word, old_bit)
+            if other_mux:
+                move_mux(other_mux, word, bit)
+            else:
+                bit_to_mux[(word, bit)] = None
+
+
+    radius = len(wordline_signals)
+    i = 0
+    avg_hpwl = total_hpwl()
+    while temperature >= 1e-7 and radius > 2:
+        print(f"i={i} hpwl={total_hpwl()} T={temperature:.2f} R={radius}")
+        for j in range(10):
+            for (word, bit), mux in r.sample(list(bit_to_mux.items()), k=len(bit_to_mux)):
+                if mux is None:
+                    continue
+                new_word = word + r.randint(-radius, radius)
+                new_bit = bit + r.randint(-radius, radius)
+                if new_word < 0 or new_word >= len(wordline_signals) or new_bit < 0 or new_bit >= len(bitline_signals):
+                    # oob
+                    continue
+                anneal_swap(mux, new_word, new_bit)
+        r_accept = n_accept / n_moves
+        curr_hpwl = total_hpwl()
+        if curr_hpwl < (0.95 * avg_hpwl):
+            avg_hpwl = 0.8 * avg_hpwl + 0.2 * curr_hpwl
+        else:
+            radius = max(1, min(len(wordline_signals)//2, int(radius * (1.0 - 0.44 + r_accept) + 0.5)))
+            if r_accept > 0.96: temperature *= 0.5
+            elif r_accept > 0.8: temperature *= 0.9
+            elif r_accept > 0.15 and radius > 1: temperature *= 0.95
+            else: temperature *= 0.8
+        n_accept = 0
+        n_moves = 0
+        i += 1
+
 
 if __name__ == "__main__":
     optimise_onehot()
