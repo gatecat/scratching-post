@@ -124,7 +124,31 @@ def optimise_onehot(reader):
             assert (word, bit) not in bit_to_mux
             bit_to_mux[(word, bit)] = instance
 
+    def net_hpwl(net):
+        for i, it in enumerate(net.getITerms()):
+            found, px, py = it.getAvgXY()
+            if not found:
+                # Failed, use the center coordinate of the instance as fall back
+                px, py = it.getInst().getLocation()
+            if i == 0:
+                x0 = x1 = px
+                y0 = y1 = py
+            else:
+                x0 = min(x0, px)
+                x1 = max(x1, px)
+                y0 = min(y0, py)
+                y1 = max(y1, py)
+        return abs(y1 - y0) + abs(x1 - x0)
+    def total_hpwl():
+        hpwl = 0
+        for wl in wordline_signals.values():#
+            hpwl += net_hpwl(wl)
+        for blp, bln in bitline_signals.values():#
+            hpwl += net_hpwl(blp)
+            hpwl += net_hpwl(bln)
+        return hpwl
     print(f"found {len(muxes)} muxes")
+    print(f"pre opt config hpwl: {total_hpwl()}")
 
 if __name__ == "__main__":
     optimise_onehot()
