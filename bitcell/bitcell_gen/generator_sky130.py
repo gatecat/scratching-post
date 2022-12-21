@@ -24,7 +24,7 @@ L_MET1      = (68, 20)
 L_MET1_PIN  = (68, 20)
 L_MET1_LB   = (68, 5)
 
-prim_size   = (460*6, 2720)
+prim_size   = (460*7, 2720)
 
 livia_size = (170, 170)
 m1via_size = (170, 170)
@@ -99,7 +99,7 @@ def _liport(cell, p, name, ext):
 
 
 def add_logic(cell):
-    bx0 =  180
+    bx0 =  180+460
     ny0 =  235
     py1 = 2485
     ncw =  420
@@ -108,19 +108,19 @@ def add_logic(cell):
     py = (py1 - pcw // 2)
 
     rtpass_width = 700
-    rtpass_gap = 360
+    rtpass_gap = 820
     bitpass_width = 550 
     twoinv_width = 1000
     inv_sdx = 125
 
-    bx1 = prim_size[0] - bx0
-    bxp = bx0 + rtpass_width + rtpass_gap
+    bx1 = prim_size[0] - 180
+    bxp = 180 + rtpass_width + rtpass_gap
 
     # diffusion for transistors
     _rect(cell, (bx0, ny0), (bx1, ny0+ncw), L_DIFF) # Ndiff
     _rect(cell, (bxp, py1-pcw), (bx1, py1), L_DIFF) # Pdiff
     # HVTP for bitcell but not mux...
-    _rect(cell, (bxp - rtpass_gap // 2, npc_pos[0]), (prim_size[0], npc_pos[1]), L_HVTP)
+    _rect(cell, (bxp - rtpass_gap // 2, hvt_start), (prim_size[0], prim_size[1]), L_HVTP)
 
     wl_y0 = 105
     wl_y1 = 800
@@ -216,7 +216,7 @@ def add_logic(cell):
     _rect(cell, (rx0, py1-pcw), (rx1, py1), L_DIFF) # Pdiff
     # ports
     _liport(cell, (rx0 + r_bcx, ry), "I", (170, 330))
-    _liport(cell, (rx1 - r_bcx, ry), "O", (330, 170))
+    _liport(cell, (rx1 - r_bcx, ry), "O", (170, 330))
     r_gx = (rx0 + rx1) // 2
     r_gw = inv_gw
     r_gy1 = inv_gy1
