@@ -60,3 +60,9 @@ module clb_dffrs(input clk, d, rn, sn, output reg q);
 		else
 			q <= d;
 endmodule
+
+module cfg_latch(input d, en, output reg q);
+	always @*
+		if (en)
+			q <= d;
+endmodule

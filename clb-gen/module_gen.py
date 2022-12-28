@@ -20,6 +20,8 @@ class ModuleGen:
 		self.insts = []
 		self.inst_autoidx = 0
 		self.sig_autoidx = 0
+		self.gen_cfg_storage = False
+		self.cfg_width = 32
 		self.config_bits = []
 		self.config_tags = []
 
@@ -32,16 +34,26 @@ class ModuleGen:
 	def add_assign(self, dst, src):
 		self.assigns += [(dst, src)]
 
-	def cfg(self, name):
+	def cfg(self, name, ext_memory=False):
+		if ext_memory:
+			assert self.gen_cfg_storage, "getting raw config access requires gen_cfg_storage set"
 		idx = len(self.config_bits)
-		self.config_bits.append(name)
-		return f"cfg[{idx}]"
-			
-	def cfg(self, name, width):
+		self.config_bits.append((name, ext_memory))
+		if ext_memory:
+			return (f"cfg_strobe[{idx//self.cfg_width}]", f"cfg_data[{idx%self.cfg_width}]")
+		else:
+			return f"cfg[{idx}]"
+
+	def cfg(self, name, width, ext_memory=False):
+		if ext_memory:
+			assert self.gen_cfg_storage, "getting raw config access requires gen_cfg_storage set"
 		idx = len(self.config_bits)
 		for i in range(width):
-			self.config_bits.append(f"{name}[{i}]")
-		return list(f"cfg[{idx+i}]" for i in range(width))
+			self.config_bits.append((f"{name}[{i}]", ext_memory))
+		if ext_memory:
+			return list((f"cfg_strobe[{(idx+i)//self.cfg_width}]", f"cfg_data[{(idx+i)%self.cfg_width}]") for i in range(width))
+		else:
+			return list(f"cfg[{idx+i}]" for i in range(width))
 
 	def add_tag(self, name, cbits):
 		bits = []
@@ -64,18 +76,31 @@ class ModuleGen:
 			name = self.autoinst()
 		self.insts.append(Instance(name, typ, dict(kwargs)))
 
+	def _cfg_height(self):
+		bits = len(self.config_bits)
+		return (bits + self.cfg_width - 1) // self.cfg_width
+
 	def add_submod(self, mod, name=None, **kwargs):
 		if name is None:
 			name = self.autoinst()
 		ports = dict(kwargs)
 		# auto propagate cbits
 		if len(mod.config_bits) > 0:
+			if mod.gen_cfg_storage:
+				# submodule must be aligned
+				while len(self.config_bits) % self.cfg_width != 0:
+					self.config_bits.append((f"__padding_{len(self.config_bits)}", True))
 			cfg_start = len(self.config_bits)
-			for b in mod.config_bits:
-				self.config_bits.append(f"{name}.{b}")
+			for b, _ in mod.config_bits:
+				self.config_bits.append((f"{name}.{b}", mod.gen_cfg_storage))
 			for m, bits in mod.config_tags:
 				self.config_tags.append(tuple([f"{name}.{b}", ] + [b + cfg_start for b in bits]))
-			ports["cfg"] = f"cfg[{cfg_start+len(mod.config_bits)-1}:{cfg_start}]"
+			if mod.gen_cfg_storage:
+				# propagate data/strobe
+				ports["cfg_strobe"] = f"cfg_strobe[{cfg_start//self.cfg_width+mod._cfg_height()-1}:{cfg_start//self.cfg_width}]"
+				ports["cfg_data"] = f"cfg_data"
+			else:
+				ports["cfg"] = f"cfg[{cfg_start+len(mod.config_bits)-1}:{cfg_start}]"
 		self.insts.append(Instance(name, mod.module_name, ports))
 	def finalise(self, filename, append_cfg=False):
 		with open(filename, "w") as f:
@@ -88,14 +113,29 @@ class ModuleGen:
 				ports.append(f"\tinput wire [{i.width-1}:0] {i.name}" if i.width > 1 else f"\tinput wire {i.name}")
 				known_sigs.add(i.name)
 			if len(self.config_bits) > 0:
-				ports.append(f"\tinput wire [{len(self.config_bits)-1}:0] cfg")
-				known_sigs.add("cfg")
+				if self.gen_cfg_storage:
+					ports.append(f"\tinput wire [{self.cfg_width-1}:0] cfg_data")
+					ports.append(f"\tinput wire [{self._cfg_height()-1}:0] cfg_strobe")
+					known_sigs.add("cfg_data")
+					known_sigs.add("cfg_strobe")
+				else:
+					ports.append(f"\tinput wire [{len(self.config_bits)-1}:0] cfg")
+					known_sigs.add("cfg")
 			for o in self.outputs:
 				ports.append(f"\toutput wire [{o.width-1}:0] {o.name}" if o.width > 1 else f"\toutput wire {o.name}")
 				known_sigs.add(o.name)
 			# use join() to avoid trailing comma issues
 			print(",\n".join(ports), file=f)
 			print(");", file=f)
+			# generate config memory if needed
+			if len(self.config_bits) > 0 and self.gen_cfg_storage:
+				print(f"\twire [{len(self.config_bits)-1}:0] cfg;", file=f)
+				for i, (name, ext_memory) in enumerate(self.config_bits):
+					if ext_memory:
+						continue
+					print(f"\tcfg_latch cfg_mem_{i} (.D(cfg_data[{i%self.cfg_width}]), .EN(cfg_strobe[{i//self.cfg_width}]), .Q(cfg[{i}]));", file=f)
+				print("", file=f)
+				known_sigs.add("cfg")
 			# auto determine signals
 			sigs = set()
 			for inst in self.insts:
