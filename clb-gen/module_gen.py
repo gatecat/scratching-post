@@ -102,71 +102,80 @@ class ModuleGen:
 			else:
 				ports["cfg"] = f"cfg[{cfg_start+len(mod.config_bits)-1}:{cfg_start}]"
 		self.insts.append(Instance(name, mod.module_name, ports))
-	def finalise(self, filename, append_cfg=False):
-		with open(filename, "w") as f:
-			print(f"module {self.module_name} (", file=f)
-			ports = []
-			# signals for which we don't need to create a wire
-			known_sigs = set()
-			# write ports
-			for i in self.inputs:
-				ports.append(f"\tinput wire [{i.width-1}:0] {i.name}" if i.width > 1 else f"\tinput wire {i.name}")
-				known_sigs.add(i.name)
-			if len(self.config_bits) > 0:
-				if self.gen_cfg_storage:
-					ports.append(f"\tinput wire [{self.cfg_width-1}:0] cfg_data")
-					ports.append(f"\tinput wire [{self._cfg_height()-1}:0] cfg_strobe")
-					known_sigs.add("cfg_data")
-					known_sigs.add("cfg_strobe")
-				else:
-					ports.append(f"\tinput wire [{len(self.config_bits)-1}:0] cfg")
-					known_sigs.add("cfg")
-			for o in self.outputs:
-				ports.append(f"\toutput wire [{o.width-1}:0] {o.name}" if o.width > 1 else f"\toutput wire {o.name}")
-				known_sigs.add(o.name)
-			# use join() to avoid trailing comma issues
-			print(",\n".join(ports), file=f)
-			print(");", file=f)
-			# generate config memory if needed
-			if len(self.config_bits) > 0 and self.gen_cfg_storage:
-				print(f"\twire [{len(self.config_bits)-1}:0] cfg;", file=f)
-				for i, (name, ext_memory) in enumerate(self.config_bits):
-					if ext_memory:
-						continue
-					print(f"\tcfg_latch cfg_mem_{i} (.D(cfg_data[{i%self.cfg_width}]), .EN(cfg_strobe[{i//self.cfg_width}]), .Q(cfg[{i}]));", file=f)
-				print("", file=f)
+	def finalise(self, f, append_cfg=False):
+		print(f"module {self.module_name} (", file=f)
+		ports = []
+		# signals for which we don't need to create a wire
+		known_sigs = set()
+		# write ports
+		for i in self.inputs:
+			ports.append(f"\tinput wire [{i.width-1}:0] {i.name}" if i.width > 1 else f"\tinput wire {i.name}")
+			known_sigs.add(i.name)
+		if len(self.config_bits) > 0:
+			if self.gen_cfg_storage:
+				ports.append(f"\tinput wire [{self.cfg_width-1}:0] cfg_data")
+				ports.append(f"\tinput wire [{self._cfg_height()-1}:0] cfg_strobe")
+				known_sigs.add("cfg_data")
+				known_sigs.add("cfg_strobe")
+			else:
+				ports.append(f"\tinput wire [{len(self.config_bits)-1}:0] cfg")
 				known_sigs.add("cfg")
-			# auto determine signals
-			sigs = set()
-			for inst in self.insts:
-				for sig in inst.ports.values():
-					s = sig.split('[')[0]
-					if s not in known_sigs:
-						sigs.add(s)
-			for pair in self.assigns:
-				for sig in pair:
-					s = sig.split('[')[0]
-					if s not in known_sigs:
-						sigs.add(s)
-			# write list of wires
-			for s in sorted(sigs):
-				print(f"\twire {s};", file=f)
+		for o in self.outputs:
+			ports.append(f"\toutput wire [{o.width-1}:0] {o.name}" if o.width > 1 else f"\toutput wire {o.name}")
+			known_sigs.add(o.name)
+		# use join() to avoid trailing comma issues
+		print(",\n".join(ports), file=f)
+		print(");", file=f)
+		# generate config memory if needed
+		if len(self.config_bits) > 0 and self.gen_cfg_storage:
+			print(f"\twire [{len(self.config_bits)-1}:0] cfg;", file=f)
+			for i, (name, ext_memory) in enumerate(self.config_bits):
+				if ext_memory:
+					continue
+				print(f"\tcfg_latch cfg_mem_{i} (.D(cfg_data[{i%self.cfg_width}]), .EN(cfg_strobe[{i//self.cfg_width}]), .Q(cfg[{i}]));", file=f)
 			print("", file=f)
-			# write instances
-			for inst in self.insts:
-				print(f"\t{inst.typ} {inst.name} ({', '.join(f'.{k}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]))});", file=f)
-			# write assigns
-			if len(self.assigns) > 0:
-				print("", file=f)
-				for dst, src in self.assigns:
-					print(f"\tassign {dst} = {src};", file=f)
-			print("endmodule", file=f)
-			if append_cfg:
-				print("/** CONFIG **", file=f)
-				for i, b in enumerate(self.config_bits):
-					print(f"  {i:>4d} {b}", file=f)
-				print("**/", file=f)
-				print("/** TAGS **", file=f)
-				for t in enumerate(self.config_tags):
-					print(f"  {t[0]} {' '.join(str(b) for b in t[1:])}", file=f)
-				print("**/", file=f)
+			known_sigs.add("cfg")
+		# auto determine signals
+		def split_cat(sig):
+			s = sig.strip()
+			if s.startswith('{'):
+				assert s.endswith('}'), s
+				result = []
+				for entry in s[1:-1].split(","):
+					result += split_cat(entry)
+				return result
+			else:
+				return [s.split('[')[0], ]
+		sigs = set()
+		for inst in self.insts:
+			for sig in inst.ports.values():
+				for s in split_cat(sig):
+					if s not in known_sigs:
+						sigs.add(s)
+		for pair in self.assigns:
+			for sig in pair:
+				for s in split_cat(sig):
+					if s not in known_sigs:
+						sigs.add(s)
+		# write list of wires
+		for s in sorted(sigs):
+			print(f"\twire {s};", file=f)
+		print("", file=f)
+		# write instances
+		for inst in self.insts:
+			print(f"\t{inst.typ} {inst.name} ({', '.join(f'.{k}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]))});", file=f)
+		# write assigns
+		if len(self.assigns) > 0:
+			print("", file=f)
+			for dst, src in self.assigns:
+				print(f"\tassign {dst} = {src};", file=f)
+		print("endmodule", file=f)
+		if append_cfg:
+			print("/** CONFIG **", file=f)
+			for i, b in enumerate(self.config_bits):
+				print(f"  {i:>4d} {b}", file=f)
+			print("**/", file=f)
+			print("/** TAGS **", file=f)
+			for t in enumerate(self.config_tags):
+				print(f"  {t[0]} {' '.join(str(b) for b in t[1:])}", file=f)
+			print("**/", file=f)

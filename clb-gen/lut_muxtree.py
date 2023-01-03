@@ -61,7 +61,7 @@ def gen_lut(name, k, extra_taps=[], with_lutram=False):
 			m.add_prim(f"clb_mux{mux_size}", f"l{level}_imux{i}",
 				x=next_layer[i],
 				**{f"a{j}": layer[mux_size*i + j] for j in range(mux_size)},
-				**{f"s{j}": f"I{level+j}" for j in range(layer_size)},
+				**{f"s{j}": f"I[{level+j}]" for j in range(layer_size)},
 			)
 		layer = next_layer
 		level += layer_size
@@ -77,4 +77,6 @@ if __name__ == '__main__':
 		s = arg.split(":")
 		extra_taps.append(LUTTap(s[0], int(s[1]), int(s[2])))
 	m = gen_lut(name, k, extra_taps, with_lutram=True)
-	m.finalise(out_file)
+	with open(out_file, "w") as f:
+		m.finalise(f)
+
