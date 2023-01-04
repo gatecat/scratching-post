@@ -61,6 +61,21 @@ module clb_dffrs(input clk, d, rn, sn, output reg q);
 			q <= d;
 endmodule
 
+(* blackbox *)
+module clb_wstrb_gen(input wclk, we, output reg strobe);
+	// TODO
+endmodule
+
+module clb_wr_decode #(parameter K=4) (input [K-1:0] addr, input strobe, output [2**K-1:0] dec);
+	generate
+		genvar ii;
+		for (ii = 0; ii < addr; ii = ii + 1'b1) begin : dec_gen
+			// Force an AND gate at the end to prevent synthesis doing something that glitches
+			clb_and and_i (.a(addr == ii), .b(strobe), .x(dec[ii]));
+		end
+	endgenerate
+endmodule
+
 module cfg_latch(input d, en, output reg q);
 	always @*
 		if (en)

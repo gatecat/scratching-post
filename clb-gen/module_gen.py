@@ -18,6 +18,7 @@ class ModuleGen:
 		self.outputs = list(outputs)
 		self.assigns = []
 		self.insts = []
+		self.vecs = []
 		self.inst_autoidx = 0
 		self.sig_autoidx = 0
 		self.gen_cfg_storage = False
@@ -30,6 +31,9 @@ class ModuleGen:
 
 	def add_output(self, name, width=1):
 		self.outputs.append(ModulePort(name, width))
+
+	def add_vector_sig(self, name, width):
+		self.vecs.append((name, width))
 
 	def add_assign(self, dst, src):
 		self.assigns += [(dst, src)]
@@ -135,6 +139,9 @@ class ModuleGen:
 				print(f"\tcfg_latch cfg_mem_{i} (.D(cfg_data[{i%self.cfg_width}]), .EN(cfg_strobe[{i//self.cfg_width}]), .Q(cfg[{i}]));", file=f)
 			print("", file=f)
 			known_sigs.add("cfg")
+		for vec, width in self.vecs:
+			print(f"\twire [{width-1}:0] {vec};", file=f)
+			known_sigs.add("vec")
 		# auto determine signals
 		def split_cat(sig):
 			s = sig.strip()
@@ -163,7 +170,12 @@ class ModuleGen:
 		print("", file=f)
 		# write instances
 		for inst in self.insts:
-			print(f"\t{inst.typ} {inst.name} ({', '.join(f'.{k}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]))});", file=f)
+			if any(k.startswith("param_") for k in inst.ports.keys()):
+				params = f" #({', '.join(f'.{k[6:]}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]) if k.startswith("param_"))})"
+			else:
+				params = ""
+			ports = ', '.join(f'.{k}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]) if not k.startswith("param_"))
+			print(f"\t{inst.typ} {params}{inst.name} ({ports});", file=f)
 		# write assigns
 		if len(self.assigns) > 0:
 			print("", file=f)
