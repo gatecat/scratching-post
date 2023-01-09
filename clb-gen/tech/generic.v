@@ -69,7 +69,7 @@ endmodule
 module clb_wr_decode #(parameter K=4) (input [K-1:0] addr, input strobe, output [2**K-1:0] dec);
 	generate
 		genvar ii;
-		for (ii = 0; ii < addr; ii = ii + 1'b1) begin : dec_gen
+		for (ii = 0; ii < K; ii = ii + 1'b1) begin : dec_gen
 			// Force an AND gate at the end to prevent synthesis doing something that glitches
 			clb_and and_i (.a(addr == ii), .b(strobe), .x(dec[ii]));
 		end

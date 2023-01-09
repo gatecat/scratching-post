@@ -21,7 +21,7 @@ def gen_lut(name, k, extra_taps=[], with_lutram=False):
 		m.gen_cfg_storage = True
 	level = 0
 	if with_lutram:
-		cfg_bits = m.cfg(f"INIT", 2**k, ext_memory=True)
+		cfg_bits = m.cfg_word(f"INIT", 2**k, ext_memory=True)
 		for i in range(2**k):
 			cfg_strobe, cfg_data = cfg_bits[i]
 			# these muxes are expensive - but should mostly be optimised out if a "long and thin" design with lots of frames and not many bits...
@@ -39,7 +39,7 @@ def gen_lut(name, k, extra_taps=[], with_lutram=False):
 		layer = [f"lut_data{i}" for i in range(2**k)]
 	else:
 		# plain fixed init
-		layer = m.cfg(f"INIT", 2**k)
+		layer = m.cfg_word(f"INIT", 2**k)
 	while True:
 		can_mux4 = True
 		for t in taps:

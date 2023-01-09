@@ -11,6 +11,7 @@ class FFConfig:
 	en: str|CMux|None = None
 	gate_sr: bool = False
 	gate_en: bool = False
+	has_async: bool = False
 	has_init: bool = False
 	config_init: bool = False
 	en_over_sr: bool = False
@@ -75,7 +76,7 @@ def gen_dff(name, cfg):
 		init = m.cfg("INIT")
 		m.add_prim("clb_or", a="GSRN", b=init, x="init_rn")
 		m.add_prim("clb_ornot", a="GSRN", b=init, x="init_sn")
-		if has_sr:
+		if cfg.sr is not None and cfg.has_async:
 			m.add_prim("clb_and", a=rn, b="init_rn", x="rn")
 			m.add_prim("clb_and", a=sn, b="init_sn", x="sn")
 			rn = "rn"
@@ -84,7 +85,7 @@ def gen_dff(name, cfg):
 			rn = "init_rn"
 			sn = "init_sn"
 	# finally, the DFF itself
-	if cfg.has_async or cfg.has_init:
+	if cfg.has_async or (cfg.has_init and (cfg.config_init or cfg.sr is None)):
 		m.add_prim("clb_dffrs", clk="CLK", d=sync_d, rn=rn, sn=sn, q="Q")
 	else:
 		m.add_prim("clb_dff", clk="CLK", d=sync_d, q="Q")

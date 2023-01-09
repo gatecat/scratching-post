@@ -41,12 +41,12 @@ def _generate_lc(cfg: CLBConfig, m: ModuleGen, f, index):
 	extra_inputs = [f"{lc}_{x}" for x in cfg.extra_inputs]
 
 	# generate LUT (TODO not a LUT or complex LUT)
-	lut = gen_lut(f"{lc}_LUT", k, cfg.extra_lut_taps, with_lutram=index in cfg.lutram_lcs)
+	lut = gen_lut(f"{lc}_LUT", cfg.lut_k, cfg.extra_lut_taps, with_lutram=index in cfg.lutram_lcs)
 	ports = dict(
 		I=f"{{{', '.join(reversed(lut_inputs))}}}",
 		O=f"{lc}_LUT_O",
 	)
-	for tap in extra_lut_taps:
+	for tap in cfg.extra_lut_taps:
 		ports[tap.name] = f"{lc}_{tap.name}"
 	if index in cfg.lutram_lcs:
 		ports["CFG_MODE"] = "CFG_MODE"
@@ -58,36 +58,36 @@ def _generate_lc(cfg: CLBConfig, m: ModuleGen, f, index):
 	# TODO: configuring bit/frame aspect ratio 
 	# generate FFs
 	for ff in cfg.flipflops:
-		ff = gen_dff(f"{lc}_{ff.name}", ff)
+		ffm = gen_dff(f"{lc}_{ff.name}", ff)
 		ports = dict(
 			CLK=get_sig(m, cfg, ff.clk, prefix=f"{lc}_"),
 			D=get_sig(m, cfg, ff.data, prefix=f"{lc}_"),
-			Q=cfg.ff.q
+			Q=f"{lc}_{ff.q}"
 		)
-		if cfg.ff.sr is not None:
+		if ff.sr is not None:
 			ports["SR"] = get_sig(m, cfg, ff.sr, prefix=f"{lc}_")
-		if cfg.ff.en is not None:
+		if ff.en is not None:
 			ports["EN"] = get_sig(m, cfg, ff.en, prefix=f"{lc}_")
-		if cfg.has_init:
-			ports["INIT"] = "CFG_MODE"
-		m.add_submod(lut, f"{lc}_{ff.name}_i", **ports)
-		ff.finalise(f)
+		if ff.has_init:
+			ports["GSRN"] = "CFG_MODE"
+		m.add_submod(ffm, f"{lc}_{ff.name}_i", **ports)
+		ffm.finalise(f)
 	# outputs
 	for out_name, sig in cfg.outputs:
 		m.add_assign(f"{lc}_{out_name}", get_sig(m, cfg, sig, prefix=f"{lc}_"))
 	print("", file=f)
 
 def generate_clb(name: str, f, cfg: CLBConfig):
-	inputs = ["CFG_MODE", ] + [ctrl.name for ctrl in cfg.glb_ctrl]
+	inputs = [ModulePort(name="CFG_MODE"), ] + [ModulePort(name=ctrl.name) for ctrl in cfg.glb_ctrl]
 	outputs = []
 
 	for i in range(cfg.num_lcs):
-		lc = chr(ord('A') + index)
-		inputs += [f"{lc}_I{i}" for i in range(cfg.lut_k)]
-		inputs += [f"{lc}_{x}" for x in cfg.extra_inputs]
-		outputs += [f"{lc}_{o}" for o, _ in cfg.outputs]
+		lc = chr(ord('A') + i)
+		inputs += [ModulePort(name=f"{lc}_I{i}") for i in range(cfg.lut_k)]
+		inputs += [ModulePort(name=f"{lc}_{x}") for x in cfg.extra_inputs]
+		outputs += [ModulePort(name=f"{lc}_{o}") for o, _ in cfg.outputs]
 	m = ModuleGen(name, inputs=inputs, outputs=outputs)
-	if len(m.lutram_lcs) > 0:
+	if len(cfg.lutram_lcs) > 0:
 		m.gen_cfg_storage = True
 	# Configurably invertible global inputs
 	for ctrl in cfg.glb_ctrl:
@@ -95,7 +95,7 @@ def generate_clb(name: str, f, cfg: CLBConfig):
 			inv = m.cfg(f"{ctrl.name}_INV")
 			m.add_prim("clb_xor", a=ctrl.name, b=inv, x=f"{ctrl.name}_I")
 	# LUTRAM global control set
-	if len(m.lutram_lcs) > 0:
+	if len(cfg.lutram_lcs) > 0:
 		wclk = get_sig(m, cfg, cfg.lutram_ctrl.wr_clock)
 		we = get_sig(m, cfg, cfg.lutram_ctrl.wr_en)
 		lutram_en = m.cfg("LUTRAM_EN")
@@ -107,19 +107,20 @@ def generate_clb(name: str, f, cfg: CLBConfig):
 		m.add_prim("clb_wr_decode", addr=wa, strobe="lutram_strobe", dec="lutram_wr_strobe", param_K=str(cfg.lut_k))
 	# the LCs themselves
 	for i in range(cfg.num_lcs):
-		_generate_lc(cfg, m, i)
+		_generate_lc(cfg, m, f, i)
 	print("// Main CLB", file=f)
 	m.finalise(f)
 	return m
 
 if __name__ == '__main__':
 	# nice challenging config
+	import sys
 	cfg = CLBConfig(
 		num_lcs=8,
 		lut_k=5,
 		extra_lut_taps=[LUTTap("LUT_O4A", 4, 0), LUTTap("LUT_O4B", 4, 1)],
 		extra_inputs=["X", ],
-		lutram_lcs=dict(i: LUTRamConfig(wr_data="X") for i in range(6)), # first 6 LCs have LUTRAM
+		lutram_lcs={i: LUTRamConfig(wr_data="X") for i in range(6)}, # first 6 LCs have LUTRAM
 		lutram_ctrl=LUTRamControl(
 			wr_clock="CLK",
 			wr_en="WE",
@@ -127,17 +128,17 @@ if __name__ == '__main__':
 		),
 		flipflops=[
 			FFConfig(name="FF0", data=CMux("FF0MUX", "LUT_O4A", "LUT_O", "X"), q="Q0",
-				clk="CLK", sr="SR0", ce="CE0", gate_sr=True, gate_en=True,
+				clk="CLK", sr="SR0", en="CE0", gate_sr=True, gate_en=True,
 				has_init=True, config_init=True, en_over_sr=False
 			),
 			FFConfig(name="FF1", data=CMux("FF1MUX", "LUT_O4B", "LUT_O"), q="Q1",
-				clk="CLK", sr="SR1", ce="CE1", gate_sr=True, gate_en=True,
+				clk="CLK", sr="SR1", en="CE1", gate_sr=True, gate_en=True,
 				has_init=True, config_init=True, en_over_sr=False
 			),
 		],
 		outputs=[
-			"O0", CMux("O0MUX", "FF0MUX", "Q0"),
-			"O1", CMux("O1MUX", "FF1MUX", "Q1"),
+			("O0", CMux("O0MUX", "FF0MUX", "Q0")),
+			("O1", CMux("O1MUX", "FF1MUX", "Q1")),
 		],
 		glb_ctrl=[
 			GlbControl("CLK", can_invert=True),

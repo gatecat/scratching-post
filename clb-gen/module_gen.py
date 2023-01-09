@@ -48,7 +48,7 @@ class ModuleGen:
 		else:
 			return f"cfg[{idx}]"
 
-	def cfg(self, name, width, ext_memory=False):
+	def cfg_word(self, name, width, ext_memory=False):
 		if ext_memory:
 			assert self.gen_cfg_storage, "getting raw config access requires gen_cfg_storage set"
 		idx = len(self.config_bits)
@@ -136,12 +136,12 @@ class ModuleGen:
 			for i, (name, ext_memory) in enumerate(self.config_bits):
 				if ext_memory:
 					continue
-				print(f"\tcfg_latch cfg_mem_{i} (.D(cfg_data[{i%self.cfg_width}]), .EN(cfg_strobe[{i//self.cfg_width}]), .Q(cfg[{i}]));", file=f)
+				print(f"\tcfg_latch cfg_mem_{i} (.d(cfg_data[{i%self.cfg_width}]), .en(cfg_strobe[{i//self.cfg_width}]), .q(cfg[{i}]));", file=f)
 			print("", file=f)
 			known_sigs.add("cfg")
 		for vec, width in self.vecs:
 			print(f"\twire [{width-1}:0] {vec};", file=f)
-			known_sigs.add("vec")
+			known_sigs.add(vec)
 		# auto determine signals
 		def split_cat(sig):
 			s = sig.strip()
@@ -155,7 +155,9 @@ class ModuleGen:
 				return [s.split('[')[0], ]
 		sigs = set()
 		for inst in self.insts:
-			for sig in inst.ports.values():
+			for key, sig in inst.ports.items():
+				if key.startswith("param_"):
+					continue
 				for s in split_cat(sig):
 					if s not in known_sigs:
 						sigs.add(s)
@@ -171,7 +173,7 @@ class ModuleGen:
 		# write instances
 		for inst in self.insts:
 			if any(k.startswith("param_") for k in inst.ports.keys()):
-				params = f" #({', '.join(f'.{k[6:]}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]) if k.startswith("param_"))})"
+				params = f"#({', '.join(f'.{k[6:]}({v}) ' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]) if k.startswith('param_'))})"
 			else:
 				params = ""
 			ports = ', '.join(f'.{k}({v})' for k, v in sorted(inst.ports.items(), key=lambda x:x[0]) if not k.startswith("param_"))
