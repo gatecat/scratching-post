@@ -102,7 +102,7 @@ def generate_clb(name: str, f, cfg: CLBConfig):
 		m.add_prim("clb_and", a=we, b=lutram_en, x="we_gate")
 		m.add_prim("clb_andnot", a="we_gate", b="CFG_MODE", x="lutram_we")
 		m.add_prim("clb_wstrb_gen", wclk=wclk, we=we, strobe="lutram_strobe")
-		m.add_vector_sig('lutram_wr_strobe', 2*cfg.lut_k)
+		m.add_vector_sig('lutram_wr_strobe', 2**cfg.lut_k)
 		wa = f"{{{', '.join(x for x in reversed(cfg.lutram_ctrl.wr_addr))}}}"
 		m.add_prim("clb_wr_decode", addr=wa, strobe="lutram_strobe", dec="lutram_wr_strobe", param_K=str(cfg.lut_k))
 	# the LCs themselves

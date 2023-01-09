@@ -7,8 +7,8 @@ class CMux:
 def get_sig(m, cfg, sig, prefix=""):
 	from module_utils import add_cfgmux
 	if isinstance(sig, CMux):
-		out = f"{prefix}_{sig.name}"
-		add_cfgmux(m, f"mux_{prefix}_{sig.name}", out, [get_sig(m, cfg, i) for i in sig.inputs])
+		out = f"{prefix}{sig.name}"
+		add_cfgmux(m, f"mux_{prefix}_{sig.name}", out, [get_sig(m, cfg, i, prefix) for i in sig.inputs])
 		return out
 	else:
 		# check if it's a global
