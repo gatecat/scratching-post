@@ -20,6 +20,7 @@ class LUTRamControl:
 	wr_en : str|CMux
 	wr_addr: list[str]
 
+
 @dataclass
 class CLBConfig:
 	num_lcs: int = 8
@@ -104,7 +105,46 @@ def generate_clb(name: str, f, cfg: CLBConfig):
 		m.add_vector_sig('lutram_wr_strobe', 2*cfg.lut_k)
 		wa = f"{{{', '.join(x for x in reversed(cfg.lutram_ctrl.wr_addr))}}}"
 		m.add_prim("clb_wr_decode", addr=wa, strobe="lutram_strobe", dec="lutram_wr_strobe", param_K=str(cfg.lut_k))
-
+	# the LCs themselves
+	for i in range(cfg.num_lcs):
+		_generate_lc(cfg, m, i)
 	print("// Main CLB", file=f)
 	m.finalise(f)
 	return m
+
+if __name__ == '__main__':
+	# nice challenging config
+	cfg = CLBConfig(
+		num_lcs=8,
+		lut_k=5,
+		extra_lut_taps=[LUTTap("LUT_O4A", 4, 0), LUTTap("LUT_O4B", 4, 1)],
+		extra_inputs=["X", ],
+		lutram_lcs=dict(i: LUTRamConfig(wr_data="X") for i in range(6)), # first 6 LCs have LUTRAM
+		lutram_ctrl=LUTRamControl(
+			wr_clock="CLK",
+			wr_en="WE",
+			wr_addr=[f"H_I{i}" for i in range(5)],
+		),
+		flipflops=[
+			FFConfig(name="FF0", data=CMux("FF0MUX", "LUT_O4A", "LUT_O", "X"), q="Q0",
+				clk="CLK", sr="SR0", ce="CE0", gate_sr=True, gate_en=True,
+				has_init=True, config_init=True, en_over_sr=False
+			),
+			FFConfig(name="FF1", data=CMux("FF1MUX", "LUT_O4B", "LUT_O"), q="Q1",
+				clk="CLK", sr="SR1", ce="CE1", gate_sr=True, gate_en=True,
+				has_init=True, config_init=True, en_over_sr=False
+			),
+		],
+		outputs=[
+			"O0", CMux("O0MUX", "FF0MUX", "Q0"),
+			"O1", CMux("O1MUX", "FF1MUX", "Q1"),
+		],
+		glb_ctrl=[
+			GlbControl("CLK", can_invert=True),
+			GlbControl("CE0", can_invert=False), GlbControl("CE1", can_invert=False),
+			GlbControl("SR0", can_invert=True), GlbControl("SR1", can_invert=True),
+			GlbControl("WE", can_invert=True)
+		],
+	)
+	with open(sys.argv[1], "w") as f:
+		generate_clb("TEST_CLB", f, cfg)
