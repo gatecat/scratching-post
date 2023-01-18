@@ -87,31 +87,61 @@ class QspiMem(Elaboratable):
         sr_shift = Signal(8)
         clk = Signal()
         dq_out = Signal(4)
-        dq_oen = Signal(4)
+        dq_oe = Signal(4)
+        quad = Signal()
+        shift_in = Signal()
         csn = Signal(self.cs_width)
 
-        # Drive out clock on negedge while active
-        m.domains += ClockDomain("neg", clk_edge="neg")
-        m.d.comb += [
-            ClockSignal("neg").eq(ClockSignal()),
-            ResetSignal("neg").eq(ResetSignal()),
-        ]
+        # counter and clock generation
         with m.If(csn.all()):
             # Reset clock if nothing active
-            m.d.neg += clk.eq(0)
+            m.d.sync += clk.eq(0)
         with m.Elif(counter.any()):
-            m.d.neg += clk.eq(~clk)
-            m.d.sync += counter.eq(counter-1)
+            m.d.sync += clk.eq(~clk)
+            with m.If(clk):
+                m.d.sync += counter.eq(counter-Mux(quad, 4, 1))
+        # IO shift register
         with m.If(counter.any()):
-            # move shift register (sample/output data) on posedge
-            pass
-        # bitbang mode handling
+            # move output shift register (sample/output data) before negedge
+            # move input shift register (sample/output data) before posedge
+            with m.If(Mux(shift_in, ~clk, clk)):
+                with m.If(quad):
+                    m.d.sync += sr.eq(Cat(sr[4:], self.d_i))
+                with m.Else():
+                    m.d.sync += sr.eq(Cat(sr[1:], self.d_i[1]))
+        with m.If(quad):
+            m.d.comb += dq_out.eq(sr[-4:])
+            m.d.comb += dq_oe.eq(Repl(~shift_in, 4))
+        with m.Else():
+            m.d.comb += dq_out.eq(Cat(sr[-1], C(0, 3)))
+            m.d.comb += dq_oe.eq(0b0001)
+        # main command FSM
         with m.FSM() as fsm:
             with m.State("IDLE"):
                 m.d.sync += [
                     counter.eq(0),
                     csn.eq(C(-1, len(self.cs_o)))
                 ]
+        # bitbang mode handling
+        with m.If(self.sys_cfg[0]):
+            m.d.comb += [
+                self.d_o.eq(Cat(self.bitbang_i[0], C(0, 3))),
+                self.d_oe.eq(0b0001 & Repl(~ResetSignal(), 4)),
+                self.clk_o.eq(self.bitbang_i[2]),
+                self.cs_o.eq(self.bitbang_i[3:]),
+            ]
+        with m.Else():
+            m.d.comb += [
+                self.d_o.eq(dq_out),
+                self.d_oe.eq(dq_oe & Repl(~ResetSignal(), 4)),
+                self.clk_o.eq(clk),
+                self.cs_o.eq(csn),
+            ]
+        m.d.comb += [
+            self.clk_oe.eq(~ResetSignal()),
+            self.cs_oe.eq(Repl(~ResetSignal(), len(self.cs_oe))),
+            self.bitbang_o.eq(self.d_i[1]),
+        ]
         return m
 
 def sim():
