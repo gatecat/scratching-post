@@ -1,1 +1,6 @@
 __pycache__
+*.vcd
+*.gtkw
+*.v
+*.il
+*.json
