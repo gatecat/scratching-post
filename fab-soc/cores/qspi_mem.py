@@ -16,6 +16,7 @@ The control registers are:
 sys_cfg:
   bit 0: bitbang enable (wishbone access blocked; use bitbang registers for manual IO)
   bit 1: QSPI enable
+  bit 2: RAM device size (0=64M, 1=128M)
   default: 0b00000000
 
 pad_count:
@@ -44,19 +45,12 @@ such as the 74xx138 will be required.
 """
 class QspiMem(Elaboratable):
     def __init__(self, *,
-        num_flash=1, num_ram=6,
-        flash_abits=24, ram_abits=23, encoded_cs=True):
-        assert num_flash > 0 and num_ram > 0 # TODO: handle the one-type-only case
-        self.num_flash = num_flash
-        self.num_ram = num_ram
-        self.flash_abits = flash_abits
-        self.ram_abits = ram_abits
+        max_devs=7, encoded_cs=True):
+        self.max_devs = max_devs
+        self.abits = 24
         self.encoded_cs = encoded_cs
-        self.cs_count = num_ram + num_flash
-        # total size of the flash address space
-        self.flash_space = (flash_abits + (num_flash-1).bit_length())
-        self.ram_space = (ram_abits + (num_ram-1).bit_length())
-        self.total_space = max(self.flash_space, self.ram_space) # 1 extra bit to determine flash or RAM access
+        # total size of the address space
+        self.total_space = 1 + max_devs.bit_length() + self.abits
         self.data_bus = wishbone.Interface(addr_width=self.total_space-2, # -2 because WB has word addresses
                                       data_width=32, granularity=8)
         # the IO
@@ -65,7 +59,7 @@ class QspiMem(Elaboratable):
         self.d_oe = Signal(4)
         self.clk_o = Signal()
         self.clk_oe = Signal()
-        self.cs_width = self.cs_count.bit_length() if self.encoded_cs else self.cs_count
+        self.cs_width = self.max_devs.bit_length() if self.encoded_cs else self.max_devs
         self.cs_o = Signal(self.cs_width)
         self.cs_oe = Signal(self.cs_width)
         self.io = [self.d_i, self.d_o, self.d_oe,
@@ -82,6 +76,7 @@ class QspiMem(Elaboratable):
         latched_adr = Signal(len(self.data_bus.adr))
         latched_we = Signal()
         counter = Signal(8)
+        next_counter = Signal(8)
         wait_count = Signal(4)
         sr = Signal(32)
         sr_shift = Signal(8)
@@ -92,14 +87,22 @@ class QspiMem(Elaboratable):
         shift_in = Signal()
         csn = Signal(self.cs_width)
 
+        cfg_bb, cfg_quad, cfg_ram128 = self.sys_cfg[:3]
+
+        # partial write handling
+        xfer_ofs = Signal(2)
+        xfer_cnt = Signal(3)
+
         # counter and clock generation
         with m.If(csn.all()):
             # Reset clock if nothing active
             m.d.sync += clk.eq(0)
         with m.Elif(counter.any()):
             m.d.sync += clk.eq(~clk)
+            m.d.comb += next_counter.eq(counter)
             with m.If(clk):
-                m.d.sync += counter.eq(counter-Mux(quad, 4, 1))
+                m.d.comb += next_counter.eq(counter-Mux(quad, 4, 1))
+            m.d.sync += counter.eq(next_counter)
         # IO shift register
         with m.If(counter.any()):
             # move output shift register (sample/output data) before negedge
@@ -120,10 +123,73 @@ class QspiMem(Elaboratable):
             with m.State("IDLE"):
                 m.d.sync += [
                     counter.eq(0),
-                    csn.eq(C(-1, len(self.cs_o)))
+                    quad.eq(0),
+                    shift_in.eq(0),
                 ]
+                with m.If(self.data_bus.stb & self.data_bus.cyc):
+                    # Wishbone transaction has occurred
+                    m.d.sync += [
+                        latched_adr.eq(self.data_bus.adr),
+                        latched_we.eq(self.data_bus.we),
+                    ]
+                    # Partial write handling
+                    with m.If(self.data_bus.we):
+                        with m.Switch(self.data_bus.sel):
+                            with m.Case(0b1111): m.d.sync += [xfer_ofs.eq(0b00), xfer_cnt.eq(4)]
+                            with m.Case(0b1100): m.d.sync += [xfer_ofs.eq(0b10), xfer_cnt.eq(2)]
+                            with m.Case(0b0011): m.d.sync += [xfer_ofs.eq(0b00), xfer_cnt.eq(2)]
+                            with m.Case(0b1000): m.d.sync += [xfer_ofs.eq(0b11), xfer_cnt.eq(1)]
+                            with m.Case(0b0100): m.d.sync += [xfer_ofs.eq(0b10), xfer_cnt.eq(1)]
+                            with m.Case(0b0010): m.d.sync += [xfer_ofs.eq(0b01), xfer_cnt.eq(1)]
+                            with m.Case(0b0001): m.d.sync += [xfer_ofs.eq(0b00), xfer_cnt.eq(1)]
+                            with m.Default():
+                                # ** ERROR: unsupported
+                                pass
+                    with m.Else():
+                        m.d.sync += [xfer_ofs.eq(0b00), xfer_cnt.eq(4)]
+                    # Select device
+                    dev = Signal(range(self.max_devs))
+                    # flash always 24-bit per chip, RAM 24 or 23 selectable
+                    with m.If(~self.data_bus.adr[-1] | cfg_ram128):
+                        m.d.comb += dev.eq(self.data_bus.adr[-(self.max_devs.bit_length()+1):-1])
+                    with m.Else():
+                        m.d.comb += dev.eq(self.data_bus.adr[-(self.max_devs.bit_length()+2):-2])
+                    # two CSN styles, with or without external decoder
+                    if self.encoded_cs:
+                        m.d.sync += csn.eq(dev)
+                    else:
+                        m.d.sync += csn.eq(~(0b1 << dev))
+                    m.next = "SEND_CMD"
+            with m.State("SEND_CMD"):
+                with m.If(latched_we & cfg_quad): cmd = 0x38 # quad write
+                with m.Elif(latched_we & cfg_quad): cmd = 0x02 # SPI write
+                with m.Elif(~latched_we & cfg_quad):  cmd = 0xEB # quad fast read
+                with m.Else(): cmd = 0x0B # SPI fast read
+                m.d.sync += [
+                    counter.eq(8),
+                    sr[-8:].eq(cmd),
+                ]
+                m.next = "WAIT_CMD"
+            with m.State("WAIT_CMD"):
+                with m.If(next_counter == 0): # command done
+                    m.d.sync += [
+                        sr[8:].eq(Cat(
+                            xfer_ofs,
+                            Mux(~self.data_bus.adr[-1] | cfg_ram128, self.data_bus.adr[:22], self.data_bus.adr[:21]))
+                        ),
+                        sr[:8].eq(0xFF), # disable CRM
+                        counter.eq(Mux(~self.data_bus.adr[-1] & cfg_quad & ~latched_we, 32, 24)), # flash quad reads require mode bits
+                        quad.eq(cfg_quad),
+                    ],
+                    m.next = "WAIT_ADDR"
+            with m.State("WAIT_ADDR"):
+                with m.If(next_counter == 0):
+                    with m.If(latched_we):
+                        # write data
+                        # TODO: byte-wise write handler
+                        pass
         # bitbang mode handling
-        with m.If(self.sys_cfg[0]):
+        with m.If(cfg_bb):
             m.d.comb += [
                 self.d_o.eq(Cat(self.bitbang_i[0], C(0, 3))),
                 self.d_oe.eq(0b0001 & Repl(~ResetSignal(), 4)),
