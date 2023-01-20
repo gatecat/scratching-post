@@ -1,11 +1,13 @@
 class QspiModel:
-    def __init__(self, cs_width=3, num_flash=1, num_rams=1,
+    def __init__(self, cs_width=3, num_flash=1, num_rams=3,
         flash_size=2**20, ram_size=2**20,
         encoded_cs=True,
         verbose=True):
         self.num_flash = num_flash
         self.num_rams = num_rams
         self.verbose = verbose
+        self.xfer_count = 0
+
         self._cs_width = cs_width
         self._encoded_cs = encoded_cs
         self._last_sclk = False
@@ -68,6 +70,7 @@ class QspiModel:
                 self._data_width = 4
             else:
                 self.log(f"  unknown command!")
+            self.xfer_count += 1
         else:
             if self._command == 0x0b:
                 # SPI fast read

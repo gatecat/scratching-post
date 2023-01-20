@@ -34,16 +34,105 @@ def run_tests():
             yield
         return result
 
-    def test_flash_spi_read():
+    def _cfg_spi():
         yield spi.sys_cfg.eq(0)
         yield spi.pad_count.eq(0x88)
         yield spi.max_burst.eq(0x10)
+
+    def _cfg_quad():
+        yield spi.sys_cfg.eq(2)
+        yield spi.pad_count.eq(0x64)
+        yield spi.max_burst.eq(0x10)
+
+    def test_flash_spi_read():
+        yield from _cfg_spi()
         model.data[0][(0x1234 << 2) | 0] = 0xEF
         model.data[0][(0x1234 << 2) | 1] = 0xBE
         model.data[0][(0x1234 << 2) | 2] = 0xAD
         model.data[0][(0x1234 << 2) | 3] = 0xDE
         result = yield from wb_xfer(addr=0x0001234)
         assert result == 0xDEADBEEF, f"{result:08x}"
+
+    def test_flash_quad_read():
+        yield from _cfg_quad()
+        for i in range(8):
+            model.data[0][(0x1234 << 2) + i] = i + 0x51
+        result = yield from wb_xfer(addr=0x0001234)
+        assert result == 0x54535251, f"{result:08x}"
+
+    def test_flash_quad_read_continue():
+        yield from _cfg_quad()
+        for i in range(8):
+            model.data[0][(0x1234 << 2) + i] = i + 0x51
+        init_xfers = model.xfer_count
+        result = yield from wb_xfer(addr=0x0001234)
+        assert result == 0x54535251, f"{result:08x}"
+        result = yield from wb_xfer(addr=0x0001235)
+        assert result == 0x58575655, f"{result:08x}"
+        assert model.xfer_count == init_xfers + 1 # assert kept alive
+
+
+    def test_flash_quad_read_discontinue():
+        yield from _cfg_quad()
+        for i in range(4):
+            model.data[0][(0x01234 << 2) + i] = i + 0x51
+            model.data[0][(0x01237 << 2) + i] = i + 0x31
+            model.data[0][(0x11237 << 2) + i] = i + 0x91
+        init_xfers = model.xfer_count
+        result = yield from wb_xfer(addr=0x0001234)
+        assert result == 0x54535251, f"{result:08x}"
+        result = yield from wb_xfer(addr=0x0001237)
+        assert result == 0x34333231, f"{result:08x}"
+        result = yield from wb_xfer(addr=0x0011237)
+        assert result == 0x94939291, f"{result:08x}"
+        assert model.xfer_count == init_xfers + 3 # assert not kept alive
+
+    def test_ram_quad_read():
+        yield from _cfg_quad()
+        for i in range(12):
+            model.data[1][(0xa5a5 << 2) + i] = i + 0x51
+        result = yield from wb_xfer(addr=0x220a5a5)
+        assert result == 0x54535251, f"{result:08x}"
+        result = yield from wb_xfer(addr=0x220a5a6)
+        assert result == 0x58575655, f"{result:08x}"
+        result = yield from wb_xfer(addr=0x220a5a7)
+        assert result == 0x5c5b5a59, f"{result:08x}"
+
+    def _ram_word(dev, addr):
+        return int.from_bytes(model.data[dev][(addr<<2):((addr+1)<<2)], byteorder="little")
+
+    def test_ram_spi_write():
+        yield from _cfg_spi()
+        yield from wb_xfer(addr=0x2201234, write_data=0xca7f100f, write_sel=0b1111)
+        assert _ram_word(1, 0x1234) == 0xca7f100f, f"{_ram_word(1, 0x1234):08x}"
+
+    def test_ram_spi_write_sel():
+        yield from _cfg_spi()
+        for i in range(8):
+            model.data[1][(0x01234 << 2) + i] = 0xff
+        yield from wb_xfer(addr=0x2201234, write_data=0xBA000000, write_sel=0b1000)
+        assert _ram_word(1, 0x1234) == 0xBAFFFFFF, f"{_ram_word(1, 0x1234):08x}"
+        yield from wb_xfer(addr=0x2201234, write_data=0x00DC0000, write_sel=0b0100)
+        assert _ram_word(1, 0x1234) == 0xBADCFFFF, f"{_ram_word(1, 0x1234):08x}"
+        yield from wb_xfer(addr=0x2201235, write_data=0x0000A77E, write_sel=0b0011)
+        assert _ram_word(1, 0x1235) == 0xFFFFA77E, f"{_ram_word(1, 0x1235):08x}"
+        yield from wb_xfer(addr=0x2201235, write_data=0xBADC0000, write_sel=0b1100)
+        assert _ram_word(1, 0x1235) == 0xBADCA77E, f"{_ram_word(1, 0x1235):08x}"
+
+    def test_ram_quad_write():
+        yield from _cfg_quad()
+        yield from wb_xfer(addr=0x2401230, write_data=0xFEEDACA7, write_sel=0b1111)
+        assert _ram_word(2, 0x1230) == 0xFEEDACA7, f"{_ram_word(2, 0x1230):08x}"
+
+    def test_ram_quad_write_continue():
+        yield from _cfg_quad()
+        init_xfers = model.xfer_count
+        yield from wb_xfer(addr=0x2201240, write_data=0x12345678, write_sel=0b1111)
+        assert _ram_word(1, 0x1240) == 0x12345678, f"{_ram_word(1, 0x1240):08x}"
+        yield from wb_xfer(addr=0x2201241, write_data=0x2468aabb, write_sel=0b1111)
+        assert _ram_word(1, 0x1241) == 0x2468aabb, f"{_ram_word(1, 0x1241):08x}"
+        assert model.xfer_count == init_xfers + 1 # assert kept alive
+
 
     tests = [v for k, v in locals().items() if k.startswith("test_")]
 

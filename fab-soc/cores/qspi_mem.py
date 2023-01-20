@@ -166,10 +166,11 @@ class QspiMem(Elaboratable):
                         m.d.sync += csn.eq(~(0b1 << dev))
                     m.next = "SEND_CMD"
             with m.State("SEND_CMD"):
-                with m.If(latched_we & cfg_quad): cmd = 0x38 # quad write
-                with m.Elif(latched_we & cfg_quad): cmd = 0x02 # SPI write
-                with m.Elif(~latched_we & cfg_quad):  cmd = 0xEB # quad fast read
-                with m.Else(): cmd = 0x0B # SPI fast read
+                cmd = Signal(8)
+                with m.If(latched_we & cfg_quad): m.d.comb += cmd.eq(0x38) # quad write
+                with m.Elif(latched_we & ~cfg_quad): m.d.comb += cmd.eq(0x02) # SPI write
+                with m.Elif(~latched_we & cfg_quad): m.d.comb += cmd.eq(0xEB) # quad fast read
+                with m.Else(): m.d.comb += cmd.eq(0x0B) # SPI fast read
                 m.d.sync += [
                     counter.eq(8),
                     sr[-8:].eq(cmd),
@@ -195,17 +196,17 @@ class QspiMem(Elaboratable):
                         #  - upper byte of SR is shifted first; little endian so this should be LSB of data bus
                         #  - for partial writes; need to have the actually-being-written part in the upper byte of SR
                         m.d.sync += [
-                            sr[24:32].eq(self.data_bus.word_select(xfer_ofs, 8)),
-                            sr[16:24].eq(self.data_bus.word_select(xfer_ofs+1, 8)),
-                            sr[ 8:16].eq(self.data_bus[16:24]),
-                            sr[ 0: 8].eq(self.data_bus[24:32]),
+                            sr[24:32].eq(self.data_bus.dat_w.word_select(xfer_ofs, 8)),
+                            sr[16:24].eq(self.data_bus.dat_w.word_select(xfer_ofs+1, 8)),
+                            sr[ 8:16].eq(self.data_bus.dat_w[16:24]),
+                            sr[ 0: 8].eq(self.data_bus.dat_w[24:32]),
                             counter.eq(8 * xfer_cnt),
                         ]
                         m.next = "WAIT_WRITE"
                     with m.Else():
                         # pad bits
                         m.d.sync += [
-                            counter.eq(Mux(self.data_bus.adr[-1], self.pad_count[4:], self.pad_count[:4])),
+                            counter.eq(Mux(cfg_quad, 4, 1) * Mux(self.data_bus.adr[-1], self.pad_count[4:], self.pad_count[:4])),
                         ]
                         m.next = "WAIT_DUMMY"
             with m.State("WAIT_WRITE"):
@@ -215,7 +216,8 @@ class QspiMem(Elaboratable):
                         # currently, only full transactions can have a continuation
                         m.next = "WAIT_NEXT"
                     with m.Else():
-                        m.next = "IDLE"
+                        m.d.sync += [wait_count.eq(3)]
+                        m.next = "GOTO_IDLE"
             with m.State("WAIT_DUMMY"):
                 with m.If(next_counter == 1):
                     # switch output to input
@@ -231,10 +233,12 @@ class QspiMem(Elaboratable):
                 m.d.sync += [self.data_bus.ack.eq(0), wait_count.eq(wait_count-1)]
                 with m.If(wait_count == 0):
                     # timeout waiting for continuation
-                    m.next = "IDLE"
+                    m.d.sync += [wait_count.eq(3)]
+                    m.next = "GOTO_IDLE"
                 with m.If(latched_adr[-1] & burst_count == self.max_burst):
                     # RAM has a maximum CS low time and burst length that must be obeyed
-                    m.next = "IDLE"
+                    m.d.sync += [wait_count.eq(3)]
+                    m.next = "GOTO_IDLE"
                 with m.If(self.data_bus.stb & self.data_bus.cyc & ~self.data_bus.ack):
                     # new transaction received
                     # check if it's a valid continuation
@@ -245,16 +249,34 @@ class QspiMem(Elaboratable):
                             (~self.data_bus.we | self.data_bus.sel.all()) # not partial
                         ):
                         m.d.sync += [
-                            counter.eq(4),
+                            counter.eq(32),
                             latched_adr.eq(self.data_bus.adr),
                         ]
                         with m.If(latched_we):
+                            m.d.sync += [
+                                sr[24:32].eq(self.data_bus.dat_w.word_select(xfer_ofs, 8)),
+                                sr[16:24].eq(self.data_bus.dat_w.word_select(xfer_ofs+1, 8)),
+                                sr[ 8:16].eq(self.data_bus.dat_w[16:24]),
+                                sr[ 0: 8].eq(self.data_bus.dat_w[24:32]),
+                            ]
                             m.next = "WAIT_WRITE"
                         with m.Else():
                             m.next = "WAIT_READ"
                     with m.Else():
-                        m.next = "IDLE"
-
+                        m.d.sync += [wait_count.eq(3)]
+                        m.next = "GOTO_IDLE"
+            with m.State("GOTO_IDLE"):
+                # state keep CS low for at least a few cycles
+                m.d.sync += [
+                    counter.eq(0),
+                    quad.eq(0),
+                    csn.eq(-1),
+                    shift_in.eq(0),
+                    self.data_bus.ack.eq(0),
+                    wait_count.eq(wait_count-1),
+                ]
+                with m.If(wait_count == 0):
+                    m.next = "IDLE"
         m.d.comb += [
             self.data_bus.dat_r[24:32].eq(sr[ 0: 8]),
             self.data_bus.dat_r[16:24].eq(sr[ 8:16]),
