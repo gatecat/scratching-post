@@ -78,6 +78,7 @@ class QspiMem(Elaboratable):
         counter = Signal(8)
         next_counter = Signal(8)
         wait_count = Signal(4)
+        burst_count = Signal(8)
         sr = Signal(32)
         sr_shift = Signal(8)
         clk = Signal()
@@ -125,6 +126,9 @@ class QspiMem(Elaboratable):
                     counter.eq(0),
                     quad.eq(0),
                     shift_in.eq(0),
+                    wait_count.eq(0),
+                    burst_count.eq(0),
+                    self.data_bus.ack.eq(0),
                 ]
                 with m.If(self.data_bus.stb & self.data_bus.cyc):
                     # Wishbone transaction has occurred
@@ -186,8 +190,73 @@ class QspiMem(Elaboratable):
                 with m.If(next_counter == 0):
                     with m.If(latched_we):
                         # write data
-                        # TODO: byte-wise write handler
-                        pass
+                        # gotta do some shuffling to deal with
+                        #  - upper byte of SR is shifted first; little endian so this should be LSB of data bus
+                        #  - for partial writes; need to have the actually-being-written part in the upper byte of SR
+                        m.d.sync += [
+                            sr[24:32].eq(self.data_bus.word_select(xfer_ofs, 8)),
+                            sr[16:24].eq(self.data_bus.word_select(xfer_ofs+1, 8)),
+                            sr[ 8:16].eq(self.data_bus[16:24]),
+                            sr[ 0: 8].eq(self.data_bus[24:32]),
+                            counter.eq(8 * xfer_cnt),
+                        ]
+                        m.next = "WAIT_WRITE"
+                    with m.Else():
+                        # pad bits
+                        m.d.sync += [
+                            counter.eq(Mux(self.data_bus.adr[-1], self.pad_count[4:], self.pad_count[:4])),
+                        ]
+                        m.next = "WAIT_DUMMY"
+            with m.State("WAIT_WRITE"):
+                with m.If(next_counter == 0):
+                    m.d.sync += [self.data_bus.ack.eq(1), wait_count.eq(9), burst_count.eq(burst_count+1)]
+                    with m.If(xfer_cnt == 4):
+                        # currently, only full transactions can have a continuation
+                        m.next = "WAIT_NEXT"
+                    with m.Else():
+                        m.next = "IDLE"
+            with m.State("WAIT_DUMMY"):
+                with m.If(next_counter == 1):
+                    # switch output to input
+                    m.d.sync += [shift_in.eq(1)]
+                with m.If(next_counter == 0):
+                    m.d.sync += [counter.eq(4)]
+                    m.next = "WAIT_READ"
+            with m.State("WAIT_READ"):
+                with m.If(next_counter == 0):
+                    m.d.sync += [self.data_bus.ack.eq(1), wait_count.eq(9), burst_count.eq(burst_count+1)]
+                    m.next = "WAIT_NEXT"
+            with m.State("WAIT_NEXT"):
+                m.d.sync += [self.data_bus.ack.eq(0), wait_count.eq(wait_count-1)]
+                with m.If(wait_count == 0):
+                    # timeout waiting for continuation
+                    m.next = "IDLE"
+                with m.If(latched_adr[-1] & burst_count == self.max_burst):
+                    # RAM has a maximum CS low time and burst length that must be obeyed
+                    m.next = "IDLE"
+                with m.If(self.data_bus.stb & self.data_bus.cyc & ~self.data_bus.ack):
+                    # new transaction received
+                    # check if it's a valid continuation
+                    with m.If(
+                            (self.data_bus.we == latched_we) & # same dir
+                            (self.data_bus.adr[8:] == latched_adr[8:]) & # same page
+                            (self.data_bus.adr[:8] == (latched_adr[:8]+1)) & # one higher
+                            (~self.data_bus.we | self.data_bus.sel.all()) # not partial
+                        ):
+                        m.d.sync += [
+                            counter.eq(4),
+                            latched_adr.eq(self.data_bus.adr),
+                        ]
+                        with m.If(latched_we):
+                            m.next = "WAIT_WRITE"
+                        with m.Else():
+                            m.next = "WAIT_READ"
+                    with m.Else():
+                        m.next = "IDLE"
+
+        m.d.comb += [
+            self.data_bus.dat_r.eq(sr),
+        ]
         # bitbang mode handling
         with m.If(cfg_bb):
             m.d.comb += [
