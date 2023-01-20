@@ -281,7 +281,9 @@ class QspiMem(Elaboratable):
         return m
 
 def sim():
+    from qspi_model import QspiModel
     m = Module()
+    model = QspiModel()
     m.submodules.spi = spi = QspiMem()
     sim = Simulator(m)
     sim.add_clock(1e-6)
@@ -290,7 +292,7 @@ def sim():
         yield spi.pad_count.eq(0x88)
         yield spi.max_burst.eq(0x10)
         yield spi.bitbang_i.eq(0)
-        yield spi.data_bus.adr.eq(0x5A5A5A)
+        yield spi.data_bus.adr.eq(0x0A5A5A)
         yield spi.data_bus.sel.eq(1)
         yield spi.data_bus.we.eq(0)
         yield spi.data_bus.stb.eq(1)
@@ -299,6 +301,7 @@ def sim():
             if (yield spi.data_bus.ack):
                 yield spi.data_bus.stb.eq(0)
                 yield spi.data_bus.cyc.eq(0)
+            yield spi.d_i.eq(model.tick((yield spi.clk_o), (yield spi.cs_o), (yield spi.d_o)))
             yield
     sim.add_sync_process(process)
     with sim.write_vcd("qspi.vcd", "qspi.gtkw"):

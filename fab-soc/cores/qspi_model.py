@@ -4,9 +4,10 @@ class QspiModel:
         encoded_cs=True):
         self.num_flash = num_flash
         self.num_rams = num_rams
+        self._cs_width = cs_width
         self._encoded_cs = encoded_cs
         self._last_sclk = False
-        self._last_cs = (1 << cs_width) - 1
+        self._last_csn = (1 << cs_width) - 1
         self._bit_count = 0
         self._byte_count = 0
         self._data_width = 0
@@ -19,18 +20,18 @@ class QspiModel:
 
         self.data = []
         for i in range(num_flash):
-            data.append(bytearray(flash_size))
+            self.data.append(bytearray(flash_size))
         for i in range(num_rams):
-            data.append(bytearray(ram_size))
+            self.data.append(bytearray(ram_size))
 
     def _get_dev(self, cs):
-        cs_mask = (1 << cs_width) - 1
+        cs_mask = (1 << self._cs_width) - 1
         if cs == cs_mask:
             return -1
-        elif self.encoded_cs:
+        elif self._encoded_cs:
             return cs
         else:
-            for i in range(num_rams+num_flash):
+            for i in range(self.num_rams+self.num_flash):
                 if cs == (~(1 << i)) & cs_mask:
                     return i
             assert False, f"{cs:0b}"
@@ -41,7 +42,7 @@ class QspiModel:
         self._data_width = 1
 
     def process_byte(self, dev):
-        pass
+        print(f"recieve byte: {self._curr_byte:02x}")
 
     def posedge(self, dev):
         if self._data_width == 4:
@@ -62,7 +63,7 @@ class QspiModel:
 
     def tick(self, sclk, csn, din):
         self._data_in = din
-        if csn != _last_cs:
+        if csn != self._last_csn:
             self.reset()
         dev = self._get_dev(csn)
         if dev != -1 and sclk and not self._last_sclk:
@@ -70,5 +71,5 @@ class QspiModel:
         if dev != -1 and not sclk and self._last_sclk:
             self.negedge(dev)
         self._last_sclk = sclk
-        self._last_cs = cs
+        self._last_csn = csn
         return self._data_out
