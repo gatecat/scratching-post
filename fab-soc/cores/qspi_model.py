@@ -1,9 +1,11 @@
 class QspiModel:
     def __init__(self, cs_width=3, num_flash=1, num_rams=1,
         flash_size=2**20, ram_size=2**20,
-        encoded_cs=True):
+        encoded_cs=True,
+        verbose=True):
         self.num_flash = num_flash
         self.num_rams = num_rams
+        self.verbose = verbose
         self._cs_width = cs_width
         self._encoded_cs = encoded_cs
         self._last_sclk = False
@@ -24,6 +26,13 @@ class QspiModel:
         for i in range(num_rams):
             self.data.append(bytearray(ram_size))
 
+        self._flash_id = [0xEF, 0x40, 0x18, 0xFF]
+        self._ram_id = [0x0D, 0x5D, 0x40, 0xFF]
+
+    def log(self, s):
+        if self.verbose:
+            print(s)
+
     def _get_dev(self, cs):
         cs_mask = (1 << self._cs_width) - 1
         if cs == cs_mask:
@@ -42,7 +51,57 @@ class QspiModel:
         self._data_width = 1
 
     def process_byte(self, dev):
-        print(f"recieve byte: {self._curr_byte:02x}")
+        is_ram = dev >= self.num_flash
+        if self._byte_count == 0:
+            self._addr = 0
+            self._data_width = 1
+            # command byte
+            self._command = self._curr_byte
+            self.log(f"SPI command: {self._command:02x}")
+            if self._command == 0xab:
+                pass # power up
+            elif self._command in (0x0b, 0x02, 0x9f):
+                # SPI fast read, SPI write, read ID
+                pass
+            elif self._command in (0xeb, 0x38):
+                # quad read, quad write
+                self._data_width = 4
+            else:
+                self.log(f"  unknown command!")
+        else:
+            if self._command == 0x0b:
+                # SPI fast read
+                if self._byte_count <= 3:
+                    self._addr |= (self._curr_byte) << ((3 - self._byte_count) * 8)
+                elif self._byte_count >= 4: # 8 dummy bits
+                    if self._byte_count == 4:
+                        self.log(f"   begin SPI read at {self._addr:06x}")
+                    self._out_buffer = self.data[dev][self._addr % len(self.data[dev])]
+                    self._addr = (self._addr + 1) & 0x00FFFFFF
+            elif self._command == 0xeb:
+                # quad read
+                dummy_mode = 3
+                if self._byte_count <= 3:
+                    self._addr |= (self._curr_byte) << ((3 - self._byte_count) * 8)
+                elif self._byte_count == 4 and not is_ram:
+                    # one mode byte
+                    pass
+                elif self._byte_count >= (3+dummy_mode): # addr, mode and dummy bits
+                    if self._byte_count == (3+dummy_mode):
+                        self.log(f"   begin quad read at {self._addr:06x}")
+                    self._out_buffer = self.data[dev][self._addr % len(self.data[dev])]
+                    self._addr = (self._addr + 1) & 0x00FFFFFF
+            elif self._command in (0x02, 0x38):
+                if self._byte_count <= 3:
+                    self._addr |= (self._curr_byte) << ((3 - self._byte_count) * 8)
+                else:
+                    if self._byte_count == 4:
+                        self.log(f"   begin SPI write at {self._addr:06x}")
+                    self.data[dev][self._addr % len(self.data[dev])] = self._curr_byte
+                    self._addr = (self._addr + 1) & 0x00FFFFFF
+            elif self._command == 0x9f:
+                data = self._ram_id if is_ram else self._flash_id
+                self._out_buffer = data[self._curr_byte % len(data)]
 
     def posedge(self, dev):
         if self._data_width == 4:
@@ -53,6 +112,7 @@ class QspiModel:
         self._bit_count += self._data_width
         if self._bit_count == 8:
             self.process_byte(dev)
+            self._byte_count += 1
             self._bit_count = 0
 
     def negedge(self, dev):
