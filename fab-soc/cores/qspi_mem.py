@@ -256,7 +256,10 @@ class QspiMem(Elaboratable):
                         m.next = "IDLE"
 
         m.d.comb += [
-            self.data_bus.dat_r.eq(sr),
+            self.data_bus.dat_r[24:32].eq(sr[ 0: 8]),
+            self.data_bus.dat_r[16:24].eq(sr[ 8:16]),
+            self.data_bus.dat_r[ 8:16].eq(sr[16:24]),
+            self.data_bus.dat_r[ 0: 8].eq(sr[24:32]),
         ]
         # bitbang mode handling
         with m.If(cfg_bb):

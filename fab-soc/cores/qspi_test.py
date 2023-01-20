@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 
 from amaranth import *
-from amaranth.sim import Simulator, Delay, Settle
+from amaranth.sim import Simulator, Delay, Settle, Passive
 
 from qspi_model import QspiModel
 from qspi_mem import QspiMem
@@ -25,9 +25,8 @@ def run_tests():
         yield spi.data_bus.cyc.eq(1)
         result = None
         for i in range(timeout):
-            yield spi.d_i.eq(model.tick((yield spi.clk_o), (yield spi.cs_o), (yield spi.d_o)))
             if (yield spi.data_bus.ack):
-                result = yield spi.data_bus.dat_w
+                result = yield spi.data_bus.dat_r
                 yield spi.data_bus.stb.eq(0)
                 yield spi.data_bus.cyc.eq(0)
                 yield
@@ -36,6 +35,9 @@ def run_tests():
         return result
 
     def test_flash_spi_read():
+        yield spi.sys_cfg.eq(0)
+        yield spi.pad_count.eq(0x88)
+        yield spi.max_burst.eq(0x10)
         model.data[0][(0x1234 << 2) | 0] = 0xEF
         model.data[0][(0x1234 << 2) | 1] = 0xBE
         model.data[0][(0x1234 << 2) | 2] = 0xAD
@@ -52,9 +54,16 @@ def run_tests():
         try:
             sim = Simulator(m)
             sim.add_clock(1e-6)
-            def process():
+            def stimulus_process():
                 yield from test()
-            sim.add_sync_process(process)
+            def model_process():
+                yield Passive()
+                yield Delay(0.25e-6)
+                while True:
+                    yield spi.d_i.eq(model.tick((yield spi.clk_o), (yield spi.cs_o), (yield spi.d_o)))
+                    yield Delay(0.5e-6)
+            sim.add_sync_process(stimulus_process)
+            sim.add_process(model_process)
             with sim.write_vcd(f"test_results/qspi_{test_name}.vcd", f"test_results/qspi_{test_name}.gtkw"):
                 sim.run()
         except Exception:

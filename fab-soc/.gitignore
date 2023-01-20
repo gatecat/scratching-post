@@ -4,3 +4,4 @@ __pycache__
 *.v
 *.il
 *.json
+test_results
