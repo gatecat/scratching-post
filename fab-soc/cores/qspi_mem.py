@@ -110,9 +110,9 @@ class QspiMem(Elaboratable):
             # move input shift register (sample/output data) before posedge
             with m.If(Mux(shift_in, ~clk, clk)):
                 with m.If(quad):
-                    m.d.sync += sr.eq(Cat(sr[4:], self.d_i))
+                    m.d.sync += sr.eq(Cat(self.d_i, sr[:-4]))
                 with m.Else():
-                    m.d.sync += sr.eq(Cat(sr[1:], self.d_i[1]))
+                    m.d.sync += sr.eq(Cat(self.d_i[1], sr[:-1]))
         with m.If(quad):
             m.d.comb += dq_out.eq(sr[-4:])
             m.d.comb += dq_oe.eq(Repl(~shift_in, 4))
@@ -125,6 +125,7 @@ class QspiMem(Elaboratable):
                 m.d.sync += [
                     counter.eq(0),
                     quad.eq(0),
+                    csn.eq(-1),
                     shift_in.eq(0),
                     wait_count.eq(0),
                     burst_count.eq(0),
@@ -220,7 +221,7 @@ class QspiMem(Elaboratable):
                     # switch output to input
                     m.d.sync += [shift_in.eq(1)]
                 with m.If(next_counter == 0):
-                    m.d.sync += [counter.eq(4)]
+                    m.d.sync += [counter.eq(32)]
                     m.next = "WAIT_READ"
             with m.State("WAIT_READ"):
                 with m.If(next_counter == 0):
@@ -294,7 +295,7 @@ def sim():
         yield spi.data_bus.we.eq(0)
         yield spi.data_bus.stb.eq(1)
         yield spi.data_bus.cyc.eq(1)
-        for i in range(100):
+        for i in range(200):
             if (yield spi.data_bus.ack):
                 yield spi.data_bus.stb.eq(0)
                 yield spi.data_bus.cyc.eq(0)
