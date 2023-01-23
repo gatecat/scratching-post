@@ -134,6 +134,15 @@ def run_tests():
         assert model.xfer_count == init_xfers + 1 # assert kept alive
 
 
+    def test_ram_max_burst():
+        yield from _cfg_quad()
+        init_xfers = model.xfer_count
+        for i in range(31*4):
+            model.data[1][(0x1000 << 2) + i] = i
+        for i in range(31):
+            yield from wb_xfer(addr=(0x2201000+i))
+        assert model.xfer_count == init_xfers + 2 # assert kept alive
+
     tests = [v for k, v in locals().items() if k.startswith("test_")]
 
     failures = 0

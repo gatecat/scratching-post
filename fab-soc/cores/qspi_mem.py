@@ -235,11 +235,11 @@ class QspiMem(Elaboratable):
                     # timeout waiting for continuation
                     m.d.sync += [wait_count.eq(3)]
                     m.next = "GOTO_IDLE"
-                with m.If(latched_adr[-1] & burst_count == self.max_burst):
+                with m.Elif(latched_adr[-1] & (burst_count == self.max_burst)):
                     # RAM has a maximum CS low time and burst length that must be obeyed
                     m.d.sync += [wait_count.eq(3)]
                     m.next = "GOTO_IDLE"
-                with m.If(self.data_bus.stb & self.data_bus.cyc & ~self.data_bus.ack):
+                with m.Elif(self.data_bus.stb & self.data_bus.cyc & ~self.data_bus.ack):
                     # new transaction received
                     # check if it's a valid continuation
                     with m.If(
