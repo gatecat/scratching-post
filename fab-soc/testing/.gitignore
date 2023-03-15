@@ -1,1 +1,7 @@
 build/
+!postsyn_tb.v
+*.log
+*.jou
+*.wdb
+*.pb
+*.dir
