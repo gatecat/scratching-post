@@ -1,27 +1,62 @@
 import math
-# test density matrix
+from math import pi
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import fft
 
-rho = [
-	[1, 0, 2, 0, 0, 0, 0, 1],
-	[2, 2, 1, 0, 2, 1, 0, 0],
-	[0, 2, 3, 2, 3, 1, 3, 1],
-	[2, 4, 4, 3, 4, 3, 2, 2],
-	[3, 3, 4, 4, 1, 1, 1, 0],
-	[0, 2, 1, 2, 2, 4, 0, 1],
-	[1, 2, 1, 1, 2, 1, 2, 2],
-	[1, 0, 1, 0, 0, 2, 0, 1],
-]
+import sys
 
-m = 8
-w = 2*math.pi/m
+in_density = []
 
-# naive approach
-result = []
+with open(sys.argv[1], "r") as f:
+	for line in f:
+		sl = line.strip().split(",")
+		if len(sl) == 0:
+			continue
+		in_density.append([float(x) for x in sl if x != ""])
+
+width = len(in_density[0])
+height = len(in_density)
+
+m = 64
+
+xs = (m / width)
+ys = (m / height)
+
+density = np.array([[0] * m] * m)
+for y, row in enumerate(in_density):
+	for x, d in enumerate(row):
+		x0 = int(x * xs)
+		x1 = min(x0 + 1, m-1)
+		y0 = int(y * ys)
+		y1 = min(y0 + 1, m-1)
+		# stamp across density bins
+		density[y0,x0] += d * (x - x0/xs)*xs * (y - y0/ys)*ys
+		density[y1,x0] += d * (x - x0/xs)*xs * (y1/ys - y)*ys
+		density[y0,x1] += d * (x1/xs - x)*xs * (y - y0/ys)*ys
+		density[y1,x1] += d * (x1/xs - x)*xs * (y1/ys - y)*ys
+
+a = fft.dctn(density, type=2)
 for v in range(m):
-	row = []
 	for u in range(m):
-		a = sum(sum(rho[y][x] * math.cos(w*u*x) * math.cos(w*v*y)
-			for x in range(m)) for y in range(m)) / (m**2)
-		row.append(a)
-	result.append(row)
-print(result)
+		# differing scale factors
+		a[v, u] *= (2 / m**2)
+
+potential = np.array([[0] * m] * m)
+for v in range(m):
+	for u in range(m):
+		w_u = (2*pi*u)/m
+		w_v = (2*pi*v)/m
+		if v != 0 or u != 0:
+			potential[v,u] = a[v,u] * (1.0 / (w_u**2 + w_v**2))
+
+potential = fft.dctn(potential, type=2)
+
+fig, axs = plt.subplots(2, 2)
+axs[0,0].imshow(density, cmap='hot', interpolation='nearest')
+axs[0,0].set_title("density")
+
+axs[0,1].imshow(potential, cmap='hot', interpolation='nearest')
+axs[0,0].set_title("potential")
+
+plt.show()
