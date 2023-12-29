@@ -1,0 +1,17 @@
+log -stdout reading /home/gatecat/chipflow-backend/chipflow_backend/pdksetup/open_pdks/C4M.gf180mcu/libs.ref/StdCell5V0Lib/liberty/StdCell5V0Lib_slow.lib file
+read_liberty -lib /home/gatecat/chipflow-backend/chipflow_backend/pdksetup/open_pdks/C4M.gf180mcu/libs.ref/StdCell5V0Lib/liberty/StdCell5V0Lib_slow.lib
+log -stdout reading rtlil.il file
+read_verilog -lib /home/gatecat/test/sram_load/gf180mcu_fd_ip_sram__sram512x8m8wm1.v
+read_verilog test.v
+synth -flatten -top \upcounter_top
+dfflibmap -liberty /home/gatecat/chipflow-backend/chipflow_backend/pdksetup/open_pdks/C4M.gf180mcu/libs.ref/StdCell5V0Lib/liberty/StdCell5V0Lib_slow.lib
+opt
+abc -script +strash;scorr;dc2;dretime;strash;&get,-n;&dch,-f;&nf,-D,10000;&put;buffer,-G,1000,-N,32;upsize,-D,10000;dnsize,-D,10000;stime,-p -constr /home/gatecat/test/sram_load/build_silicon/abc_gf180.constr -liberty /home/gatecat/chipflow-backend/chipflow_backend/pdksetup/open_pdks/C4M.gf180mcu/libs.ref/StdCell5V0Lib/liberty/StdCell5V0Lib_slow.lib
+setundef -zero
+clean -purge
+setundef -zero
+write_blif upcounter_top.blif
+write_json upcounter_top.json
+splitnets -ports
+write_verilog -noattr upcounter_top_syn.v
+tee -o /home/gatecat/test/sram_load/build_silicon/upcounter_top_stats.json stat -liberty /home/gatecat/chipflow-backend/chipflow_backend/pdksetup/open_pdks/C4M.gf180mcu/libs.ref/StdCell5V0Lib/liberty/StdCell5V0Lib_slow.lib -json

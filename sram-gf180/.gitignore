@@ -1,0 +1,10 @@
+*.vst
+*.spi
+*.blif
+*.plt
+*.dat
+*.gds
+*.txt
+*.json
+*.rpt
+*_syn.v
