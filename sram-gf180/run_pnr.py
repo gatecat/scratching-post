@@ -1,7 +1,7 @@
 from run_pnr_config import *
 from coriolis import CRL
 from coriolis.CRL import Gds, LefImport
-from coriolis.Hurricane import DataBase, Library, Transformation
+from coriolis.Hurricane import DataBase, Library, Transformation, NetExternalComponents
 from coriolis.plugins.block.spares import Spares
 from coriolis.plugins.chip.configuration import ChipConf, BlockConf
 from coriolis.plugins.chip.chip import Chip
@@ -9,6 +9,7 @@ from coriolis.plugins.block.block import Block
 from coriolis.plugins.block.configuration import IoPin
 from coriolis.Anabatic import StyleFlags
 from coriolis.helpers import u
+import sys
 
 
 af = CRL.AllianceFramework.get()
@@ -26,6 +27,12 @@ LefImport.load( "/home/gatecat/test/sram_load/gf180mcu_fd_sc_mcu7t5v0__nom.lef" 
 LefImport.load( "/home/gatecat/test/sram_load/gf180mcu_fd_ip_sram__sram512x8m8wm1.lef" )
 af.wrapLibrary( sramLib, 1 )
 # Gds.load(sramLib, "../gf180mcu_fd_ip_sram__sram512x8m8wm1.gds" , Gds.NoGdsPrefix|Gds.Layer_0_IsBoundary )
+
+sram = sramLib.getCell("gf180mcu_fd_ip_sram__sram512x8m8wm1")
+for net in sram.getNets():
+    if net.getName() in ("VSS","VDD"):
+        for component in net.getComponents():
+            NetExternalComponents.setInternal(component)
 
 cell = CRL.Blif.load("upcounter_top")
 env.setCLOCK("^sys_clk")
