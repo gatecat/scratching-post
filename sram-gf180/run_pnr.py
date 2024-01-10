@@ -1,7 +1,7 @@
 from run_pnr_config import *
 from coriolis import CRL
 from coriolis.CRL import Gds, LefImport
-from coriolis.Hurricane import DataBase, Library, Transformation, NetExternalComponents
+from coriolis.Hurricane import DataBase, Library, Transformation, NetExternalComponents, Box, Net, Horizontal, Vertical, Rectilinear
 from coriolis.plugins.block.spares import Spares
 from coriolis.plugins.chip.configuration import ChipConf, BlockConf
 from coriolis.plugins.chip.chip import Chip
@@ -9,6 +9,8 @@ from coriolis.plugins.block.block import Block
 from coriolis.plugins.block.configuration import IoPin
 from coriolis.Anabatic import StyleFlags
 from coriolis.helpers import u
+from coriolis.helpers.overlay import UpdateSession
+
 import sys
 
 
@@ -29,10 +31,35 @@ af.wrapLibrary( sramLib, 1 )
 # Gds.load(sramLib, "../gf180mcu_fd_ip_sram__sram512x8m8wm1.gds" , Gds.NoGdsPrefix|Gds.Layer_0_IsBoundary )
 
 sram = sramLib.getCell("gf180mcu_fd_ip_sram__sram512x8m8wm1")
-for net in sram.getNets():
-    if net.getName() in ("VSS","VDD"):
-        for component in net.getComponents():
-            NetExternalComponents.setInternal(component)
+with UpdateSession():
+    for net in sram.getNets():
+        if net.getName() in ("VSS","VDD"):
+            for component in net.getComponents():
+                if isinstance(component, Horizontal) and component.getWidth() in (u(1.5), u(5)):
+                    continue
+                NetExternalComponents.setInternal(component)
+                if isinstance(component, Rectilinear):
+                    bb = Box( component.getBoundingBox() )
+                    block = Horizontal.create( net
+                     , component.getLayer().getBlockageLayer()
+                     , bb.getYCenter()
+                     , bb.getHeight()
+                     , bb.getXMin()
+                     , bb.getXMax() )
+                    NetExternalComponents.setExternal(block)
+
+# with UpdateSession():
+#     bb = Box( sram.getBoundingBox() )
+#     extra_block = Net.create(sram, "__blockage__")
+#     for layer in range(0, 2):
+#         block_layer = rg.getLayerGauge( layer ).getBlockageLayer()
+#         Horizontal.create(extra_block,
+#             block_layer,
+#             bb.getYCenter(),
+#             bb.getHeight(),
+#             bb.getXMin(),
+#             bb.getXMax()
+#         )
 
 cell = CRL.Blif.load("upcounter_top")
 env.setCLOCK("^sys_clk")
@@ -44,8 +71,8 @@ ioPads = [
     ]
 conf = ChipConf( cell, ioPins=ioPins, ioPads=ioPads )
 conf.cfg.anabatic.globalIterations = 20
-conf.cfg.anabatic.searchHalo = 2
-conf.cfg.anabatic.topRoutingLayer = "Metal3"
+conf.cfg.anabatic.searchHalo = 4
+conf.cfg.anabatic.topRoutingLayer = "Metal4"
 conf.cfg.block.spareSide = u(112)
 conf.cfg.chip.minPadSpacing = u(1.46)
 conf.cfg.chip.supplyRailPitch = u(64.0)
@@ -85,9 +112,11 @@ else:
         builder.doChipNetlist()
     builder.doChipFloorplan()
 
+dx = 0
 for instance in conf.core.getInstances():
     if "sram512x8" in instance.getMasterCell().getName():
-        builder.placeMacro(instance.getName(), Transformation( u(160.0), u(160.0),  Transformation.Orientation.ID))
+        builder.placeMacro(instance.getName(), Transformation( dx, u(2398.0),  Transformation.Orientation.ID))
+        dx += instance.getMasterCell().getBoundingBox().getWidth()
 builder.doPnR()
 if wrapPackage:
     package = ChipPackage( conf )

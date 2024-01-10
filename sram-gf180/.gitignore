@@ -8,3 +8,5 @@
 *.json
 *.rpt
 *_syn.v
+*.log
+__pycache__
