@@ -36,34 +36,26 @@ with UpdateSession():
         if net.getName() in ("VSS","VDD"):
             for component in net.getComponents():
                 if isinstance(component, Horizontal) and component.getWidth() in (u(1.5), u(5)):
+                    # Connect these (sensible) power strips
                     continue
+                # Skip other power elements, that often cause offgrid vias
                 NetExternalComponents.setInternal(component)
-                if isinstance(component, Rectilinear):
-                    bb = Box( component.getBoundingBox() )
-                    block = Horizontal.create( net
-                     , component.getLayer().getBlockageLayer()
-                     , bb.getYCenter()
-                     , bb.getHeight()
-                     , bb.getXMin()
-                     , bb.getXMax() )
-                    NetExternalComponents.setExternal(block)
-
-# with UpdateSession():
-#     bb = Box( sram.getBoundingBox() )
-#     extra_block = Net.create(sram, "__blockage__")
-#     for layer in range(0, 2):
-#         block_layer = rg.getLayerGauge( layer ).getBlockageLayer()
-#         Horizontal.create(extra_block,
-#             block_layer,
-#             bb.getYCenter(),
-#             bb.getHeight(),
-#             bb.getXMin(),
-#             bb.getXMax()
-#         )
+with UpdateSession():
+    bb = Box( sram.getBoundingBox() )
+    extra_block = Net.create(sram, "__blockage__")
+    block_layer = rg.getLayerGauge( 2 ).getBlockageLayer()
+    Horizontal.create(extra_block,
+        block_layer,
+        bb.getYCenter(),
+        bb.getHeight() + u(2),
+        bb.getXMin() - u(1),
+        bb.getXMax() + u(1)
+    )
+    sram.setAbutmentBox(Box(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax() + u(32)))
 
 cell = CRL.Blif.load("upcounter_top")
 env.setCLOCK("^sys_clk")
-lg = af.getRoutingGauge("StdCell5V0Lib").getLayerGauge(5)
+lg = af.getRoutingGauge("StdCell5V0Lib").getLayerGauge(4)
 lg.setType(CRL.RoutingLayerGauge.PowerSupply)
 ioPins = [
     ]
@@ -72,7 +64,7 @@ ioPads = [
 conf = ChipConf( cell, ioPins=ioPins, ioPads=ioPads )
 conf.cfg.anabatic.globalIterations = 20
 conf.cfg.anabatic.searchHalo = 4
-conf.cfg.anabatic.topRoutingLayer = "Metal4"
+conf.cfg.anabatic.topRoutingLayer = "Metal5"
 conf.cfg.block.spareSide = u(112)
 conf.cfg.chip.minPadSpacing = u(1.46)
 conf.cfg.chip.supplyRailPitch = u(64.0)
@@ -115,7 +107,7 @@ else:
 dx = 0
 for instance in conf.core.getInstances():
     if "sram512x8" in instance.getMasterCell().getName():
-        builder.placeMacro(instance.getName(), Transformation( dx, u(2398.0),  Transformation.Orientation.ID))
+        builder.placeMacro(instance.getName(), Transformation( dx, u(2398.0) - u(32),  Transformation.Orientation.ID))
         dx += instance.getMasterCell().getBoundingBox().getWidth()
 builder.doPnR()
 if wrapPackage:
