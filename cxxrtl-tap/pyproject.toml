@@ -1,0 +1,22 @@
+
+# Project metadata
+
+[project]
+name = "cxxrtl-test"
+version = "0.0.0"
+description = ""
+authors = [
+  {name = "Myrtle Shah", email = "gatecat@ds0.me" },
+]
+license = {file = "LICENSE.md"}
+
+requires-python = "~=3.9"
+dependencies = [
+  "amaranth[builtin-yosys] @ git+https://github.com/amaranth-lang/amaranth",
+]
+
+# Build system configuration
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
