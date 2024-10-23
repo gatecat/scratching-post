@@ -3,9 +3,10 @@ tapcfg/
 *.v
 *.il
 *.d
-tap_demo
 tap_demo.cc
 .venv
 __pycache__
 .pdm-python
 .pdm-build
+*.vcd
+*.gtkw

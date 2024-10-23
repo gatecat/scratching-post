@@ -7,7 +7,7 @@ tapcfg:
 	git clone https://github.com/enjoy-digital/tapcfg
 
 tap_demo.il: tap_demo.py
-	pdm run python -m tap_demo generate tap_demo.il
+	pdm run python -m tap_demo.tap_demo generate tap_demo.il
 
 tap_demo.cc: tap_demo.il
 	yosys -p "hierarchy -top top; write_cxxrtl tap_demo.cc" tap_demo.il
