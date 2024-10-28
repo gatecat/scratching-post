@@ -12,15 +12,14 @@ requires_python = "~=3.9"
 
 [[package]]
 name = "amaranth"
-version = "0.6.0.dev45"
-requires_python = "~=3.8"
+version = "0.6.0.dev70"
+requires_python = "~=3.9"
 git = "https://github.com/amaranth-lang/amaranth"
-revision = "bc2e90913311e326d8f396e33d7a1c7f6eef6e4e"
+revision = "ef4f68a1be4f549ecec0db73ebc751f7e8f6ac51"
 summary = "Amaranth hardware definition language"
 groups = ["default"]
 dependencies = [
     "Jinja2~=3.0",
-    "importlib-resources; python_version < \"3.9\"",
     "jschon~=0.11.1",
     "pyvcd<0.5,>=0.2.2",
 ]
@@ -41,11 +40,11 @@ files = [
 
 [[package]]
 name = "amaranth"
-version = "0.6.0.dev45"
+version = "0.6.0.dev70"
 extras = ["builtin-yosys"]
-requires_python = "~=3.8"
+requires_python = "~=3.9"
 git = "https://github.com/amaranth-lang/amaranth"
-revision = "bc2e90913311e326d8f396e33d7a1c7f6eef6e4e"
+revision = "ef4f68a1be4f549ecec0db73ebc751f7e8f6ac51"
 summary = "Amaranth hardware definition language"
 groups = ["default"]
 dependencies = [

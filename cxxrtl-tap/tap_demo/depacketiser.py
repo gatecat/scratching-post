@@ -29,7 +29,7 @@ class Depacketiser(wiring.Component):
         header_sr_next = Signal(header_len)
         byte_count = Signal(range(header_len + 2))
 
-        m.d.comb += header_sr_next.eq(Cat(self.bytes_in.payload.data, header_sr[:-8]))
+        m.d.comb += header_sr_next.eq(Cat(header_sr[8:], self.bytes_in.payload.data))
 
         m.d.sync += self.error.eq(0)
 
@@ -63,4 +63,35 @@ class Depacketiser(wiring.Component):
             m.d.comb += self.bytes_in.ready.eq(1)
 
         m.d.comb += self.payload_out.payload.eq(self.bytes_in.payload)
+        return m
+
+
+class HeaderEndianSwapper(wiring.Component):
+    def __init__(self, stream_type):
+        super().__init__({
+            "header_in": In(stream_type),
+            "header_out": Out(stream_type),
+        })
+    def elaborate(self, platform):
+        m = Module()
+
+        for name, field in self.header_in.payload.shape():
+            if field.width <= 8:
+                m.d.comb += getattr(self.header_out.payload, name).eq(getattr(self.header_in.payload, name))
+            else:
+                if field.width % 8 != 0:
+                    raise ValueError(f"multi-byte field {name} is not an exact number of bytes")
+                if field.offset % 8 != 0:
+                    raise ValueError(f"multi-byte field {name} is not byte-aligned")
+
+                field_bytes = field.width // 8
+
+                for byte in range(field_bytes):
+                    m.d.comb += getattr(self.header_out.payload, name)[byte*8:(byte+1)*8].eq(
+                        getattr(self.header_in.payload, name)[(field_bytes - byte - 1)*8:(field_bytes - byte)*8])
+
+        m.d.comb += [
+            self.header_out.valid.eq(self.header_in.valid),
+#            self.header_in.ready.eq(self.header_out.ready)
+        ]
         return m
