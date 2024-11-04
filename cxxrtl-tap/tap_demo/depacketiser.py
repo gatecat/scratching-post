@@ -31,14 +31,16 @@ class Depacketiser(wiring.Component):
 
         m.d.comb += header_sr_next.eq(Cat(header_sr[8:], self.bytes_in.payload.data))
 
-        m.d.sync += self.error.eq(0)
+        m.d.sync += [
+            self.header_out.valid.eq(0),
+            self.error.eq(0),
+        ]
 
         # Header processing
         with m.If(self.bytes_in.valid):
 
             with m.If(byte_count < header_bytes):
                 m.d.sync += [
-                    self.header_out.valid.eq(0),
                     byte_count.eq(byte_count + 1),
                     header_sr.eq(header_sr_next),
                 ]

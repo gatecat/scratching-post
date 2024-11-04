@@ -1,4 +1,4 @@
-all: tap_demo
+all: tap_demo_sim
 
 CXXFLAGS = -I$(shell yosys-config --datdir)/include/backends/cxxrtl/runtime -O3 -g
 CFLAGS = -Itapcfg/src/include
@@ -6,7 +6,7 @@ CFLAGS = -Itapcfg/src/include
 tapcfg:
 	git clone https://github.com/enjoy-digital/tapcfg
 
-tap_demo.il: tap_demo.py
+tap_demo.il: tap_demo/tap_demo.py
 	pdm run python -m tap_demo.tap_demo generate tap_demo.il
 
 tap_demo.cc: tap_demo.il
@@ -23,5 +23,5 @@ taplog.o: tapcfg/src/lib/taplog.c
 main.o: main.cc tap_demo.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-tap_demo: tapcfg.o taplog.o main.o
+tap_demo_sim: tapcfg.o taplog.o main.o
 	$(CXX) $(LDFLAGS) -o $@ $^

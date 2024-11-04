@@ -2,6 +2,14 @@ from amaranth import *
 from amaranth.lib import stream, wiring, data
 from amaranth.lib.wiring import In, Out
 
+from .depacketiser import Depacketiser, HeaderEndianSwapper
+
+ETHERNET_HEADER = data.StructLayout({
+    "dst_mac": 48,
+    "src_mac":  48,
+    "ethertype": 16,
+})
+
 class TapDemo(wiring.Component):
     rx: In(stream.Signature(data.StructLayout({
         "data": 8,
@@ -14,30 +22,17 @@ class TapDemo(wiring.Component):
 
     def elaborate(self, platform):
         m = Module()
-        header = Signal(data.ArrayLayout(unsigned(8), 6+6+2))
-        byte_count = Signal(range(1600))
+        m.submodules.depack = depack = Depacketiser(ETHERNET_HEADER)
+        m.submodules.swapper = swapper = HeaderEndianSwapper(stream.Signature(ETHERNET_HEADER, always_ready=True))
+        wiring.connect(m, wiring.flipped(self.rx), depack.bytes_in)
+        wiring.connect(m, depack.header_out, swapper.header_in)
 
-        with m.FSM():
-            with m.State("RX_IDLE"):
-                m.d.comb += self.rx.ready.eq(1)
-                m.d.sync += byte_count.eq(0)
-                with m.If(self.rx.valid):
-                    m.d.sync += byte_count.eq(byte_count + 1)
-                    m.next = "RX_ACTIVE"
-            with m.State("RX_ACTIVE"):
-                m.d.comb += self.rx.ready.eq(1)
-                with m.If(self.rx.valid):
-                    m.d.sync += byte_count.eq(byte_count + 1)
-                    with m.If(self.rx.payload.end):
-                        m.next = "RX_END"
-            with m.State("RX_END"):
-                m.d.comb += self.rx.ready.eq(0)
-                m.d.sync += Print(Format("src address: {:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x} ethertype: {:04x}",
-                    *header[6:12],
-                    Cat(*reversed(header[12:14]))))
-                m.next = "RX_IDLE"
-        with m.If(self.rx.valid & byte_count < len(header)):
-            m.d.sync += header[byte_count].eq(self.rx.payload.data)
+        m.d.comb += depack.payload_out.ready.eq(1)
+
+        with m.If(swapper.header_out.valid):
+            hdr = swapper.header_out.payload
+            m.d.sync += Print(Format("dst_mac {:012x} src_mac {:012x} ethertype {:04x}",
+                hdr.dst_mac, hdr.src_mac, hdr.ethertype))
 
         return m
 

@@ -4,6 +4,7 @@ tapcfg/
 *.il
 *.d
 tap_demo.cc
+tap_demo_sim
 .venv
 __pycache__
 .pdm-python
