@@ -13,6 +13,7 @@ license = {file = "LICENSE.txt"}
 requires-python = ">=3.10"
 dependencies = [
     "amaranth>=0.5,<0.6",
+    "pytest"
 ]
 
 # Build system configuration
@@ -20,3 +21,8 @@ dependencies = [
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+
+[tool.pdm.scripts]
+test.cmd = "pytest"
+
