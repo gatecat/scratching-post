@@ -1,0 +1,6 @@
+.pdm-build/
+.venv/
+.pdm-python
+pdm.lock
+__pycache__
+*.vcd
