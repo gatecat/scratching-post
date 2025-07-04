@@ -46,6 +46,13 @@ class Signature(wiring.Signature):
             "resp": Response,
         }))
 
+    @property
+    def addr_width(self):
+        return self._addr_width
+
+    @property
+    def data_width(self):
+        return self._data_width
 
     def __init__(self, *, addr_width, data_width):
         if not isinstance(addr_width, int) or addr_width < 0:
@@ -55,7 +62,6 @@ class Signature(wiring.Signature):
 
         self._addr_width  = addr_width
         self._data_width  = data_width
-        self._memory_map = None
 
         super().__init__({
             "aw": Out(self.aw_signature()),
@@ -64,6 +70,26 @@ class Signature(wiring.Signature):
             "ar": Out(self.ar_signature()),
             "r": In(self.r_signature()),
         })
+
+
+    def create(self, *, path=None, src_loc_at=0):
+        return Interface(addr_width=self.addr_width, data_width=self.data_width,
+                         path=path, src_loc_at=1 + src_loc_at)
+
+class Interface(wiring.PureInterface):
+    def __init__(self, *, addr_width, data_width,
+                 path=None, src_loc_at=0):
+        super().__init__(Signature(addr_width=addr_width, data_width=data_width),
+                         path=path, src_loc_at=1 + src_loc_at)
+        self._memory_map = None
+
+    @property
+    def addr_width(self):
+        return self.signature.addr_width
+
+    @property
+    def data_width(self):
+        return self.signature.data_width
 
     @property
     def memory_map(self):
@@ -78,12 +104,11 @@ class Signature(wiring.Signature):
         if memory_map.data_width != 8:
             raise ValueError(f"Memory map has data width {memory_map.data_width}, which is "
                              f"not the same as bus interface granularity 8")
-        if memory_map.addr_width != self._addr_width:
+        if memory_map.addr_width != self.addr_width:
            raise ValueError(f"Memory map has address width {memory_map.addr_width}, which is "
                              f"not the same as the bus interface effective address width "
-                             f"{self._addr_width}")
+                             f"{self.addr_width}")
         self._memory_map = memory_map
 
-
-if __name__ == '__main__':
-    Signature(addr_width=32, data_width=32)
+    def __repr__(self):
+        return f"wishbone.Interface({self.signature!r})"

@@ -8,7 +8,6 @@ from amaranth_soc.memory import MemoryMap
 
 from .bus import Signature, Response
 
-
 __all__ = ["AxiLiteSRAM"]
 
 class AxiLiteSRAM(wiring.Component):
