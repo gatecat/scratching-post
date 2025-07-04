@@ -4,6 +4,8 @@ from amaranth.lib.wiring import In
 from amaranth.lib.memory import MemoryData, Memory
 from amaranth.utils import ceil_log2, exact_log2
 
+from amaranth_soc.memory import MemoryMap
+
 from .bus import Signature, Response
 
 
@@ -25,6 +27,11 @@ class AxiLiteSRAM(wiring.Component):
 
         super().__init__({"bus": In(Signature(addr_width=addr_width,
             data_width=data_width))})
+
+        self.bus.memory_map = MemoryMap(addr_width=exact_log2(size), data_width=8)
+        self.bus.memory_map.add_resource(self._mem, name=("mem",), size=size)
+        self.bus.memory_map.freeze()
+
 
         @property
         def size(self):

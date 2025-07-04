@@ -2,6 +2,8 @@ from amaranth import *
 from amaranth.lib import enum, data, stream, wiring
 from amaranth.lib.wiring import In, Out
 
+from amaranth_soc.memory import MemoryMap
+
 class Protection(data.Struct):
     privileged:  1
     non_secure:  1
@@ -53,6 +55,7 @@ class Signature(wiring.Signature):
 
         self._addr_width  = addr_width
         self._data_width  = data_width
+        self._memory_map = None
 
         super().__init__({
             "aw": Out(self.aw_signature()),
@@ -61,6 +64,26 @@ class Signature(wiring.Signature):
             "ar": Out(self.ar_signature()),
             "r": In(self.r_signature()),
         })
+
+    @property
+    def memory_map(self):
+        if self._memory_map is None:
+            raise AttributeError(f"{self!r} does not have a memory map")
+        return self._memory_map
+
+    @memory_map.setter
+    def memory_map(self, memory_map):
+        if not isinstance(memory_map, MemoryMap):
+            raise TypeError(f"Memory map must be an instance of MemoryMap, not {memory_map!r}")
+        if memory_map.data_width != 8:
+            raise ValueError(f"Memory map has data width {memory_map.data_width}, which is "
+                             f"not the same as bus interface granularity 8")
+        if memory_map.addr_width != self._addr_width:
+           raise ValueError(f"Memory map has address width {memory_map.addr_width}, which is "
+                             f"not the same as the bus interface effective address width "
+                             f"{self._addr_width}")
+        self._memory_map = memory_map
+
 
 if __name__ == '__main__':
     Signature(addr_width=32, data_width=32)
