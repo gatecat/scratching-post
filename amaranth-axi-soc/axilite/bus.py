@@ -1,6 +1,6 @@
 from amaranth import *
 from amaranth.lib import enum, data, stream, wiring
-from amaranth.lib.wiring import In, Out
+from amaranth.lib.wiring import In, Out, flipped
 
 from amaranth_soc.memory import MemoryMap
 
@@ -143,11 +143,12 @@ class _RequestCounter(wiring.Component):
             m.d.sync += counter.eq(counter + 1)
         with m.Elif(self.response & ~empty):
             m.d.sync += counter.eq(counter - 1)
+        return m
 
-class _ArbiterImpl(Elaboratable):
+class _DecoderImpl(Elaboratable):
     def __init__(self, bus, subs, addr, req, resp):
         self.bus = bus
-        self.subs = subs
+        self._subs = subs
         self.addr = addr
         self.req = req
         self.resp = resp
@@ -161,14 +162,14 @@ class _ArbiterImpl(Elaboratable):
 
         m = Module()
         m.submodules.lock = lock = _RequestCounter()
-        m.d.comb = [
+        m.d.comb += [
             lock.request.eq(bus_a.valid & bus_a.ready),
             lock.response.eq(bus_resp.valid & bus_resp.ready),
         ]
 
-        sub_sel_dec = Signal(len(self.subs))
-        sub_sel_reg = Signal(len(self.subs))
-        sub_sel     = Signal(len(self.subs))
+        sub_sel_dec = Signal(len(self._subs))
+        sub_sel_reg = Signal(len(self._subs))
+        sub_sel     = Signal(len(self._subs))
 
         # We need to hold the subordinate selected until all responses come back.
         m.d.comb += sub_sel_dec.eq(0)
@@ -190,9 +191,9 @@ class _ArbiterImpl(Elaboratable):
         for index, (sub_map, sub_name, (sub_pat, sub_ratio)) in enumerate(self.bus.memory_map.window_patterns()):
             sub_bus = self._subs[sub_map]
 
-            sub_a = getattr(self.sub, self.addr)
-            sub_req = getattr(self.sub, self.req) if self.req is not None else None
-            sub_resp = getattr(self.sub, self.resp)
+            sub_a = getattr(sub_bus, self.addr)
+            sub_req = getattr(sub_bus, self.req) if self.req is not None else None
+            sub_resp = getattr(sub_bus, self.resp)
 
             # Address
             m.d.comb += [
@@ -219,4 +220,33 @@ class _ArbiterImpl(Elaboratable):
                     bus_resp.payload.eq(sub_resp.payload),
                     bus_resp.valid.eq(sub_resp.valid),
                 ]
+        return m
         # TODO: DECERR generation
+
+class Decoder(wiring.Component):
+    def __init__(self, *, addr_width, data_width, alignment=0, name=None):
+        super().__init__({"bus": In(Signature(addr_width=addr_width, data_width=data_width))})
+        self.bus.memory_map = MemoryMap(addr_width=addr_width, data_width=8, alignment=alignment)
+        self._subs = dict()
+
+    def add(self, sub_bus, *, name=None, addr=None):
+        if isinstance(sub_bus, wiring.FlippedInterface):
+            sub_bus_unflipped = flipped(sub_bus)
+        else:
+            sub_bus_unflipped = sub_bus
+        if not isinstance(sub_bus_unflipped, Interface):
+            raise TypeError(f"Subordinate bus must be an instance of axilite.Interface, not "
+                            f"{sub_bus_unflipped!r}")
+        if sub_bus.data_width != self.bus.data_width:
+            raise ValueError(f"Subordinate bus has data width {sub_bus.data_width}, which is "
+                             f"not the same as decoder data width {self.bus.data_width}")
+        self._subs[sub_bus.memory_map] = sub_bus
+        return self.bus.memory_map.add_window(sub_bus.memory_map, name=name, addr=addr,
+                                              sparse=False)
+    def elaborate(self, platform):
+        m = Module()
+
+        m.submodules.wr = _DecoderImpl(self.bus, self._subs, "aw", "w", "b")
+        m.submodules.rd = _DecoderImpl(self.bus, self._subs, "ar", None, "r")
+
+        return m
