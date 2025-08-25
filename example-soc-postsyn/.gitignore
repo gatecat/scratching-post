@@ -1,0 +1,8 @@
+1_synth.v
+6_final.v
+firmware.hex
+postpnr
+postsyn
+*.fst
+*.fst.hier
+*.log
