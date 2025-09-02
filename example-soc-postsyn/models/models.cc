@@ -167,7 +167,7 @@ void spiflash_model::step(unsigned timestamp) {
                     s.addr |= (uint32_t(s.curr_byte) << ((3 - s.byte_count) * 8));
                 }
                 if (s.byte_count == 3) {
-                    fprintf(stderr, "addr : 0x%06x\n", s.addr);
+                    // fprintf(stderr, "addr : 0x%06x\n", s.addr);
                 }
                 if (s.byte_count >= 3) {
                     s.out_buffer = data.at(s.addr);

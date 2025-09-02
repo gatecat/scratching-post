@@ -54,6 +54,6 @@ module sim_top(
 	assign gpio_in[28:25] = soc_gpio_open_drain_gpio_i;
 
 	assign gpio_in[7] = soc_uart_0_rx;
-	assign soc_uart_0_tx = gpio_in[6];
+	assign soc_uart_0_tx = gpio_out[6];
 endmodule
 
