@@ -11,6 +11,8 @@ int main(int argc, char **argv) {
     VerilatedContext* contextp = new VerilatedContext;
     contextp->commandArgs(argc, argv);
 
+    // Verilated::traceEverOn(true);
+
     Vsim_top *top = new Vsim_top{contextp};
 
     spiflash_model flash("flash", &top->soc_flash_clk, &top->soc_flash_csn,
@@ -33,10 +35,12 @@ int main(int argc, char **argv) {
         gpio_0.step(timestamp);
 
         top->clk = 0;
+        contextp->timeInc(1);
         top->eval();
         ++timestamp;
 
         top->clk = 1;
+        contextp->timeInc(1);
         top->eval();
         ++timestamp;
 

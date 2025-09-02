@@ -21,6 +21,12 @@ module sim_top(
 	input soc_uart_0_rx,
 	output soc_uart_0_tx
 );
+/*
+	initial begin
+		$dumpfile("sim_top.fst");
+		$dumpvars(2, sim_top);
+	end
+*/
 
 	wire [43:0] gpio_in, gpio_oeb, gpio_out;
 
