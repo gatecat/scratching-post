@@ -6,3 +6,5 @@ postsyn
 *.fst
 *.fst.hier
 *.log
+*.cc
+obj_dir
