@@ -15,6 +15,8 @@ module testbench;
 		$finish;
 	end
 
+	wire ledr, ledg;
+
 	top dut_i (
 	    .CLK(clk),
 
@@ -22,8 +24,8 @@ module testbench;
 	    .RX(1'b0),
 
 	    .BTN_N(1'b1),
-	    .LEDR_N(),
-	    .LEDG_N()
+	    .LEDR_N(ledr),
+	    .LEDG_N(ledg)
 	);
 
 

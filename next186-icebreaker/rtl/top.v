@@ -125,6 +125,16 @@ module top(
 
     end
 
-    assign RAM_DIN = rom_rdsel ? rom_dout : ram_dout;
+    assign RAM_DIN = rom_rdsel ? {rom_dout[7:0], rom_dout[15:8], rom_dout[23:16], rom_dout[31:24]} : ram_dout;
+
+    reg [7:0] io = 0;
+
+    always @(posedge CLK) begin
+        if (IORQ && WR)
+            io <= POUT[7:0];
+    end
+
+    assign LEDR_N = ~io[0];
+    assign LEDG_N = ~io[1];
 
 endmodule
