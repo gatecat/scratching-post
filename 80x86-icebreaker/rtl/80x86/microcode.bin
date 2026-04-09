@@ -1,0 +1,1197 @@
+//next a_sel alu_op b_sel ext_int_inhibit ext_int_yield immediate io jump_type load_ip mar_wr_sel mar_write mdr_write mem_read mem_write next_instruction ra_modrm_rm_reg ra_sel rb_cl rd_sel rd_sel_source reg_wr_source segment segment_force segment_wr_en tmp_wr_en tmp_wr_sel update_flags width
+0010100010100000000000000000000010010000100000000000110000000010 // 0 /home/gatecat/80x86/rtl/microcode/add.us:26 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010100010100000000000000000000010010000100000000000110000000010 // 1 /home/gatecat/80x86/rtl/microcode/add.us:28 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010100100000000000000000000000010010000100000000000110000000010 // 2 /home/gatecat/80x86/rtl/microcode/add.us:36 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010100100000000000000000000000010010000100000000000110000000010 // 3 /home/gatecat/80x86/rtl/microcode/add.us:38 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010100101100000000000000000000000000000000000000000000000000010 // 4 /home/gatecat/80x86/rtl/microcode/add.us:46 width ra_sel jump_type jump_target
+0010100101100000000000000000000000000000000000000000000000000010 // 5 /home/gatecat/80x86/rtl/microcode/add.us:48 width ra_sel jump_type jump_target
+0110010111000000000000000000000000000000000000000000001000000000 // 6 /home/gatecat/80x86/rtl/microcode/push.us:58 segment_force segment jump_type jump_target
+0101111111100000000000000000000000000000010000000000000000000000 // 7 /home/gatecat/80x86/rtl/microcode/pop.us:80 ra_sel jump_type jump_target
+0101110100000000000000000000000010010000100000000000110000000010 // 8 /home/gatecat/80x86/rtl/microcode/or.us:26 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0101110100000000000000000000000010010000100000000000110000000010 // 9 /home/gatecat/80x86/rtl/microcode/or.us:28 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0101110101100000000000000000000010010000100000000000110000000010 // a /home/gatecat/80x86/rtl/microcode/or.us:36 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0101110101100000000000000000000010010000100000000000110000000010 // b /home/gatecat/80x86/rtl/microcode/or.us:38 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0101110111000000000000000000000000000000000000000000000000000010 // c /home/gatecat/80x86/rtl/microcode/or.us:46 width ra_sel jump_type jump_target
+0101110111000000000000000000000000000000000000000000000000000010 // d /home/gatecat/80x86/rtl/microcode/or.us:48 width ra_sel jump_type jump_target
+0110010111000000000000000000000000000000000000000000011000000000 // e /home/gatecat/80x86/rtl/microcode/push.us:60 segment_force segment jump_type jump_target
+1000011101000000000000000000000000000000000000000000000000000000 // f /home/gatecat/80x86/rtl/microcode/microcode.us:94 jump_type jump_target
+0010011011000000000000000000000010010000100000000000110000000010 // 10 /home/gatecat/80x86/rtl/microcode/adc.us:26 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010011011000000000000000000000010010000100000000000110000000010 // 11 /home/gatecat/80x86/rtl/microcode/adc.us:28 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010011100100000000000000000000010010000100000000000110000000010 // 12 /home/gatecat/80x86/rtl/microcode/adc.us:36 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010011100100000000000000000000010010000100000000000110000000010 // 13 /home/gatecat/80x86/rtl/microcode/adc.us:38 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010011110000000000000000000000000000000000000000000000000000010 // 14 /home/gatecat/80x86/rtl/microcode/adc.us:46 width ra_sel jump_type jump_target
+0010011110000000000000000000000000000000000000000000000000000010 // 15 /home/gatecat/80x86/rtl/microcode/adc.us:48 width ra_sel jump_type jump_target
+0110010111000000000000000000000000000000000000000000101000000000 // 16 /home/gatecat/80x86/rtl/microcode/push.us:62 segment_force segment jump_type jump_target
+0110000001000000000000000000000000000000010000000000000000000000 // 17 /home/gatecat/80x86/rtl/microcode/pop.us:87 ra_sel jump_type jump_target
+0111010101000000000000000000000010010000100000000000110000000010 // 18 /home/gatecat/80x86/rtl/microcode/sbb.us:26 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0111010101000000000000000000000010010000100000000000110000000010 // 19 /home/gatecat/80x86/rtl/microcode/sbb.us:28 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0111010110100000000000000000000010010000100000000000110000000010 // 1a /home/gatecat/80x86/rtl/microcode/sbb.us:36 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0111010110100000000000000000000010010000100000000000110000000010 // 1b /home/gatecat/80x86/rtl/microcode/sbb.us:38 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0111011000000000000000000000000000000000000000000000000000000010 // 1c /home/gatecat/80x86/rtl/microcode/sbb.us:46 width ra_sel jump_type jump_target
+0111011000000000000000000000000000000000000000000000000000000010 // 1d /home/gatecat/80x86/rtl/microcode/sbb.us:48 width ra_sel jump_type jump_target
+0110010111000000000000000000000000000000000000000000111000000000 // 1e /home/gatecat/80x86/rtl/microcode/push.us:64 segment_force segment jump_type jump_target
+0110000010100000000000000000000000000000010000000000000000000000 // 1f /home/gatecat/80x86/rtl/microcode/pop.us:94 ra_sel jump_type jump_target
+0010101010000000000000000000000010010000100000000000110000000010 // 20 /home/gatecat/80x86/rtl/microcode/and.us:26 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010101010000000000000000000000010010000100000000000110000000010 // 21 /home/gatecat/80x86/rtl/microcode/and.us:28 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010101011100000000000000000000010010000100000000000110000000010 // 22 /home/gatecat/80x86/rtl/microcode/and.us:36 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010101011100000000000000000000010010000100000000000110000000010 // 23 /home/gatecat/80x86/rtl/microcode/and.us:38 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0010101101000000000000000000000000000000000000000000000000000010 // 24 /home/gatecat/80x86/rtl/microcode/and.us:46 width ra_sel jump_type jump_target
+0010101101000000000000000000000000000000000000000000000000000010 // 25 /home/gatecat/80x86/rtl/microcode/and.us:48 width ra_sel jump_type jump_target
+0000010011100000000000000000000000000001000000000000000000000000 // 26 /home/gatecat/80x86/rtl/microcode/microcode.us:108 next_instruction
+0010110110100000000000000000000000000000000000000000000000000000 // 27 /home/gatecat/80x86/rtl/microcode/daa.us:24 ra_sel jump_type jump_target
+0111111001000000000000000000000010010000100000000000110000000010 // 28 /home/gatecat/80x86/rtl/microcode/sub.us:26 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0111111001000000000000000000000010010000100000000000110000000010 // 29 /home/gatecat/80x86/rtl/microcode/sub.us:28 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0111111010100000000000000000000010010000100000000000110000000010 // 2a /home/gatecat/80x86/rtl/microcode/sub.us:36 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0111111010100000000000000000000010010000100000000000110000000010 // 2b /home/gatecat/80x86/rtl/microcode/sub.us:38 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+0111111100000000000000000000000000000000000000000000000000000010 // 2c /home/gatecat/80x86/rtl/microcode/sub.us:46 width ra_sel jump_type jump_target
+0111111100000000000000000000000000000000000000000000000000000010 // 2d /home/gatecat/80x86/rtl/microcode/sub.us:48 width ra_sel jump_type jump_target
+0000010111100000000000000000000000000001000000000000000000000000 // 2e /home/gatecat/80x86/rtl/microcode/microcode.us:110 next_instruction
+0010110111000000000000000000000000000000000000000000000000000000 // 2f /home/gatecat/80x86/rtl/microcode/das.us:24 ra_sel jump_type jump_target
+1000010101100000000000000000000010010000100000000000110000000010 // 30 /home/gatecat/80x86/rtl/microcode/xor.us:26 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+1000010101100000000000000000000010010000100000000000110000000010 // 31 /home/gatecat/80x86/rtl/microcode/xor.us:28 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+1000010111000000000000000000000010010000100000000000110000000010 // 32 /home/gatecat/80x86/rtl/microcode/xor.us:36 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+1000010111000000000000000000000010010000100000000000110000000010 // 33 /home/gatecat/80x86/rtl/microcode/xor.us:38 mar_write mar_wr_sel width ra_modrm_rm_reg jump_type segment jump_target
+1000011000100000000000000000000000000000000000000000000000000010 // 34 /home/gatecat/80x86/rtl/microcode/xor.us:46 width ra_sel jump_type jump_target
+1000011000100000000000000000000000000000000000000000000000000010 // 35 /home/gatecat/80x86/rtl/microcode/xor.us:48 width ra_sel jump_type jump_target
+0000011011100000000000000000000000000001000000000000000000000000 // 36 /home/gatecat/80x86/rtl/microcode/microcode.us:112 next_instruction
+0010011000000000000000000000000000000000000000000000000000000000 // 37 /home/gatecat/80x86/rtl/microcode/aaa.us:24 ra_sel jump_type jump_target
+0011000110000000000000000000000010010000100000000000110000000010 // 38 /home/gatecat/80x86/rtl/microcode/cmp.us:26 mar_write mar_wr_sel width segment ra_modrm_rm_reg jump_type jump_target
+0011000110000000000000000000000010010000100000000000110000000010 // 39 /home/gatecat/80x86/rtl/microcode/cmp.us:28 mar_write mar_wr_sel width segment ra_modrm_rm_reg jump_type jump_target
+0011000111100000000000000000000010010000100000000000110000000010 // 3a /home/gatecat/80x86/rtl/microcode/cmp.us:36 mar_write mar_wr_sel width segment ra_modrm_rm_reg jump_type jump_target
+0011000111100000000000000000000010010000100000000000110000000010 // 3b /home/gatecat/80x86/rtl/microcode/cmp.us:38 mar_write mar_wr_sel width segment ra_modrm_rm_reg jump_type jump_target
+0011001001000000000000000000000000000000000000000000000000000010 // 3c /home/gatecat/80x86/rtl/microcode/cmp.us:46 width ra_sel jump_type jump_target
+0011001001000000000000000000000000000000000000000000000000000010 // 3d /home/gatecat/80x86/rtl/microcode/cmp.us:48 width ra_sel jump_type jump_target
+0000011111100000000000000000000000000001000000000000000000000000 // 3e /home/gatecat/80x86/rtl/microcode/microcode.us:114 next_instruction
+0010011010100000000000000000000000000000000000000000000000000000 // 3f /home/gatecat/80x86/rtl/microcode/aas.us:24 ra_sel jump_type jump_target
+0011111011000000000000000000000000000000000000000000000000000000 // 40 /home/gatecat/80x86/rtl/microcode/inc.us:96 ra_sel jump_type jump_target
+0011111011100000000000000000000000000000000100000000000000000000 // 41 /home/gatecat/80x86/rtl/microcode/inc.us:100 ra_sel jump_type jump_target
+0011111100000000000000000000000000000000001000000000000000000000 // 42 /home/gatecat/80x86/rtl/microcode/inc.us:104 ra_sel jump_type jump_target
+0011111100100000000000000000000000000000001100000000000000000000 // 43 /home/gatecat/80x86/rtl/microcode/inc.us:108 ra_sel jump_type jump_target
+0011111101000000000000000000000000000000010000000000000000000000 // 44 /home/gatecat/80x86/rtl/microcode/inc.us:112 ra_sel jump_type jump_target
+0011111101100000000000000000000000000000010100000000000000000000 // 45 /home/gatecat/80x86/rtl/microcode/inc.us:116 ra_sel jump_type jump_target
+0011111110000000000000000000000000000000011000000000000000000000 // 46 /home/gatecat/80x86/rtl/microcode/inc.us:120 ra_sel jump_type jump_target
+0011111110100000000000000000000000000000011100000000000000000000 // 47 /home/gatecat/80x86/rtl/microcode/inc.us:124 ra_sel jump_type jump_target
+0011111111000000000000000000000000000000000000000000000000000000 // 48 /home/gatecat/80x86/rtl/microcode/inc.us:128 ra_sel jump_type jump_target
+0011111111100000000000000000000000000000000100000000000000000000 // 49 /home/gatecat/80x86/rtl/microcode/inc.us:132 ra_sel jump_type jump_target
+0100000000000000000000000000000000000000001000000000000000000000 // 4a /home/gatecat/80x86/rtl/microcode/inc.us:136 ra_sel jump_type jump_target
+0100000000100000000000000000000000000000001100000000000000000000 // 4b /home/gatecat/80x86/rtl/microcode/inc.us:140 ra_sel jump_type jump_target
+0100000001000000000000000000000000000000010000000000000000000000 // 4c /home/gatecat/80x86/rtl/microcode/inc.us:144 ra_sel jump_type jump_target
+0100000001100000000000000000000000000000010100000000000000000000 // 4d /home/gatecat/80x86/rtl/microcode/inc.us:148 ra_sel jump_type jump_target
+0100000010000000000000000000000000000000011000000000000000000000 // 4e /home/gatecat/80x86/rtl/microcode/inc.us:152 ra_sel jump_type jump_target
+0100000010100000000000000000000000000000011100000000000000000000 // 4f /home/gatecat/80x86/rtl/microcode/inc.us:156 ra_sel jump_type jump_target
+0110010100100000000000000000000000000000000000000000000000000000 // 50 /home/gatecat/80x86/rtl/microcode/push.us:66 ra_sel jump_type jump_target
+0110010100100000000000000000000000000000000100000000000000000000 // 51 /home/gatecat/80x86/rtl/microcode/push.us:68 ra_sel jump_type jump_target
+0110010100100000000000000000000000000000001000000000000000000000 // 52 /home/gatecat/80x86/rtl/microcode/push.us:70 ra_sel jump_type jump_target
+0110010100100000000000000000000000000000001100000000000000000000 // 53 /home/gatecat/80x86/rtl/microcode/push.us:72 ra_sel jump_type jump_target
+0110010110000000000000000000000000000000010000000000000000000000 // 54 /home/gatecat/80x86/rtl/microcode/push.us:85 ra_sel jump_type jump_target
+0110010100100000000000000000000000000000010100000000000000000000 // 55 /home/gatecat/80x86/rtl/microcode/push.us:74 ra_sel jump_type jump_target
+0110010100100000000000000000000000000000011000000000000000000000 // 56 /home/gatecat/80x86/rtl/microcode/push.us:76 ra_sel jump_type jump_target
+0110010100100000000000000000000000000000011100000000000000000000 // 57 /home/gatecat/80x86/rtl/microcode/push.us:78 ra_sel jump_type jump_target
+0110000100000000000000000000000000000000010000000000000000000000 // 58 /home/gatecat/80x86/rtl/microcode/pop.us:101 ra_sel jump_type jump_target
+0110000101100000000000000000000000000000010000000000000000000000 // 59 /home/gatecat/80x86/rtl/microcode/pop.us:108 ra_sel jump_type jump_target
+0110000111000000000000000000000000000000010000000000000000000000 // 5a /home/gatecat/80x86/rtl/microcode/pop.us:115 ra_sel jump_type jump_target
+0110001000100000000000000000000000000000010000000000000000000000 // 5b /home/gatecat/80x86/rtl/microcode/pop.us:122 ra_sel jump_type jump_target
+0110001010000000000000000000000000000000010000000000000000000000 // 5c /home/gatecat/80x86/rtl/microcode/pop.us:129 ra_sel jump_type jump_target
+0110001011100000000000000000000000000000010000000000000000000000 // 5d /home/gatecat/80x86/rtl/microcode/pop.us:136 ra_sel jump_type jump_target
+0110001101000000000000000000000000000000010000000000000000000000 // 5e /home/gatecat/80x86/rtl/microcode/pop.us:143 ra_sel jump_type jump_target
+0110001110100000000000000000000000000000010000000000000000000000 // 5f /home/gatecat/80x86/rtl/microcode/pop.us:150 ra_sel jump_type jump_target
+0110011100100000000000000000000000000000010000000000000000000000 // 60 /home/gatecat/80x86/rtl/microcode/push.us:115 ra_sel jump_type jump_target
+0110100101000000000000000000000000000000010000000000000000000000 // 61 /home/gatecat/80x86/rtl/microcode/push.us:136 ra_sel jump_type jump_target
+0010110001100000000000000000000010010000000000000000110000000000 // 62 /home/gatecat/80x86/rtl/microcode/bound.us:24 mar_write mar_wr_sel segment jump_type jump_target
+1000011101000000000000000000000000000000000000000000000000000000 // 63 /home/gatecat/80x86/rtl/microcode/microcode.us:96 jump_type jump_target
+1000011101000000000000000000000000000000000000000000000000000000 // 64 /home/gatecat/80x86/rtl/microcode/microcode.us:98 jump_type jump_target
+1000011101000000000000000000000000000000000000000000000000000000 // 65 /home/gatecat/80x86/rtl/microcode/microcode.us:100 jump_type jump_target
+1000011101000000000000000000000000000000000000000000000000000000 // 66 /home/gatecat/80x86/rtl/microcode/microcode.us:102 jump_type jump_target
+1000011101000000000000000000000000000000000000000000000000000000 // 67 /home/gatecat/80x86/rtl/microcode/microcode.us:104 jump_type jump_target
+0110011000100000000000000000000000000000010000000000000000000000 // 68 /home/gatecat/80x86/rtl/microcode/push.us:95 ra_sel jump_type jump_target
+0101101111100000000000000000000010010000100000000000110000000000 // 69 /home/gatecat/80x86/rtl/microcode/mul.us:64 mar_write mar_wr_sel ra_modrm_rm_reg segment jump_type jump_target
+0110011010000000000000000000000000000000010000000000000000000000 // 6a /home/gatecat/80x86/rtl/microcode/push.us:102 ra_sel jump_type jump_target
+0101101111100000000000000000000010010000100000000000110000000000 // 6b /home/gatecat/80x86/rtl/microcode/mul.us:56 mar_write mar_wr_sel ra_modrm_rm_reg segment jump_type jump_target
+0100100000000000000000000000000000000000000000000000000000000000 // 6c /home/gatecat/80x86/rtl/microcode/io.us:98 jump_type jump_target
+0100100110100000000000000000000000000000000000000000000000000000 // 6d /home/gatecat/80x86/rtl/microcode/io.us:118 jump_type jump_target
+0100010100000000000000000000000000000000000000000000000000000000 // 6e /home/gatecat/80x86/rtl/microcode/io.us:60 jump_type jump_target
+0100011010000000000000000000000000000000000000000000000000000000 // 6f /home/gatecat/80x86/rtl/microcode/io.us:79 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 70 /home/gatecat/80x86/rtl/microcode/jmp.us:53 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 71 /home/gatecat/80x86/rtl/microcode/jmp.us:55 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 72 /home/gatecat/80x86/rtl/microcode/jmp.us:57 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 73 /home/gatecat/80x86/rtl/microcode/jmp.us:59 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 74 /home/gatecat/80x86/rtl/microcode/jmp.us:61 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 75 /home/gatecat/80x86/rtl/microcode/jmp.us:63 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 76 /home/gatecat/80x86/rtl/microcode/jmp.us:65 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 77 /home/gatecat/80x86/rtl/microcode/jmp.us:67 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 78 /home/gatecat/80x86/rtl/microcode/jmp.us:69 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 79 /home/gatecat/80x86/rtl/microcode/jmp.us:71 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 7a /home/gatecat/80x86/rtl/microcode/jmp.us:73 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 7b /home/gatecat/80x86/rtl/microcode/jmp.us:75 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 7c /home/gatecat/80x86/rtl/microcode/jmp.us:77 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 7d /home/gatecat/80x86/rtl/microcode/jmp.us:79 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 7e /home/gatecat/80x86/rtl/microcode/jmp.us:81 jump_type jump_target
+0100110011100000000000000000000000000000000000000000000000000000 // 7f /home/gatecat/80x86/rtl/microcode/jmp.us:83 jump_type jump_target
+1000011101100000000000000000000110010000000000000000000000000000 // 80 /home/gatecat/80x86/rtl/microcode/microcode.us:125 mar_write mar_wr_sel jump_type jump_target
+1000011101100000000000000000000110010000000000000000000000000000 // 81 /home/gatecat/80x86/rtl/microcode/microcode.us:137 mar_write mar_wr_sel jump_type jump_target
+1000011101100000000000000000000110010000000000000000000000000000 // 82 /home/gatecat/80x86/rtl/microcode/microcode.us:139 mar_write mar_wr_sel jump_type jump_target
+1000100001100000000000000000000110010000000000000000000000000000 // 83 /home/gatecat/80x86/rtl/microcode/microcode.us:141 mar_write mar_wr_sel jump_type jump_target
+1000000000100000000000000000000010010000100000000000110000000010 // 84 /home/gatecat/80x86/rtl/microcode/test.us:26 mar_write mar_wr_sel width segment ra_modrm_rm_reg jump_type jump_target
+1000000000100000000000000000000010010000100000000000110000000010 // 85 /home/gatecat/80x86/rtl/microcode/test.us:28 mar_write mar_wr_sel width segment ra_modrm_rm_reg jump_type jump_target
+1000000101100000000000000000000010010000100000000000110000000010 // 86 /home/gatecat/80x86/rtl/microcode/xchg.us:23 width mar_write mar_wr_sel ra_modrm_rm_reg jump_type segment jump_target
+1000000101100000000000000000000010010000100000000000110000000000 // 87 /home/gatecat/80x86/rtl/microcode/xchg.us:25 mar_write mar_wr_sel ra_modrm_rm_reg jump_type segment jump_target
+0101001011100000000000000000000010010000000000000000000000000001 // 88 /home/gatecat/80x86/rtl/microcode/mov.us:24 mar_write mar_wr_sel width jump_type jump_target
+0101001011100000000000000000000010010000000000000000000000000000 // 89 /home/gatecat/80x86/rtl/microcode/mov.us:26 mar_write mar_wr_sel jump_type jump_target
+0101001100100000000000000000000010010000100000000000110000000001 // 8a /home/gatecat/80x86/rtl/microcode/mov.us:33 mar_write mar_wr_sel ra_modrm_rm_reg width jump_type segment a_sel jump_target
+0101001100100000000000000000000010010000100000000000110000000000 // 8b /home/gatecat/80x86/rtl/microcode/mov.us:35 mar_write mar_wr_sel ra_modrm_rm_reg jump_type a_sel segment jump_target
+0101010110000000000000000000000110010000000000000000000000000000 // 8c /home/gatecat/80x86/rtl/microcode/mov.us:116 mar_write mar_wr_sel jump_type jump_target
+0100111000000000000000000000000010010000000000000000110000000000 // 8d /home/gatecat/80x86/rtl/microcode/lea.us:23 mar_write mar_wr_sel segment jump_type jump_target
+0101010100100000000000000000000010010000100000000000110000000000 // 8e /home/gatecat/80x86/rtl/microcode/mov.us:108 mar_write mar_wr_sel ra_modrm_rm_reg segment jump_type jump_target
+1000100101100000000000000000000110010000000000000000100000000000 // 8f /home/gatecat/80x86/rtl/microcode/microcode.us:153 mar_write mar_wr_sel segment jump_type jump_target
+0001001000100000000000000000000000000001000000000000000000000000 // 90 /home/gatecat/80x86/rtl/microcode/xchg.us:75 next_instruction
+1000001001000000000000000000000000000000000100000000000000000000 // 91 /home/gatecat/80x86/rtl/microcode/xchg.us:77 ra_sel jump_type jump_target
+1000001010100000000000000000000000000000001000000000000000000000 // 92 /home/gatecat/80x86/rtl/microcode/xchg.us:84 ra_sel jump_type jump_target
+1000001100000000000000000000000000000000001100000000000000000000 // 93 /home/gatecat/80x86/rtl/microcode/xchg.us:91 ra_sel jump_type jump_target
+1000001101100000000000000000000000000000010000000000000000000000 // 94 /home/gatecat/80x86/rtl/microcode/xchg.us:98 ra_sel jump_type jump_target
+1000001111000000000000000000000000000000010100000000000000000000 // 95 /home/gatecat/80x86/rtl/microcode/xchg.us:105 ra_sel jump_type jump_target
+1000010000100000000000000000000000000000011000000000000000000000 // 96 /home/gatecat/80x86/rtl/microcode/xchg.us:112 ra_sel jump_type jump_target
+1000010010000000000000000000000000000000011100000000000000000000 // 97 /home/gatecat/80x86/rtl/microcode/xchg.us:119 ra_sel jump_type jump_target
+0011110001100000000000000000000000000000000000000000000000000001 // 98 /home/gatecat/80x86/rtl/microcode/extend.us:23 width ra_sel jump_type jump_target
+0011110010000000000000000000000000000000000000000000000000000000 // 99 /home/gatecat/80x86/rtl/microcode/extend.us:28 ra_sel jump_type jump_target
+0010111100000000001001000000000001001000000000000000010000000000 // 9a /home/gatecat/80x86/rtl/microcode/call.us:39 jump_type mdr_write b_sel alu_op load_ip segment jump_target
+0001001110000000000000000000000000000001000000000000000000000000 // 9b /home/gatecat/80x86/rtl/microcode/wait.us:23 next_instruction
+0110011011100001011000000000000000001000010000000000000000000000 // 9c /home/gatecat/80x86/rtl/microcode/push.us:109 alu_op mdr_write ra_sel jump_type jump_target
+0110010000000000000000000000000000000000010000000000000000000000 // 9d /home/gatecat/80x86/rtl/microcode/pop.us:157 ra_sel jump_type jump_target
+0011110010100000000000000000000000000000010000000000000000000001 // 9e /home/gatecat/80x86/rtl/microcode/flags.us:40 ra_sel width jump_type jump_target
+0001010000000001011000000000000000000001000001001100000000000001 // 9f /home/gatecat/80x86/rtl/microcode/flags.us:38 alu_op rd_sel_source rd_sel width next_instruction
+0101010011000000001001000000000000110000000000000000110000000000 // a0 /home/gatecat/80x86/rtl/microcode/mov.us:93 mar_write mar_wr_sel b_sel alu_op jump_type segment jump_target
+0101010011000000001001000000000000110000000000000000110000000000 // a1 /home/gatecat/80x86/rtl/microcode/mov.us:95 mar_write mar_wr_sel b_sel alu_op jump_type segment jump_target
+0101010100000000001001000000000000110000000000000000000000000000 // a2 /home/gatecat/80x86/rtl/microcode/mov.us:101 mar_write mar_wr_sel b_sel alu_op jump_type ra_sel jump_target
+0101010100000000001001000000000000110000000000000000000000000000 // a3 /home/gatecat/80x86/rtl/microcode/mov.us:103 mar_write mar_wr_sel b_sel alu_op jump_type ra_sel jump_target
+0101011011000000000000000000000000000000000000000000000000000000 // a4 /home/gatecat/80x86/rtl/microcode/movs.us:23 jump_type jump_target
+0101100000100000000000000000000000000000000000000000000000000000 // a5 /home/gatecat/80x86/rtl/microcode/movs.us:42 jump_type jump_target
+0011001101100000000000000000000000000000000000000000000000000000 // a6 /home/gatecat/80x86/rtl/microcode/cmps.us:23 jump_type jump_target
+0011010011100000000000000000000000000000000000000000000000000000 // a7 /home/gatecat/80x86/rtl/microcode/cmps.us:42 jump_type jump_target
+1000000010000000000000000000000000000000000000000000000000000010 // a8 /home/gatecat/80x86/rtl/microcode/test.us:36 width ra_sel jump_type jump_target
+1000000010000000000000000000000000000000000000000000000000000010 // a9 /home/gatecat/80x86/rtl/microcode/test.us:38 width ra_sel jump_type jump_target
+0111101111100000000000000000000000000000000000000000000000000001 // aa /home/gatecat/80x86/rtl/microcode/stos.us:23 width ra_sel jump_type jump_target
+0111110101000000000000000000000000000000000000000000000000000000 // ab /home/gatecat/80x86/rtl/microcode/stos.us:41 ra_sel jump_type jump_target
+0100111110000000000000000000000000000000000000000000000000000000 // ac /home/gatecat/80x86/rtl/microcode/lods.us:23 jump_type jump_target
+0101000010000000000000000000000000000000000000000000000000000000 // ad /home/gatecat/80x86/rtl/microcode/lods.us:38 jump_type jump_target
+0111011100100000000000000000000000000000011100000000000000000000 // ae /home/gatecat/80x86/rtl/microcode/scas.us:23 jump_type ra_sel jump_target
+0111100000100000000000000000000000000000011100000000000000000000 // af /home/gatecat/80x86/rtl/microcode/scas.us:39 jump_type ra_sel jump_target
+0001011000100000001001000000000000000001000000001100000000000001 // b0 /home/gatecat/80x86/rtl/microcode/mov.us:61 rd_sel_source rd_sel alu_op b_sel width next_instruction
+0001011001000000001001000000000000000001000000011100000000000001 // b1 /home/gatecat/80x86/rtl/microcode/mov.us:63 rd_sel_source rd_sel alu_op b_sel width next_instruction
+0001011001100000001001000000000000000001000000101100000000000001 // b2 /home/gatecat/80x86/rtl/microcode/mov.us:65 rd_sel_source rd_sel alu_op b_sel width next_instruction
+0001011010000000001001000000000000000001000000111100000000000001 // b3 /home/gatecat/80x86/rtl/microcode/mov.us:67 rd_sel_source rd_sel alu_op b_sel width next_instruction
+0001011010100000001001000000000000000001000001001100000000000001 // b4 /home/gatecat/80x86/rtl/microcode/mov.us:69 rd_sel_source rd_sel alu_op b_sel width next_instruction
+0001011011000000001001000000000000000001000001011100000000000001 // b5 /home/gatecat/80x86/rtl/microcode/mov.us:71 rd_sel_source rd_sel alu_op b_sel width next_instruction
+0001011011100000001001000000000000000001000001101100000000000001 // b6 /home/gatecat/80x86/rtl/microcode/mov.us:73 rd_sel_source rd_sel alu_op b_sel width next_instruction
+0001011100000000001001000000000000000001000001111100000000000001 // b7 /home/gatecat/80x86/rtl/microcode/mov.us:75 rd_sel_source rd_sel alu_op b_sel width next_instruction
+0001011100100000001001000000000000000001000000001100000000000000 // b8 /home/gatecat/80x86/rtl/microcode/mov.us:77 rd_sel_source rd_sel alu_op b_sel next_instruction
+0001011101000000001001000000000000000001000000011100000000000000 // b9 /home/gatecat/80x86/rtl/microcode/mov.us:79 rd_sel_source rd_sel alu_op b_sel next_instruction
+0001011101100000001001000000000000000001000000101100000000000000 // ba /home/gatecat/80x86/rtl/microcode/mov.us:81 rd_sel_source rd_sel alu_op b_sel next_instruction
+0001011110000000001001000000000000000001000000111100000000000000 // bb /home/gatecat/80x86/rtl/microcode/mov.us:83 rd_sel_source rd_sel alu_op b_sel next_instruction
+0001011110100000001001000000000000000001000001001100000000000000 // bc /home/gatecat/80x86/rtl/microcode/mov.us:85 rd_sel_source rd_sel alu_op b_sel next_instruction
+0001011111000000001001000000000000000001000001011100000000000000 // bd /home/gatecat/80x86/rtl/microcode/mov.us:87 rd_sel_source rd_sel alu_op b_sel next_instruction
+0001011111100000001001000000000000000001000001101100000000000000 // be /home/gatecat/80x86/rtl/microcode/mov.us:89 rd_sel_source rd_sel alu_op b_sel next_instruction
+0001100000000000001001000000000000000001000001111100000000000000 // bf /home/gatecat/80x86/rtl/microcode/mov.us:91 rd_sel_source rd_sel alu_op b_sel next_instruction
+1000101101100000000000000000000110010000000000000000000000000001 // c0 /home/gatecat/80x86/rtl/microcode/microcode.us:177 width mar_write mar_wr_sel jump_type jump_target
+1000110001100000000000000000000110010000000000000000000000000000 // c1 /home/gatecat/80x86/rtl/microcode/microcode.us:189 mar_write mar_wr_sel jump_type jump_target
+0110111001000000000000000000000000000000010000000000000000000000 // c2 /home/gatecat/80x86/rtl/microcode/ret.us:30 ra_sel jump_type jump_target
+0110110111100000000000000000000000000000010000000000000000000000 // c3 /home/gatecat/80x86/rtl/microcode/ret.us:23 ra_sel jump_type jump_target
+0100111011000000000000000000000010010000000000000000110000000000 // c4 /home/gatecat/80x86/rtl/microcode/les.us:23 mar_write mar_wr_sel segment jump_type jump_target
+0100110101000000000000000000000010010000000000000000110000000000 // c5 /home/gatecat/80x86/rtl/microcode/lds.us:23 mar_write mar_wr_sel segment jump_type jump_target
+0101001110000000000000000000000110010000000000000000000000000000 // c6 /home/gatecat/80x86/rtl/microcode/mov.us:43 mar_write mar_wr_sel jump_type jump_target
+0101001110000000000000000000000110010000000000000000000000000000 // c7 /home/gatecat/80x86/rtl/microcode/mov.us:45 mar_write mar_wr_sel jump_type jump_target
+0011100111100000001001000000000000000000010000000000000010000000 // c8 /home/gatecat/80x86/rtl/microcode/enter.us:23 b_sel alu_op tmp_wr_en ra_sel jump_type jump_target
+0100111001000000000000000000000000000000010100000000000000000000 // c9 /home/gatecat/80x86/rtl/microcode/leave.us:23 ra_sel jump_type jump_target
+0110111101100000000000000000000000000000010000000000000000000000 // ca /home/gatecat/80x86/rtl/microcode/ret.us:47 ra_sel jump_type jump_target
+0110111011000000000000000000000000000000010000000000000000000000 // cb /home/gatecat/80x86/rtl/microcode/ret.us:38 ra_sel jump_type jump_target
+0010010110100000001001000111000000000000000000000000000010000000 // cc /home/gatecat/80x86/rtl/microcode/int.us:24 b_sel immediate alu_op tmp_wr_en jump_type jump_target
+0100000011000000001001000000000000110000000000000000000000000000 // cd /home/gatecat/80x86/rtl/microcode/int.us:26 b_sel alu_op mar_wr_sel mar_write jump_type jump_target
+0100000100000001011000000000000000001000000000000000000000000000 // ce /home/gatecat/80x86/rtl/microcode/int.us:32 alu_op mdr_write jump_type jump_target
+0111000000100000000000000000000000000000010000000000000000000000 // cf /home/gatecat/80x86/rtl/microcode/ret.us:57 ra_sel jump_type jump_target
+1000101001100000000000000000000110010000000000000000000000000010 // d0 /home/gatecat/80x86/rtl/microcode/microcode.us:165 width mar_write mar_wr_sel jump_type jump_target
+1000101001100000000000000000000110010000000000000000000000000000 // d1 /home/gatecat/80x86/rtl/microcode/microcode.us:201 mar_write mar_wr_sel jump_type jump_target
+1000110101100000000000000000000110010000000000000000000000000010 // d2 /home/gatecat/80x86/rtl/microcode/microcode.us:203 width mar_write mar_wr_sel jump_type jump_target
+1000110101100000000000000000000110010000000000000000000000000000 // d3 /home/gatecat/80x86/rtl/microcode/microcode.us:215 mar_write mar_wr_sel jump_type jump_target
+0011100100000000001001000000000000001000100000000000000000000001 // d4 /home/gatecat/80x86/rtl/microcode/div.us:59 width ra_modrm_rm_reg b_sel alu_op mdr_write jump_type jump_target
+0010011000100000000000000000000000000000010000000000000000000001 // d5 /home/gatecat/80x86/rtl/microcode/aad.us:24 width ra_sel jump_type jump_target
+0011110011000000000000000000000000000000000110000000000000000000 // d6 /home/gatecat/80x86/rtl/microcode/flags.us:45 ra_sel rb_cl jump_type jump_target
+1000010011100000000000000000000000000000000000000000000000000001 // d7 /home/gatecat/80x86/rtl/microcode/xlat.us:23 width ra_sel jump_type jump_target
+0011110001000000000000000000000000000000000000000000000000000000 // d8 /home/gatecat/80x86/rtl/microcode/esc.us:26 jump_type jump_target
+0011110001000000000000000000000000000000000000000000000000000000 // d9 /home/gatecat/80x86/rtl/microcode/esc.us:28 jump_type jump_target
+0011110001000000000000000000000000000000000000000000000000000000 // da /home/gatecat/80x86/rtl/microcode/esc.us:30 jump_type jump_target
+0011110001000000000000000000000000000000000000000000000000000000 // db /home/gatecat/80x86/rtl/microcode/esc.us:32 jump_type jump_target
+0011110001000000000000000000000000000000000000000000000000000000 // dc /home/gatecat/80x86/rtl/microcode/esc.us:34 jump_type jump_target
+0011110001000000000000000000000000000000000000000000000000000000 // dd /home/gatecat/80x86/rtl/microcode/esc.us:36 jump_type jump_target
+0011110001000000000000000000000000000000000000000000000000000000 // de /home/gatecat/80x86/rtl/microcode/esc.us:38 jump_type jump_target
+0011110001000000000000000000000000000000000000000000000000000000 // df /home/gatecat/80x86/rtl/microcode/esc.us:40 jump_type jump_target
+0101001010000000000000000000000000000000000100000000000000000000 // e0 /home/gatecat/80x86/rtl/microcode/loop.us:42 ra_sel jump_type jump_target
+0101001000000000000000000000000000000000000100000000000000000000 // e1 /home/gatecat/80x86/rtl/microcode/loop.us:33 ra_sel jump_type jump_target
+0101000110000000000000000000000000000000000100000000000000000000 // e2 /home/gatecat/80x86/rtl/microcode/loop.us:24 ra_sel jump_type jump_target
+0100110010000000000000000000000000000000000010000000000000000000 // e3 /home/gatecat/80x86/rtl/microcode/jmp.us:45 rb_cl jump_type jump_target
+0100010001000000001001000000000000110000000000000000000000000001 // e4 /home/gatecat/80x86/rtl/microcode/io.us:42 width b_sel alu_op mar_wr_sel mar_write jump_type jump_target
+0100010001000000001001000000000000110000000000000000000000000001 // e5 /home/gatecat/80x86/rtl/microcode/io.us:44 width b_sel alu_op mar_wr_sel mar_write jump_type jump_target
+0100001110000000001001000000000000110000000000000000000000000001 // e6 /home/gatecat/80x86/rtl/microcode/io.us:24 width b_sel alu_op mar_wr_sel mar_write jump_type ra_sel jump_target
+0100001110000000001001000000000000110000000000000000000000000001 // e7 /home/gatecat/80x86/rtl/microcode/io.us:26 width b_sel alu_op mar_wr_sel mar_write jump_type jump_target
+0010110111100000000000000000000000000000010000000000000000000000 // e8 /home/gatecat/80x86/rtl/microcode/call.us:23 jump_type ra_sel jump_target
+0001110101001000010001000000000001000001000000000000000000000000 // e9 /home/gatecat/80x86/rtl/microcode/jmp.us:23 a_sel b_sel alu_op load_ip next_instruction
+0100101101000000001001000000000001000000000000000000000000000000 // ea /home/gatecat/80x86/rtl/microcode/jmp.us:25 b_sel alu_op load_ip jump_type jump_target
+0001110110001000010001000000000001000001000000000000000000000000 // eb /home/gatecat/80x86/rtl/microcode/jmp.us:30 a_sel b_sel alu_op load_ip next_instruction
+0100010010100000000000000000000000000000001000000000000000000000 // ec /home/gatecat/80x86/rtl/microcode/io.us:51 ra_sel jump_type jump_target
+0100010010100000000000000000000000000000001000000000000000000000 // ed /home/gatecat/80x86/rtl/microcode/io.us:53 ra_sel jump_type jump_target
+0100001111100000000000000000000000000000000000000000000000000001 // ee /home/gatecat/80x86/rtl/microcode/io.us:33 width ra_sel jump_type jump_target
+0100001111100000000000000000000000000000000000000000000000000000 // ef /home/gatecat/80x86/rtl/microcode/io.us:35 ra_sel jump_type jump_target
+0001111000100000000000000000000000000001000000000000000000000000 // f0 /home/gatecat/80x86/rtl/microcode/microcode.us:116 next_instruction
+1000011101000000000000000000000000000000000000000000000000000000 // f1 /home/gatecat/80x86/rtl/microcode/microcode.us:106 jump_type jump_target
+0001111001100000000000000000000000000001000000000000000000000000 // f2 /home/gatecat/80x86/rtl/microcode/microcode.us:118 next_instruction
+0001111010000000000000000000000000000001000000000000000000000000 // f3 /home/gatecat/80x86/rtl/microcode/microcode.us:120 next_instruction
+0011110011100000000000000000000000000000000000000000000000000000 // f4 /home/gatecat/80x86/rtl/microcode/hlt.us:23 jump_type jump_target
+0001111011000001110000000000000000000001000000000000000000010100 // f5 /home/gatecat/80x86/rtl/microcode/flags.us:36 alu_op update_flags next_instruction
+1000111001100000000000000000000110010000000000000000000000000001 // f6 /home/gatecat/80x86/rtl/microcode/microcode.us:217 width mar_write mar_wr_sel jump_type jump_target
+1000111101100000000000000000000110010000000000000000000000000000 // f7 /home/gatecat/80x86/rtl/microcode/microcode.us:229 mar_write mar_wr_sel jump_type jump_target
+0001111100100001100001000001000000000001000000000000000000010100 // f8 /home/gatecat/80x86/rtl/microcode/flags.us:24 b_sel immediate alu_op update_flags next_instruction
+0001111101000001100001000110000000000001000000000000000000010100 // f9 /home/gatecat/80x86/rtl/microcode/flags.us:26 b_sel immediate alu_op update_flags next_instruction
+0001111101100001100001100001000000000001000000000000000000011100 // fa /home/gatecat/80x86/rtl/microcode/flags.us:28 b_sel immediate alu_op update_flags ext_int_inhibit next_instruction
+0001111110000001100001100110000000000001000000000000000000011100 // fb /home/gatecat/80x86/rtl/microcode/flags.us:30 b_sel immediate alu_op update_flags ext_int_inhibit next_instruction
+0001111110100001100001000001000000000001000000000000000000100000 // fc /home/gatecat/80x86/rtl/microcode/flags.us:32 b_sel immediate alu_op update_flags next_instruction
+0001111111000001100001000110000000000001000000000000000000100000 // fd /home/gatecat/80x86/rtl/microcode/flags.us:34 b_sel immediate alu_op update_flags next_instruction
+0011110100000000000000000000000110010000000000000000000000000001 // fe /home/gatecat/80x86/rtl/microcode/inc.us:24 width mar_write mar_wr_sel jump_type jump_target
+1001000001100000000000000000000110010000000000000000110000000000 // ff /home/gatecat/80x86/rtl/microcode/microcode.us:241 mar_write mar_wr_sel segment jump_type jump_target
+0010000000100000000000010000000100000000000000000000000000000000 // 100 /home/gatecat/80x86/rtl/microcode/microcode.us:27 ext_int_yield jump_type jump_target
+0010010110100000001001000001000000000000000000000000000010000000 // 101 /home/gatecat/80x86/rtl/microcode/microcode.us:30 b_sel immediate alu_op tmp_wr_en jump_type jump_target
+0010000001000000000000000000000000000000000000000000000000000000 // 102 /home/gatecat/80x86/rtl/microcode/debug.us:24 jump_type jump_target
+1001001101000000000000000000000000000000000000000000000000000000 // 103 /home/gatecat/80x86/rtl/microcode/debug.us:39 ra_sel jump_type jump_target
+1001001101000000000000000000000000000000000100000000000000000000 // 104 /home/gatecat/80x86/rtl/microcode/debug.us:41 ra_sel jump_type jump_target
+1001001101000000000000000000000000000000001000000000000000000000 // 105 /home/gatecat/80x86/rtl/microcode/debug.us:43 ra_sel jump_type jump_target
+1001001101000000000000000000000000000000001100000000000000000000 // 106 /home/gatecat/80x86/rtl/microcode/debug.us:45 ra_sel jump_type jump_target
+1001001101000000000000000000000000000000010000000000000000000000 // 107 /home/gatecat/80x86/rtl/microcode/debug.us:47 ra_sel jump_type jump_target
+1001001101000000000000000000000000000000010100000000000000000000 // 108 /home/gatecat/80x86/rtl/microcode/debug.us:49 ra_sel jump_type jump_target
+1001001101000000000000000000000000000000011000000000000000000000 // 109 /home/gatecat/80x86/rtl/microcode/debug.us:51 ra_sel jump_type jump_target
+1001001101000000000000000000000000000000011100000000000000000000 // 10a /home/gatecat/80x86/rtl/microcode/debug.us:53 ra_sel jump_type jump_target
+1001001101100000000000000000000000000000000000000000001000000000 // 10b /home/gatecat/80x86/rtl/microcode/debug.us:55 segment_force segment jump_type jump_target
+1001001101100000000000000000000000000000000000000000011000000000 // 10c /home/gatecat/80x86/rtl/microcode/debug.us:57 segment_force segment jump_type jump_target
+1001001101100000000000000000000000000000000000000000101000000000 // 10d /home/gatecat/80x86/rtl/microcode/debug.us:59 segment_force segment jump_type jump_target
+1001001101100000000000000000000000000000000000000000111000000000 // 10e /home/gatecat/80x86/rtl/microcode/debug.us:61 segment_force segment jump_type jump_target
+0010000001001000000000000000000000000000000000000000000010000000 // 10f /home/gatecat/80x86/rtl/microcode/debug.us:117 a_sel alu_op tmp_wr_en jump_type jump_target
+0010000001000001011000000000000000000000000000000000000010000000 // 110 /home/gatecat/80x86/rtl/microcode/debug.us:119 alu_op tmp_wr_en jump_type jump_target
+0010000001000000001011100000000001000001000000000000000000000000 // 111 /home/gatecat/80x86/rtl/microcode/debug.us:121 b_sel alu_op load_ip next_instruction ext_int_inhibit jump_type jump_target
+0010000001000001100011000000000000000000000000000000000000110000 // 112 /home/gatecat/80x86/rtl/microcode/debug.us:123 b_sel alu_op update_flags jump_type jump_target
+0010000001000000001011000000000000000000000000001100000000000000 // 113 /home/gatecat/80x86/rtl/microcode/debug.us:88 b_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0010000001000000001011000000000000000000000000011100000000000000 // 114 /home/gatecat/80x86/rtl/microcode/debug.us:90 b_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0010000001000000001011000000000000000000000000101100000000000000 // 115 /home/gatecat/80x86/rtl/microcode/debug.us:92 b_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0010000001000000001011000000000000000000000000111100000000000000 // 116 /home/gatecat/80x86/rtl/microcode/debug.us:94 b_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0010000001000000001011000000000000000000000001001100000000000000 // 117 /home/gatecat/80x86/rtl/microcode/debug.us:96 b_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0010000001000000001011000000000000000000000001011100000000000000 // 118 /home/gatecat/80x86/rtl/microcode/debug.us:98 b_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0010000001000000001011000000000000000000000001101100000000000000 // 119 /home/gatecat/80x86/rtl/microcode/debug.us:100 b_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0010000001000000001011000000000000000000000001111100000000000000 // 11a /home/gatecat/80x86/rtl/microcode/debug.us:102 b_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0010000001000000001011100000000000000001000000000000001100000000 // 11b /home/gatecat/80x86/rtl/microcode/debug.us:104 b_sel alu_op segment_force segment_wr_en segment next_instruction ext_int_inhibit jump_type jump_target
+0010000001000000001011100000000000000001000000000000011100000000 // 11c /home/gatecat/80x86/rtl/microcode/debug.us:106 b_sel alu_op segment_force segment_wr_en segment next_instruction ext_int_inhibit jump_type jump_target
+0010000001000000001011100000000000000001000000000000101100000000 // 11d /home/gatecat/80x86/rtl/microcode/debug.us:108 b_sel alu_op segment_force segment_wr_en segment next_instruction ext_int_inhibit jump_type jump_target
+0010000001000000001011100000000000000001000000000000111100000000 // 11e /home/gatecat/80x86/rtl/microcode/debug.us:110 b_sel alu_op segment_force segment_wr_en segment next_instruction ext_int_inhibit jump_type jump_target
+0010000001000000001011000000000000110000000000000000000000000000 // 11f /home/gatecat/80x86/rtl/microcode/debug.us:125 b_sel alu_op mar_wr_sel mar_write jump_type jump_target
+0010000001000000001011000000000000001000000000000000000000000000 // 120 /home/gatecat/80x86/rtl/microcode/debug.us:127 b_sel alu_op mdr_write jump_type jump_target
+1001001110000000000000000000000000000000000000000000111000000000 // 121 /home/gatecat/80x86/rtl/microcode/debug.us:129 segment_force segment jump_type jump_target
+1001001111100000000000000000000000000000000000000000111000000000 // 122 /home/gatecat/80x86/rtl/microcode/debug.us:136 segment_force segment jump_type jump_target
+1001010001000000000000000000000000000000000000000000111000000000 // 123 /home/gatecat/80x86/rtl/microcode/debug.us:143 segment_force segment jump_type jump_target
+1001010010000000000000000000000000000000000000000000111000000000 // 124 /home/gatecat/80x86/rtl/microcode/debug.us:149 segment_force segment jump_type jump_target
+1001010011000000000000000000000000000000000000000000111000000000 // 125 /home/gatecat/80x86/rtl/microcode/debug.us:155 segment_force segment jump_type jump_target
+1001010100000000000000000000000000000000000000000000111000000000 // 126 /home/gatecat/80x86/rtl/microcode/debug.us:161 segment_force segment jump_type jump_target
+1001010101000000000000000000000000000000000000000000111000000000 // 127 /home/gatecat/80x86/rtl/microcode/debug.us:167 segment_force segment jump_type jump_target
+1001010101100000000000000000000000000000000000000000111000000000 // 128 /home/gatecat/80x86/rtl/microcode/debug.us:172 segment_force segment jump_type jump_target
+1001000101100000000000000000000000000000000000000000000000000000 // 129 /home/gatecat/80x86/rtl/microcode/microcode.us:253 jump_type jump_target
+0010010110100000001001001011000000000000000000000000000010000000 // 12a /home/gatecat/80x86/rtl/microcode/microcode.us:35 b_sel immediate alu_op tmp_wr_en jump_type jump_target
+0010010110111011100001001001000000000000000000000000000010000000 // 12b /home/gatecat/80x86/rtl/microcode/microcode.us:32 a_sel b_sel immediate alu_op tmp_wr_en jump_type jump_target
+0010010110100000001001001001000000000000000000000000000010000000 // 12c /home/gatecat/80x86/rtl/microcode/microcode.us:38 b_sel immediate alu_op tmp_wr_en jump_type jump_target
+0100000101100001011000000000000000001000010000000000000000000000 // 12d /home/gatecat/80x86/rtl/microcode/int.us:73 alu_op mdr_write ra_sel jump_type jump_target
+0010010111100000000000000000000100000000000000000000000000000000 // 12e /home/gatecat/80x86/rtl/microcode/microcode.us:41 jump_type jump_target
+1000011101000000000000000000000000000000000000000000000000000000 // 12f /home/gatecat/80x86/rtl/microcode/microcode.us:44 jump_type jump_target
+0010011000100011000000000000000000000001000000001100000000000100 // 130 /home/gatecat/80x86/rtl/microcode/aaa.us:27 a_sel alu_op rd_sel_source rd_sel update_flags next_instruction
+0010011001000011101001000000000000000000000000000000000010000000 // 131 /home/gatecat/80x86/rtl/microcode/aad.us:27 a_sel b_sel alu_op tmp_wr_en
+0010011001100000000000000000000000000000000000000000000000000001 // 132 /home/gatecat/80x86/rtl/microcode/aad.us:28 width ra_sel
+0010011010000000010011000000000000000000000000001100000000001000 // 133 /home/gatecat/80x86/rtl/microcode/aad.us:29 a_sel b_sel alu_op update_flags rd_sel_source rd_sel
+0010011010100000001001000001000000000001000001001100000000000001 // 134 /home/gatecat/80x86/rtl/microcode/aad.us:30 width b_sel immediate alu_op rd_sel_source rd_sel next_instruction
+0010011011000011001000000000000000000001000000001100000000000100 // 135 /home/gatecat/80x86/rtl/microcode/aas.us:27 a_sel alu_op rd_sel_source rd_sel update_flags next_instruction
+0010011011100000011000000000000000000001000000001000000000001110 // 136 /home/gatecat/80x86/rtl/microcode/adc.us:31 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0010011100000000000000000000000000000100000000000000110000000010 // 137 /home/gatecat/80x86/rtl/microcode/adc.us:33 segment mem_read width
+1001001100111000011000000000000000001000000000000000110000001110 // 138 /home/gatecat/80x86/rtl/microcode/adc.us:34 a_sel b_sel alu_op mdr_write update_flags width segment jump_type jump_target
+0010011101000000011000000000000000000001000000000100000000001110 // 139 /home/gatecat/80x86/rtl/microcode/adc.us:41 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0010011101100000000000000000000000000100000000000000110000000010 // 13a /home/gatecat/80x86/rtl/microcode/adc.us:43 segment mem_read width
+0010011110011000011000000000000000000001000000000100000000001110 // 13b /home/gatecat/80x86/rtl/microcode/adc.us:44 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0010011110100000011001000000000000000001000000001100000000001110 // 13c /home/gatecat/80x86/rtl/microcode/adc.us:51 a_sel b_sel alu_op rd_sel_source rd_sel update_flags width next_instruction
+0010011111000000011001000000000000000001000000001000000000001110 // 13d /home/gatecat/80x86/rtl/microcode/adc.us:53 a_sel b_sel alu_op rd_sel_source width update_flags next_instruction
+0010011111100000000000000000000000000100000000000000110000000010 // 13e /home/gatecat/80x86/rtl/microcode/adc.us:55 segment mem_read width
+1001001100111000011001000000000000001000000000000000110000001110 // 13f /home/gatecat/80x86/rtl/microcode/adc.us:56 a_sel b_sel alu_op mdr_write update_flags segment width jump_type jump_target
+0010100001000000000000000000000000000000100000000000000000000000 // 140 /home/gatecat/80x86/rtl/microcode/adc.us:58 ra_modrm_rm_reg jump_type jump_target
+0010100001100000000000000000000000000000100000000000110000000000 // 141 /home/gatecat/80x86/rtl/microcode/adc.us:60 ra_modrm_rm_reg segment jump_type jump_target
+0010100001100000011001000000000000000001000000001000000000001100 // 142 /home/gatecat/80x86/rtl/microcode/adc.us:62 a_sel b_sel alu_op rd_sel_source update_flags next_instruction
+0010100010000000000000000000000000000100000000000000110000000000 // 143 /home/gatecat/80x86/rtl/microcode/adc.us:64 segment mem_read
+1001001100011000011001000000000000001000000000000000110000001100 // 144 /home/gatecat/80x86/rtl/microcode/adc.us:65 a_sel b_sel alu_op mdr_write update_flags segment jump_type jump_target
+0010100011000000010000000000000000000001000000001000000000001110 // 145 /home/gatecat/80x86/rtl/microcode/add.us:31 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0010100011100000000000000000000000000100000000000000110000000010 // 146 /home/gatecat/80x86/rtl/microcode/add.us:33 segment mem_read width
+1001001100111000010000000000000000001000000000000000110000001110 // 147 /home/gatecat/80x86/rtl/microcode/add.us:34 a_sel b_sel alu_op mdr_write update_flags width segment jump_type jump_target
+0010100100100000010000000000000000000001000000000100000000001110 // 148 /home/gatecat/80x86/rtl/microcode/add.us:41 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0010100101000000000000000000000000000100000000000000110000000010 // 149 /home/gatecat/80x86/rtl/microcode/add.us:43 segment mem_read width
+0010100101111000010000000000000000000001000000000100000000001110 // 14a /home/gatecat/80x86/rtl/microcode/add.us:44 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0010100110000000010001000000000000000001000000001100000000001110 // 14b /home/gatecat/80x86/rtl/microcode/add.us:51 a_sel b_sel alu_op rd_sel_source rd_sel update_flags width next_instruction
+0010100110100000010001000000000000000001000000001000000000001110 // 14c /home/gatecat/80x86/rtl/microcode/add.us:53 a_sel b_sel alu_op rd_sel_source width update_flags next_instruction
+0010100111000000000000000000000000000100000000000000110000000010 // 14d /home/gatecat/80x86/rtl/microcode/add.us:55 segment mem_read width
+1001001100111000010001000000000000001000000000000000110000001110 // 14e /home/gatecat/80x86/rtl/microcode/add.us:56 a_sel b_sel alu_op mdr_write update_flags segment width jump_type jump_target
+0010101000100000000000000000000000000000100000000000000000000000 // 14f /home/gatecat/80x86/rtl/microcode/add.us:58 ra_modrm_rm_reg jump_type jump_target
+0010101001000000000000000000000000000000100000000000110000000000 // 150 /home/gatecat/80x86/rtl/microcode/add.us:60 ra_modrm_rm_reg segment jump_type jump_target
+0010101001000000010001000000000000000001000000001000000000001100 // 151 /home/gatecat/80x86/rtl/microcode/add.us:62 a_sel b_sel alu_op rd_sel_source update_flags next_instruction
+0010101001100000000000000000000000000100000000000000110000000000 // 152 /home/gatecat/80x86/rtl/microcode/add.us:64 segment mem_read
+1001001100011000010001000000000000001000000000000000110000001100 // 153 /home/gatecat/80x86/rtl/microcode/add.us:65 a_sel b_sel alu_op mdr_write update_flags segment jump_type jump_target
+0010101010100000100000000000000000000001000000001000000000010010 // 154 /home/gatecat/80x86/rtl/microcode/and.us:31 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0010101011000000000000000000000000000100000000000000110000000010 // 155 /home/gatecat/80x86/rtl/microcode/and.us:33 segment mem_read width
+1001001100111000100000000000000000001000000000000000110000010010 // 156 /home/gatecat/80x86/rtl/microcode/and.us:34 a_sel b_sel alu_op mdr_write update_flags width segment jump_type jump_target
+0010101100000000100000000000000000000001000000000100000000010010 // 157 /home/gatecat/80x86/rtl/microcode/and.us:41 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0010101100100000000000000000000000000100000000000000110000000010 // 158 /home/gatecat/80x86/rtl/microcode/and.us:43 segment mem_read width
+0010101101011000100000000000000000000001000000000100000000010010 // 159 /home/gatecat/80x86/rtl/microcode/and.us:44 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0010101101100000100001000000000000000001000000001100000000010010 // 15a /home/gatecat/80x86/rtl/microcode/and.us:51 a_sel b_sel alu_op rd_sel_source rd_sel update_flags width next_instruction
+0010101110000000100001000000000000000001000000001000000000010010 // 15b /home/gatecat/80x86/rtl/microcode/and.us:53 a_sel b_sel alu_op rd_sel_source width update_flags next_instruction
+0010101110100000000000000000000000000100000000000000110000000010 // 15c /home/gatecat/80x86/rtl/microcode/and.us:55 segment mem_read width
+1001001100111000100001000000000000001000000000000000110000010010 // 15d /home/gatecat/80x86/rtl/microcode/and.us:56 a_sel b_sel alu_op mdr_write update_flags segment width jump_type jump_target
+0010110000000000000000000000000000000000100000000000000000000000 // 15e /home/gatecat/80x86/rtl/microcode/and.us:58 ra_modrm_rm_reg jump_type jump_target
+0010110000100000000000000000000000000000100000000000110000000000 // 15f /home/gatecat/80x86/rtl/microcode/and.us:60 ra_modrm_rm_reg segment jump_type jump_target
+0010110000100000100001000000000000000001000000001000000000010000 // 160 /home/gatecat/80x86/rtl/microcode/and.us:62 a_sel b_sel alu_op rd_sel_source update_flags next_instruction
+0010110001000000000000000000000000000100000000000000110000000000 // 161 /home/gatecat/80x86/rtl/microcode/and.us:64 segment mem_read
+1001001100011000100001000000000000001000000000000000110000010000 // 162 /home/gatecat/80x86/rtl/microcode/and.us:65 a_sel b_sel alu_op mdr_write update_flags segment jump_type jump_target
+0010010110100000001001000010000000000000000000000000000010000000 // 163 /home/gatecat/80x86/rtl/microcode/bound.us:27 b_sel immediate alu_op tmp_wr_en jump_type jump_target
+0010110010100001011000000000000000000100000000000000110010000000 // 164 /home/gatecat/80x86/rtl/microcode/bound.us:29 alu_op tmp_wr_en segment mem_read
+0010110011011100001000000000000000000000000000000000000000010100 // 165 /home/gatecat/80x86/rtl/microcode/bound.us:30 a_sel b_sel alu_op update_flags
+0010110101110000010001000011001110110000000000000000110000000000 // 166 /home/gatecat/80x86/rtl/microcode/bound.us:31 a_sel b_sel immediate alu_op mar_write mar_wr_sel segment jump_type jump_target
+0010110100000000000000000000000000000100000000000000110000000000 // 167 /home/gatecat/80x86/rtl/microcode/bound.us:32 segment mem_read
+0010110100111100010000000000000000000000000000000000000000010100 // 168 /home/gatecat/80x86/rtl/microcode/bound.us:33 a_sel b_sel alu_op update_flags
+0010110101100000000000000000001110000000000000000000000000000000 // 169 /home/gatecat/80x86/rtl/microcode/bound.us:34 jump_type jump_target
+0010110101100001100011000000000000000001000000000000000000010100 // 16a /home/gatecat/80x86/rtl/microcode/bound.us:35 b_sel alu_op update_flags next_instruction
+0010110110000001100011000000000000000000000000000000000000010100 // 16b /home/gatecat/80x86/rtl/microcode/bound.us:37 b_sel alu_op update_flags
+0010010110100000001001000100000000000000000000000000000010000000 // 16c /home/gatecat/80x86/rtl/microcode/bound.us:38 b_sel immediate alu_op tmp_wr_en jump_type jump_target
+0010110111000011010000000000000000000001000000001100000000011000 // 16d /home/gatecat/80x86/rtl/microcode/daa.us:27 a_sel alu_op rd_sel_source rd_sel update_flags next_instruction
+0010110111100011011000000000000000000001000000001100000000011000 // 16e /home/gatecat/80x86/rtl/microcode/das.us:27 a_sel alu_op rd_sel_source rd_sel update_flags next_instruction
+0010111000000000111001000011000000110000000001001100000000000000 // 16f /home/gatecat/80x86/rtl/microcode/call.us:26 a_sel b_sel immediate alu_op rd_sel rd_sel_source mar_write mar_wr_sel
+0010111000101000000000000000000000001000010000000000101000000000 // 170 /home/gatecat/80x86/rtl/microcode/call.us:27 a_sel alu_op mdr_write ra_sel segment segment_force
+0010111001001000010001000000000001000011000000000000101000000000 // 171 /home/gatecat/80x86/rtl/microcode/call.us:28 segment segment_force mem_write a_sel b_sel alu_op load_ip next_instruction
+0010111010100000000000000000000001000000010000000000000000000000 // 172 /home/gatecat/80x86/rtl/microcode/call.us:30 a_sel alu_op load_ip jump_type ra_sel jump_target
+0010111010000000000000000000000000000100000000000000110000000000 // 173 /home/gatecat/80x86/rtl/microcode/call.us:32 segment mem_read
+0010111010111000000000000000000001000000010000000000000000000000 // 174 /home/gatecat/80x86/rtl/microcode/call.us:33 a_sel alu_op load_ip jump_type ra_sel jump_target
+0010111011000000111001000011000000110000000001001100000000000000 // 175 /home/gatecat/80x86/rtl/microcode/call.us:35 a_sel b_sel immediate alu_op rd_sel rd_sel_source mar_write mar_wr_sel
+0010111011101000000000000000000000001000010000000000101000000000 // 176 /home/gatecat/80x86/rtl/microcode/call.us:36 a_sel alu_op mdr_write ra_sel segment segment_force
+0010111100000000000000000000000000000011000000000000101000000000 // 177 /home/gatecat/80x86/rtl/microcode/call.us:37 segment segment_force mem_write next_instruction
+0010111100100000001010000000000000001000010000000000000000000000 // 178 /home/gatecat/80x86/rtl/microcode/call.us:42 b_sel alu_op mdr_write ra_sel
+0010111101000000111001000011000000110000000001001100101000000000 // 179 /home/gatecat/80x86/rtl/microcode/call.us:43 a_sel b_sel immediate alu_op rd_sel rd_sel_source mar_write mar_wr_sel segment_force segment
+0010111101100000000000000000000000000010010000000000101000000000 // 17a /home/gatecat/80x86/rtl/microcode/call.us:44 segment_force segment mem_write ra_sel
+0010111110000000111001000011000000110000000001001100000000000000 // 17b /home/gatecat/80x86/rtl/microcode/call.us:45 a_sel b_sel immediate alu_op rd_sel rd_sel_source mar_write mar_wr_sel
+0010111110101000000000000000000000001000000000000000101000000000 // 17c /home/gatecat/80x86/rtl/microcode/call.us:46 a_sel alu_op mdr_write segment_force segment
+0010111111000000000000000000000000000010000000000000101000000000 // 17d /home/gatecat/80x86/rtl/microcode/call.us:47 segment_force segment mem_write
+0010111111100000001100000000000000000001000000000000011100000000 // 17e /home/gatecat/80x86/rtl/microcode/call.us:48 b_sel alu_op segment_force segment segment_wr_en next_instruction
+0011000000000000000000000000000000000001000000000000000000000000 // 17f /home/gatecat/80x86/rtl/microcode/call.us:50 next_instruction
+0011000000100000001010000000000000001000010000000000000000000000 // 180 /home/gatecat/80x86/rtl/microcode/call.us:52 b_sel alu_op mdr_write ra_sel
+0011000001000000111001000011000000110000000001001100101000000000 // 181 /home/gatecat/80x86/rtl/microcode/call.us:53 a_sel b_sel immediate alu_op rd_sel rd_sel_source mar_write mar_wr_sel segment_force segment
+0011000001100000000000000000000000000010010000000000101000000000 // 182 /home/gatecat/80x86/rtl/microcode/call.us:54 segment_force segment mem_write ra_sel
+0011000010000000111001000011000000110000000001001100000000000000 // 183 /home/gatecat/80x86/rtl/microcode/call.us:55 a_sel b_sel immediate alu_op rd_sel rd_sel_source mar_write mar_wr_sel
+0011000010101000000000000000000000001000000000000000101000000000 // 184 /home/gatecat/80x86/rtl/microcode/call.us:56 a_sel alu_op mdr_write segment_force segment
+0011000011000000000000000000000000000010000000000000101000000000 // 185 /home/gatecat/80x86/rtl/microcode/call.us:57 segment_force segment mem_write
+0011000011100000000000000000000000010000000000000000110000000000 // 186 /home/gatecat/80x86/rtl/microcode/call.us:58 mar_wr_sel mar_write segment
+0011000100000000000000000000000000000100000000000000110000000000 // 187 /home/gatecat/80x86/rtl/microcode/call.us:59 segment mem_read
+0011000100111000000000000000000001000000000000000000000000000000 // 188 /home/gatecat/80x86/rtl/microcode/call.us:60 a_sel alu_op load_ip
+0011000101010000010001000011000000110000000000000000110000000000 // 189 /home/gatecat/80x86/rtl/microcode/call.us:61 a_sel b_sel immediate alu_op mar_wr_sel mar_write segment
+0011000101100000000000000000000000000100000000000000110000000000 // 18a /home/gatecat/80x86/rtl/microcode/call.us:62 segment mem_read
+0011000110011000000000000000000000000001000000000000011100000000 // 18b /home/gatecat/80x86/rtl/microcode/call.us:63 a_sel alu_op segment_wr_en segment_force segment next_instruction
+0011000110100000111000000000000000000001000000000000000000001110 // 18c /home/gatecat/80x86/rtl/microcode/cmp.us:31 a_sel b_sel alu_op update_flags width next_instruction
+0011000111000000000000000000000000000100000000000000110000000010 // 18d /home/gatecat/80x86/rtl/microcode/cmp.us:33 segment mem_read width
+0011000111111000111000000000000000000001000000000000000000001110 // 18e /home/gatecat/80x86/rtl/microcode/cmp.us:34 a_sel b_sel alu_op update_flags width next_instruction
+0011001000000001000000000000000000000001000000000000000000001110 // 18f /home/gatecat/80x86/rtl/microcode/cmp.us:41 a_sel b_sel alu_op update_flags width next_instruction
+0011001000100000000000000000000000000100000000000000110000000010 // 190 /home/gatecat/80x86/rtl/microcode/cmp.us:43 segment mem_read width
+0011001001011001000000000000000000000001000000000000000000001110 // 191 /home/gatecat/80x86/rtl/microcode/cmp.us:44 a_sel b_sel alu_op update_flags width next_instruction
+0011001001100000111001000000000000000001000000000000000000001110 // 192 /home/gatecat/80x86/rtl/microcode/cmp.us:51 a_sel b_sel alu_op update_flags width next_instruction
+0011001010000000111001000000000000000001000000000000000000001110 // 193 /home/gatecat/80x86/rtl/microcode/cmp.us:53 a_sel b_sel alu_op update_flags width next_instruction
+0011001010100000000000000000000000000100000000000000110000000010 // 194 /home/gatecat/80x86/rtl/microcode/cmp.us:55 segment mem_read width
+0011001011011000111001000000000000000001000000000000000000001110 // 195 /home/gatecat/80x86/rtl/microcode/cmp.us:56 a_sel b_sel alu_op update_flags width next_instruction
+0011001100000000000000000000000000000000100000000000000000000000 // 196 /home/gatecat/80x86/rtl/microcode/cmp.us:58 ra_modrm_rm_reg jump_type jump_target
+0011001100100000000000000000000000000000100000000000110000000000 // 197 /home/gatecat/80x86/rtl/microcode/cmp.us:60 ra_modrm_rm_reg segment jump_type jump_target
+0011001100100000111001000000000000000001000000000000000000001100 // 198 /home/gatecat/80x86/rtl/microcode/cmp.us:62 a_sel b_sel alu_op update_flags next_instruction
+0011001101000000000000000000000000000100000000000000110000000000 // 199 /home/gatecat/80x86/rtl/microcode/cmp.us:64 segment mem_read
+0011001101111000111001000000000000000001000000000000000000001100 // 19a /home/gatecat/80x86/rtl/microcode/cmp.us:65 a_sel b_sel alu_op update_flags next_instruction
+0011001111000000000000000000001000000000011110000000000000000000 // 19b /home/gatecat/80x86/rtl/microcode/cmps.us:26 ra_sel rb_cl jump_type jump_target
+0011010011000000000000000000010000000000000100000000000000000000 // 19c /home/gatecat/80x86/rtl/microcode/cmps.us:28 ra_sel jump_type jump_target
+0011001111000000111001000101000000000000011100011100000000000000 // 19d /home/gatecat/80x86/rtl/microcode/cmps.us:29 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0011001111100000000000000000000000110000011100000000001000000000 // 19e /home/gatecat/80x86/rtl/microcode/cmps.us:31 ra_sel a_sel alu_op mar_wr_sel mar_write segment segment_force
+0011010000011000000000000000000000000100000000000000001010000001 // 19f /home/gatecat/80x86/rtl/microcode/cmps.us:32 width segment segment_force mem_read a_sel alu_op tmp_wr_en
+0011010000110010111001000101000000000000011001111100000000000000 // 1a0 /home/gatecat/80x86/rtl/microcode/cmps.us:33 a_sel b_sel immediate alu_op rd_sel_source rd_sel ra_sel
+0011010001000000000000000000000000110000011000000000110000000000 // 1a1 /home/gatecat/80x86/rtl/microcode/cmps.us:34 a_sel alu_op mar_wr_sel mar_write segment ra_sel
+0011010001100010111001000101000000000000000001101100110000000000 // 1a2 /home/gatecat/80x86/rtl/microcode/cmps.us:35 a_sel b_sel immediate alu_op rd_sel_source rd_sel segment
+0011010010000000000000000000000000000100000000000000110000000001 // 1a3 /home/gatecat/80x86/rtl/microcode/cmps.us:36 width segment mem_read
+0011010011011000111011000000001000000000000000000000000000001101 // 1a4 /home/gatecat/80x86/rtl/microcode/cmps.us:37 width a_sel b_sel alu_op update_flags jump_type jump_target
+0011001110000001011000010000001100000000000010000000000000000000 // 1a5 /home/gatecat/80x86/rtl/microcode/cmps.us:38 rb_cl alu_op ext_int_yield jump_type jump_target
+0011010011100000000000000000000000000001000000000000000000000000 // 1a6 /home/gatecat/80x86/rtl/microcode/cmps.us:40 next_instruction
+0011010101000000000000000000001000000000011110000000000000000000 // 1a7 /home/gatecat/80x86/rtl/microcode/cmps.us:45 ra_sel rb_cl jump_type jump_target
+0011011000100000000000000000010000000000000100000000000000000000 // 1a8 /home/gatecat/80x86/rtl/microcode/cmps.us:47 ra_sel jump_type jump_target
+0011010101000000111001000101000000000000011100011100000000000000 // 1a9 /home/gatecat/80x86/rtl/microcode/cmps.us:48 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0011010101100000000000000000000000110000011100000000001000000000 // 1aa /home/gatecat/80x86/rtl/microcode/cmps.us:50 ra_sel a_sel alu_op mar_wr_sel mar_write segment segment_force
+0011010110011000000000000000000000000100011100000000001010000000 // 1ab /home/gatecat/80x86/rtl/microcode/cmps.us:51 segment segment_force mem_read a_sel alu_op tmp_wr_en ra_sel
+0011010110100010111001000011000000000000011001111100000000000000 // 1ac /home/gatecat/80x86/rtl/microcode/cmps.us:52 a_sel b_sel immediate alu_op rd_sel_source rd_sel ra_sel
+0011010111000000000000000000000000110000011000000000110000000000 // 1ad /home/gatecat/80x86/rtl/microcode/cmps.us:53 a_sel alu_op mar_wr_sel mar_write segment ra_sel
+0011010111100010111001000011000000000000000001101100110000000000 // 1ae /home/gatecat/80x86/rtl/microcode/cmps.us:54 a_sel b_sel immediate alu_op rd_sel_source rd_sel segment
+0011011000111000111011000000001000000100000000000000110000001100 // 1af /home/gatecat/80x86/rtl/microcode/cmps.us:55 segment mem_read a_sel b_sel alu_op update_flags jump_type jump_target
+0011010100000001011000010000001100000000000010000000000000000000 // 1b0 /home/gatecat/80x86/rtl/microcode/cmps.us:56 rb_cl alu_op ext_int_yield jump_type jump_target
+0011011001000000000000000000000000000001000000000000000000000000 // 1b1 /home/gatecat/80x86/rtl/microcode/cmps.us:58 next_instruction
+0011011010000000000000000000000000001000000000000000000000000001 // 1b2 /home/gatecat/80x86/rtl/microcode/div.us:23 width a_sel alu_op mdr_write jump_type jump_target
+0011011010000000000000000000000000000100000000000000110000000001 // 1b3 /home/gatecat/80x86/rtl/microcode/div.us:25 width segment mem_read jump_type jump_target
+0011011010100000000000000000000000000000000000000000000000000000 // 1b4 /home/gatecat/80x86/rtl/microcode/div.us:27 ra_sel
+0011011011000000000000000000000000000000000000000000000010000000 // 1b5 /home/gatecat/80x86/rtl/microcode/div.us:28 a_sel alu_op tmp_wr_en
+0011011011100011110000000000000000000000000000000000000000000001 // 1b6 /home/gatecat/80x86/rtl/microcode/div.us:29 width alu_op
+0011011100000000000000000000000000000000000000001101000000000001 // 1b7 /home/gatecat/80x86/rtl/microcode/div.us:31 width reg_wr_source rd_sel_source rd_sel
+0011011100100000000000000000000000000001000001001110000000000001 // 1b8 /home/gatecat/80x86/rtl/microcode/div.us:32 width reg_wr_source rd_sel_source rd_sel next_instruction
+0011011101100000000000000000000000001000000000000000000000000000 // 1b9 /home/gatecat/80x86/rtl/microcode/div.us:34 a_sel alu_op mdr_write ra_sel jump_type jump_target
+0011011101100000000000000000000000000100000000000000110000000000 // 1ba /home/gatecat/80x86/rtl/microcode/div.us:36 segment mem_read ra_sel jump_type jump_target
+0011011110000000000000000000000000000000001000000000000010000000 // 1bb /home/gatecat/80x86/rtl/microcode/div.us:38 a_sel alu_op tmp_wr_en ra_sel
+0011011110100011110000000000000000000000001000000000000000000000 // 1bc /home/gatecat/80x86/rtl/microcode/div.us:39 ra_sel alu_op
+0011011111000000000000000000000000000000000000001101000000000000 // 1bd /home/gatecat/80x86/rtl/microcode/div.us:41 reg_wr_source rd_sel_source rd_sel
+0011011111100000000000000000000000000001000000101110000000000000 // 1be /home/gatecat/80x86/rtl/microcode/div.us:42 reg_wr_source rd_sel_source rd_sel next_instruction
+0011100000100000000000000000000000001000000000000000000000000001 // 1bf /home/gatecat/80x86/rtl/microcode/div.us:44 width a_sel alu_op mdr_write jump_type jump_target
+0011100000100000000000000000000000000100000000000000110000000001 // 1c0 /home/gatecat/80x86/rtl/microcode/div.us:46 width segment mem_read jump_type jump_target
+0011100001000000000000000000000000000000000000000000000000000000 // 1c1 /home/gatecat/80x86/rtl/microcode/div.us:48 ra_sel
+0011100001100000000000000000000000000000000000000000000010000000 // 1c2 /home/gatecat/80x86/rtl/microcode/div.us:49 a_sel alu_op tmp_wr_en
+0011011011100011111000000000000000000000000000000000000000000001 // 1c3 /home/gatecat/80x86/rtl/microcode/div.us:50 width alu_op jump_type jump_target
+0011100011000000000000000000000000001000000000000000000000000000 // 1c4 /home/gatecat/80x86/rtl/microcode/div.us:52 a_sel alu_op mdr_write ra_sel jump_type jump_target
+0011100011000000000000000000000000000100000000000000110000000000 // 1c5 /home/gatecat/80x86/rtl/microcode/div.us:54 segment mem_read ra_sel jump_type jump_target
+0011100011100000000000000000000000000000001000000000000010000000 // 1c6 /home/gatecat/80x86/rtl/microcode/div.us:56 a_sel alu_op tmp_wr_en ra_sel
+0011011110100011111000000000000000000000001000000000000000000000 // 1c7 /home/gatecat/80x86/rtl/microcode/div.us:57 ra_sel alu_op jump_type jump_target
+0011100100100000000000000000000000000000000000000000000000000001 // 1c8 /home/gatecat/80x86/rtl/microcode/div.us:62 width ra_sel
+0011100101000000000000000000000000000000000000000000000010000000 // 1c9 /home/gatecat/80x86/rtl/microcode/div.us:63 a_sel alu_op tmp_wr_en
+0011100101100011110000000000000000000000000000000000000000000001 // 1ca /home/gatecat/80x86/rtl/microcode/div.us:64 width alu_op
+0011100110000000000000000000000000000000000001001101000000000001 // 1cb /home/gatecat/80x86/rtl/microcode/div.us:65 width reg_wr_source rd_sel_source rd_sel
+0011100110100000000000000000000000000000000000001110000000000001 // 1cc /home/gatecat/80x86/rtl/microcode/div.us:66 width reg_wr_source rd_sel_source rd_sel
+0011100111000000000000000000000000000000000000000000000000000000 // 1cd /home/gatecat/80x86/rtl/microcode/div.us:67 ra_sel
+0011100111100000010001000001000000000001000000000000000000001000 // 1ce /home/gatecat/80x86/rtl/microcode/div.us:68 a_sel b_sel immediate alu_op update_flags next_instruction
+0011101000000000111001000011000000110000010101001100000000000000 // 1cf /home/gatecat/80x86/rtl/microcode/enter.us:26 a_sel b_sel immediate alu_op mar_write mar_wr_sel ra_sel rd_sel_source rd_sel
+0011101000100000000000000000000000001000000000000000101000000000 // 1d0 /home/gatecat/80x86/rtl/microcode/enter.us:27 a_sel alu_op mdr_write segment_force segment
+0011110000000000000000000000010010000010010000000000101000000000 // 1d1 /home/gatecat/80x86/rtl/microcode/enter.us:28 segment_force segment mem_write ra_sel jump_type jump_target
+0011101001100100011100000000000000110000010000000000000000000000 // 1d2 /home/gatecat/80x86/rtl/microcode/enter.us:29 a_sel b_sel alu_op mar_write mar_wr_sel ra_sel
+0011101010000000000000000000000000001000000000000000101000000000 // 1d3 /home/gatecat/80x86/rtl/microcode/enter.us:30 a_sel alu_op mdr_write segment_force segment
+0011101010100000000000000000000000000010000000000000101000000000 // 1d4 /home/gatecat/80x86/rtl/microcode/enter.us:31 segment_force segment mem_write
+0011101101100000000000000000010010000000010100000000000000000000 // 1d5 /home/gatecat/80x86/rtl/microcode/enter.us:33 jump_type ra_sel jump_target
+0011101011100000111001000011000000110000000001011100101000000000 // 1d6 /home/gatecat/80x86/rtl/microcode/enter.us:34 a_sel b_sel immediate alu_op rd_sel rd_sel_source segment_force segment mar_write mar_wr_sel
+0011101100000000000000000000000000000100010000000000101000000000 // 1d7 /home/gatecat/80x86/rtl/microcode/enter.us:35 segment_force segment mem_read ra_sel
+0011101100100000111001000011000000110000000001001100101000000000 // 1d8 /home/gatecat/80x86/rtl/microcode/enter.us:36 a_sel b_sel immediate alu_op rd_sel rd_sel_source segment_force segment mar_write mar_wr_sel
+0011101101000000000000000000000000000010000000000000101000000000 // 1d9 /home/gatecat/80x86/rtl/microcode/enter.us:37 segment_force segment mem_write
+0011101010100000000000000000000000000000000000000000000000000000 // 1da /home/gatecat/80x86/rtl/microcode/enter.us:38 jump_type jump_target
+0011101110000000000000000000000000000000010000000000000000000000 // 1db /home/gatecat/80x86/rtl/microcode/enter.us:40 ra_sel
+0011101110100000111001000011000000110000000001001100101000000000 // 1dc /home/gatecat/80x86/rtl/microcode/enter.us:41 a_sel b_sel immediate alu_op rd_sel rd_sel_source segment_force segment mar_write mar_wr_sel
+0011101111000000000000000000000000000100010000000000101000000000 // 1dd /home/gatecat/80x86/rtl/microcode/enter.us:42 segment_force segment mem_read ra_sel
+0011101111111000000000000000000000000000010001011100000000000000 // 1de /home/gatecat/80x86/rtl/microcode/enter.us:43 a_sel alu_op rd_sel rd_sel_source ra_sel
+0011110000000000111011000000000000000001000001001100000000000000 // 1df /home/gatecat/80x86/rtl/microcode/enter.us:44 a_sel b_sel alu_op rd_sel rd_sel_source next_instruction
+0011110000100000000000000000000000000000010001011100000000000000 // 1e0 /home/gatecat/80x86/rtl/microcode/enter.us:46 a_sel alu_op rd_sel rd_sel_source ra_sel
+0011110001000000111011000000000000000001000001001100000000000000 // 1e1 /home/gatecat/80x86/rtl/microcode/enter.us:47 a_sel b_sel alu_op rd_sel rd_sel_source next_instruction
+0011110001100000000000000000000000000001000000000000000000000000 // 1e2 /home/gatecat/80x86/rtl/microcode/esc.us:43 next_instruction
+0011110010000100000001000000000000000001000001001100000000000001 // 1e3 /home/gatecat/80x86/rtl/microcode/extend.us:26 width a_sel b_sel alu_op rd_sel_source rd_sel next_instruction
+0011110010100100000001000000000000000001000000101100000000000000 // 1e4 /home/gatecat/80x86/rtl/microcode/extend.us:31 a_sel b_sel alu_op rd_sel_source rd_sel next_instruction
+0011110011000001101000000000000000000001000000000000000000011000 // 1e5 /home/gatecat/80x86/rtl/microcode/flags.us:43 a_sel alu_op update_flags next_instruction
+0011110011100001001000000000000000000001000000001100000000000001 // 1e6 /home/gatecat/80x86/rtl/microcode/flags.us:48 width a_sel b_sel alu_op rd_sel_source rd_sel next_instruction
+0011110011100000000000010000000000000000000000000000000000000000 // 1e7 /home/gatecat/80x86/rtl/microcode/hlt.us:26 jump_type ext_int_yield jump_target
+0011111000000000000000000000000010000000100000000000110000000001 // 1e8 /home/gatecat/80x86/rtl/microcode/inc.us:27 width ra_modrm_rm_reg segment jump_type jump_target
+0011111001100000000000000000000010000000100000000000110000000001 // 1e9 /home/gatecat/80x86/rtl/microcode/inc.us:28 width ra_modrm_rm_reg segment jump_type jump_target
+0011110101100000000000000000000000000001000000000000000000000000 // 1ea /home/gatecat/80x86/rtl/microcode/inc.us:29 next_instruction
+0011110110000000000000000000000000000001000000000000000000000000 // 1eb /home/gatecat/80x86/rtl/microcode/inc.us:30 next_instruction
+0011110110100000000000000000000000000001000000000000000000000000 // 1ec /home/gatecat/80x86/rtl/microcode/inc.us:31 next_instruction
+0011110111000000000000000000000000000001000000000000000000000000 // 1ed /home/gatecat/80x86/rtl/microcode/inc.us:32 next_instruction
+0011110111100000000000000000000000000001000000000000000000000000 // 1ee /home/gatecat/80x86/rtl/microcode/inc.us:33 next_instruction
+1000011101000000000000000000000000000000000000000000000000000000 // 1ef /home/gatecat/80x86/rtl/microcode/inc.us:34 jump_type jump_target
+0011111000100000010001000101000000000001000000001000000000100110 // 1f0 /home/gatecat/80x86/rtl/microcode/inc.us:36 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0011111001000000000000000000000000000100000000000000110000000010 // 1f1 /home/gatecat/80x86/rtl/microcode/inc.us:38 width segment mem_read
+1001001100111000010001000101000000001000000000000000110000100110 // 1f2 /home/gatecat/80x86/rtl/microcode/inc.us:39 a_sel b_sel immediate alu_op mdr_write update_flags width segment jump_type jump_target
+0011111010000000111001000101000000000001000000001000000000100110 // 1f3 /home/gatecat/80x86/rtl/microcode/inc.us:41 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0011111010100000000000000000000000000100000000000000110000000010 // 1f4 /home/gatecat/80x86/rtl/microcode/inc.us:43 width segment mem_read
+1001001100111000111001000101000000001000000000000000110000100110 // 1f5 /home/gatecat/80x86/rtl/microcode/inc.us:44 a_sel b_sel immediate alu_op mdr_write update_flags width segment jump_type jump_target
+0011111011100000010001000101000000000001000000001100000000100100 // 1f6 /home/gatecat/80x86/rtl/microcode/inc.us:98 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0011111100000000010001000101000000000001000000011100000000100100 // 1f7 /home/gatecat/80x86/rtl/microcode/inc.us:102 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0011111100100000010001000101000000000001000000101100000000100100 // 1f8 /home/gatecat/80x86/rtl/microcode/inc.us:106 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0011111101000000010001000101000000000001000000111100000000100100 // 1f9 /home/gatecat/80x86/rtl/microcode/inc.us:110 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0011111101100000010001000101000000000001000001001100000000100100 // 1fa /home/gatecat/80x86/rtl/microcode/inc.us:114 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0011111110000000010001000101000000000001000001011100000000100100 // 1fb /home/gatecat/80x86/rtl/microcode/inc.us:118 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0011111110100000010001000101000000000001000001101100000000100100 // 1fc /home/gatecat/80x86/rtl/microcode/inc.us:122 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0011111111000000010001000101000000000001000001111100000000100100 // 1fd /home/gatecat/80x86/rtl/microcode/inc.us:126 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0011111111100000111001000101000000000001000000001100000000100100 // 1fe /home/gatecat/80x86/rtl/microcode/inc.us:130 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0100000000000000111001000101000000000001000000011100000000100100 // 1ff /home/gatecat/80x86/rtl/microcode/inc.us:134 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0100000000100000111001000101000000000001000000101100000000100100 // 200 /home/gatecat/80x86/rtl/microcode/inc.us:138 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0100000001000000111001000101000000000001000000111100000000100100 // 201 /home/gatecat/80x86/rtl/microcode/inc.us:142 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0100000001100000111001000101000000000001000001001100000000100100 // 202 /home/gatecat/80x86/rtl/microcode/inc.us:146 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0100000010000000111001000101000000000001000001011100000000100100 // 203 /home/gatecat/80x86/rtl/microcode/inc.us:150 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0100000010100000111001000101000000000001000001101100000000100100 // 204 /home/gatecat/80x86/rtl/microcode/inc.us:154 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0100000011000000111001000101000000000001000001111100000000100100 // 205 /home/gatecat/80x86/rtl/microcode/inc.us:158 a_sel b_sel immediate alu_op rd_sel_source rd_sel update_flags next_instruction
+0100000011110000100001001000000000110000000000000000000000000000 // 206 /home/gatecat/80x86/rtl/microcode/int.us:29 a_sel b_sel immediate alu_op mar_write mar_wr_sel
+0010010110110011100001001001000000000000000000000000000010000000 // 207 /home/gatecat/80x86/rtl/microcode/int.us:30 a_sel b_sel immediate alu_op tmp_wr_en jump_type jump_target
+0100000101000000001001001010001110000000010000000000000010000000 // 208 /home/gatecat/80x86/rtl/microcode/int.us:35 b_sel immediate alu_op tmp_wr_en jump_type ra_sel jump_target
+0100000101000000000000000000000000000001000000000000000000000000 // 209 /home/gatecat/80x86/rtl/microcode/int.us:36 next_instruction
+0010010110100000000000000000000000000000000000000000000000000000 // 20a /home/gatecat/80x86/rtl/microcode/int.us:38 jump_type jump_target
+0100000110000000111001000011000000110000000000000000101000000000 // 20b /home/gatecat/80x86/rtl/microcode/int.us:76 a_sel b_sel immediate alu_op mar_write mar_wr_sel segment segment_force
+0100000110100000000000000000000000000010000000000000101000000000 // 20c /home/gatecat/80x86/rtl/microcode/int.us:77 segment segment_force mem_write
+0100000111010000111001000011000000110000000000000000011000000000 // 20d /home/gatecat/80x86/rtl/microcode/int.us:78 a_sel b_sel immediate alu_op mar_write mar_wr_sel segment_force segment
+0100000111100000001010000000000000001000000000000000101000000000 // 20e /home/gatecat/80x86/rtl/microcode/int.us:79 b_sel alu_op mdr_write segment segment_force
+0100001000000000000000000000000000000010000000000000101000000000 // 20f /home/gatecat/80x86/rtl/microcode/int.us:80 segment segment_force mem_write
+0100001000110000111001000011000000110000000000000000000000000000 // 210 /home/gatecat/80x86/rtl/microcode/int.us:81 a_sel b_sel immediate alu_op mar_write mar_wr_sel
+0100001001001000000000000000000000001000000000000000101000000000 // 211 /home/gatecat/80x86/rtl/microcode/int.us:82 a_sel alu_op mdr_write segment segment_force
+0100001001100000000000000000000000000010000000000000101000000000 // 212 /home/gatecat/80x86/rtl/microcode/int.us:83 segment segment_force mem_write
+0100001010010000000000000000000000000000000001001100000000000000 // 213 /home/gatecat/80x86/rtl/microcode/int.us:84 a_sel alu_op rd_sel_source rd_sel
+0100001010100001100001000001000000000000000000000000000000101000 // 214 /home/gatecat/80x86/rtl/microcode/int.us:85 b_sel immediate alu_op update_flags
+0100001011000000001001000001000000000000000000000000011100000000 // 215 /home/gatecat/80x86/rtl/microcode/int.us:86 b_sel immediate alu_op segment_force segment segment_wr_en
+0100001011100000001011000000000000110000000000000000011000000000 // 216 /home/gatecat/80x86/rtl/microcode/int.us:87 b_sel alu_op mar_wr_sel mar_write segment segment_force
+0100001100000000000000000000000000000100000000000000011000000000 // 217 /home/gatecat/80x86/rtl/microcode/int.us:88 segment_force segment mem_read
+0100001100111000000000000000000001000000000000000000000000000000 // 218 /home/gatecat/80x86/rtl/microcode/int.us:89 a_sel alu_op load_ip
+0100001101010000010001000011000000110000000000000000011000000000 // 219 /home/gatecat/80x86/rtl/microcode/int.us:90 a_sel b_sel immediate alu_op mar_write mar_wr_sel segment segment_force
+0100001101100000000000000000000000000100000000000000011000000000 // 21a /home/gatecat/80x86/rtl/microcode/int.us:91 segment_force segment mem_read
+0100001110011000000000000000000000000001000000000000011100000000 // 21b /home/gatecat/80x86/rtl/microcode/int.us:92 a_sel alu_op segment_force segment segment_wr_en next_instruction
+0100001110110000100001001000000000110000000000000000000000000000 // 21c /home/gatecat/80x86/rtl/microcode/io.us:29 a_sel b_sel immediate alu_op mar_write mar_wr_sel
+0100001111000000000000000000000000001000000000000000000000000000 // 21d /home/gatecat/80x86/rtl/microcode/io.us:30 a_sel alu_op mdr_write
+0100001111100000000000000000100000000011000000000000000000000010 // 21e /home/gatecat/80x86/rtl/microcode/io.us:31 width io mem_write next_instruction
+0100010000000000000000000000000000001000001000000000000000000000 // 21f /home/gatecat/80x86/rtl/microcode/io.us:38 a_sel alu_op mdr_write ra_sel
+0100010000100000000000000000000000110000000000000000000000000000 // 220 /home/gatecat/80x86/rtl/microcode/io.us:39 a_sel alu_op mar_write mar_wr_sel
+0100010001000000000000000000100000000011000000000000000000000010 // 221 /home/gatecat/80x86/rtl/microcode/io.us:40 width io mem_write next_instruction
+0100010001110000100001001000000000110000000000000000000000000000 // 222 /home/gatecat/80x86/rtl/microcode/io.us:47 a_sel b_sel immediate alu_op mar_write mar_wr_sel
+0100010010000000000000000000100000000100000000000000000000000010 // 223 /home/gatecat/80x86/rtl/microcode/io.us:48 width io mem_read
+0100010010111000000000000000000000000001000000001100000000000010 // 224 /home/gatecat/80x86/rtl/microcode/io.us:49 a_sel alu_op rd_sel_source rd_sel width next_instruction
+0100010011000000000000000000000000110000000000000000000000000000 // 225 /home/gatecat/80x86/rtl/microcode/io.us:56 a_sel alu_op mar_write mar_wr_sel
+0100010011100000000000000000100000000100000000000000000000000010 // 226 /home/gatecat/80x86/rtl/microcode/io.us:57 width io mem_read
+0100010100011000000000000000000000000001000000001100000000000010 // 227 /home/gatecat/80x86/rtl/microcode/io.us:58 a_sel alu_op rd_sel_source rd_sel width next_instruction
+0100010110000000000000000000001000000000011000000000000000000000 // 228 /home/gatecat/80x86/rtl/microcode/io.us:63 ra_sel jump_type jump_target
+0100010101000000000000000000000000000000000010000000000000000000 // 229 /home/gatecat/80x86/rtl/microcode/io.us:64 rb_cl
+0100011001100000111001000001010000000000000100000000000000000000 // 22a /home/gatecat/80x86/rtl/microcode/io.us:66 ra_sel a_sel b_sel immediate alu_op jump_type jump_target
+0100010110000000111001000101000000000000011000011100000000000000 // 22b /home/gatecat/80x86/rtl/microcode/io.us:67 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0100010110100000000000000000000000110000011000000000110000000000 // 22c /home/gatecat/80x86/rtl/microcode/io.us:69 ra_sel a_sel alu_op mar_wr_sel mar_write segment
+0100010111000010111001000101000000000000000001101100110000000000 // 22d /home/gatecat/80x86/rtl/microcode/io.us:70 a_sel b_sel immediate alu_op rd_sel_source rd_sel segment
+0100010111100000000000000000000000000100000000000000110000000001 // 22e /home/gatecat/80x86/rtl/microcode/io.us:71 width segment mem_read
+0100011000000000000000000000000000000000001000000000000000000000 // 22f /home/gatecat/80x86/rtl/microcode/io.us:72 ra_sel
+0100011000100000000000000000000000110000000000000000000000000000 // 230 /home/gatecat/80x86/rtl/microcode/io.us:73 a_sel alu_op mar_write mar_wr_sel
+0100011001100000000000000000101000000010000000000000000000000001 // 231 /home/gatecat/80x86/rtl/microcode/io.us:74 width io mem_write jump_type jump_target
+0100010101000000000000010000000000000000000010000000000000000000 // 232 /home/gatecat/80x86/rtl/microcode/io.us:75 rb_cl ext_int_yield jump_type jump_target
+0100011010000000000000000000000000000001000000000000000000000000 // 233 /home/gatecat/80x86/rtl/microcode/io.us:77 next_instruction
+0100011100000000000000000000001000000000011000000000000000000000 // 234 /home/gatecat/80x86/rtl/microcode/io.us:82 ra_sel jump_type jump_target
+0100011011000000000000000000000000000000000010000000000000000000 // 235 /home/gatecat/80x86/rtl/microcode/io.us:83 rb_cl
+0100011111100000111001000001010000000000000100000000000000000000 // 236 /home/gatecat/80x86/rtl/microcode/io.us:85 ra_sel a_sel b_sel immediate alu_op jump_type jump_target
+0100011100000000111001000101000000000000011000011100000000000000 // 237 /home/gatecat/80x86/rtl/microcode/io.us:86 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0100011100100000000000000000000000110000011000000000110000000000 // 238 /home/gatecat/80x86/rtl/microcode/io.us:88 ra_sel a_sel alu_op mar_wr_sel mar_write segment
+0100011101000010111001000011000000000000000001101100110000000000 // 239 /home/gatecat/80x86/rtl/microcode/io.us:89 a_sel b_sel immediate alu_op rd_sel_source rd_sel segment
+0100011101100000000000000000000000000100000000000000110000000000 // 23a /home/gatecat/80x86/rtl/microcode/io.us:90 segment mem_read
+0100011110000000000000000000000000000000001000000000000000000000 // 23b /home/gatecat/80x86/rtl/microcode/io.us:91 ra_sel
+0100011110100000000000000000000000110000000000000000000000000000 // 23c /home/gatecat/80x86/rtl/microcode/io.us:92 a_sel alu_op mar_write mar_wr_sel
+0100011111100000000000000000101000000010000000000000000000000000 // 23d /home/gatecat/80x86/rtl/microcode/io.us:93 io mem_write jump_type jump_target
+0100011011000000000000010000000000000000000010000000000000000000 // 23e /home/gatecat/80x86/rtl/microcode/io.us:94 rb_cl ext_int_yield jump_type jump_target
+0100100000000000000000000000000000000001000000000000000000000000 // 23f /home/gatecat/80x86/rtl/microcode/io.us:96 next_instruction
+0100100010000000000000000000001000000000001000000000000000000000 // 240 /home/gatecat/80x86/rtl/microcode/io.us:101 ra_sel jump_type jump_target
+0100100001000000000000000000000000000000000010000000000000000000 // 241 /home/gatecat/80x86/rtl/microcode/io.us:102 rb_cl
+0100100110000000111001000001010000000000000100000000000000000000 // 242 /home/gatecat/80x86/rtl/microcode/io.us:104 ra_sel a_sel b_sel immediate alu_op jump_type jump_target
+0100100010000000111001000101000000000000001000011100000000000000 // 243 /home/gatecat/80x86/rtl/microcode/io.us:105 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0100100010100000000000000000000000110000000000000000000000000000 // 244 /home/gatecat/80x86/rtl/microcode/io.us:107 a_sel alu_op mar_wr_sel mar_write
+0100100011000000000000000000100000000100000000000000000000000001 // 245 /home/gatecat/80x86/rtl/microcode/io.us:108 width io mem_read
+0100100011100000000000000000000000000000011100000000000000000000 // 246 /home/gatecat/80x86/rtl/microcode/io.us:109 ra_sel
+0100100100000000000000000000000000110000000000000000001000000000 // 247 /home/gatecat/80x86/rtl/microcode/io.us:110 a_sel alu_op mar_write mar_wr_sel segment segment_force
+0100100100100000000000000000000000000010000000000000001000000001 // 248 /home/gatecat/80x86/rtl/microcode/io.us:111 segment segment_force width mem_write
+0100100101000000000000000000000000000000011100000000000000000000 // 249 /home/gatecat/80x86/rtl/microcode/io.us:112 ra_sel
+0100100110000010111001000101001000000000000001111100000000000000 // 24a /home/gatecat/80x86/rtl/microcode/io.us:113 a_sel b_sel immediate alu_op rd_sel_source rd_sel jump_type jump_target
+0100100001000000000000010000000000000000000010000000000000000000 // 24b /home/gatecat/80x86/rtl/microcode/io.us:114 rb_cl ext_int_yield jump_type jump_target
+0100100110100000000000000000000000000001000000000000000000000000 // 24c /home/gatecat/80x86/rtl/microcode/io.us:116 next_instruction
+0100101000100000000000000000001000000000001000000000000000000000 // 24d /home/gatecat/80x86/rtl/microcode/io.us:121 ra_sel jump_type jump_target
+0100100111100000000000000000000000000000000010000000000000000000 // 24e /home/gatecat/80x86/rtl/microcode/io.us:122 rb_cl
+0100101100100000111001000001010000000000000100000000000000000000 // 24f /home/gatecat/80x86/rtl/microcode/io.us:124 ra_sel a_sel b_sel immediate alu_op jump_type jump_target
+0100101000100000111001000101000000000000001000011100000000000000 // 250 /home/gatecat/80x86/rtl/microcode/io.us:125 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0100101001000000000000000000000000110000000000000000000000000000 // 251 /home/gatecat/80x86/rtl/microcode/io.us:127 a_sel alu_op mar_wr_sel mar_write
+0100101001100000000000000000100000000100000000000000000000000000 // 252 /home/gatecat/80x86/rtl/microcode/io.us:128 io mem_read
+0100101010000000000000000000000000000000011100000000000000000000 // 253 /home/gatecat/80x86/rtl/microcode/io.us:129 ra_sel
+0100101010100000000000000000000000110000000000000000001000000000 // 254 /home/gatecat/80x86/rtl/microcode/io.us:130 a_sel alu_op mar_write mar_wr_sel segment segment_force
+0100101011000000000000000000000000000010000000000000001000000000 // 255 /home/gatecat/80x86/rtl/microcode/io.us:131 segment segment_force mem_write
+0100101011100000000000000000000000000000011100000000000000000000 // 256 /home/gatecat/80x86/rtl/microcode/io.us:132 ra_sel
+0100101100100010111001000011001000000000000001111100000000000000 // 257 /home/gatecat/80x86/rtl/microcode/io.us:133 a_sel b_sel immediate alu_op rd_sel_source rd_sel jump_type jump_target
+0100100111100000000000010000000000000000000010000000000000000000 // 258 /home/gatecat/80x86/rtl/microcode/io.us:134 rb_cl ext_int_yield jump_type jump_target
+0100101101000000000000000000000000000001000000000000000000000000 // 259 /home/gatecat/80x86/rtl/microcode/io.us:136 next_instruction
+0100101101100000001100000000000000000001000000000000011100000000 // 25a /home/gatecat/80x86/rtl/microcode/jmp.us:28 b_sel alu_op segment_wr_en segment_force segment next_instruction
+0100101110000000000000000000000001000001000000000000000000000000 // 25b /home/gatecat/80x86/rtl/microcode/jmp.us:32 a_sel alu_op load_ip next_instruction
+0100101110100000000000000000000000000100000000000000110000000000 // 25c /home/gatecat/80x86/rtl/microcode/jmp.us:34 segment mem_read
+0100101111011000000000000000000001000001000000000000000000000000 // 25d /home/gatecat/80x86/rtl/microcode/jmp.us:35 a_sel alu_op load_ip next_instruction
+0100101111100000000000000000000000000001000000000000000000000000 // 25e /home/gatecat/80x86/rtl/microcode/jmp.us:37 next_instruction
+0100110000000000000000000000000000000100000000000000110000000000 // 25f /home/gatecat/80x86/rtl/microcode/jmp.us:39 segment mem_read
+0100110000111000000000000000000001000000000000000000000000000000 // 260 /home/gatecat/80x86/rtl/microcode/jmp.us:40 a_sel alu_op load_ip
+0100110001010000010001000011000000110000000000000000110000000000 // 261 /home/gatecat/80x86/rtl/microcode/jmp.us:41 immediate a_sel b_sel alu_op mar_wr_sel mar_write segment
+0100110001100000000000000000000000000100000000000000110000000000 // 262 /home/gatecat/80x86/rtl/microcode/jmp.us:42 segment mem_read
+0100110010011000000000000000000000000001000000000000011100000000 // 263 /home/gatecat/80x86/rtl/microcode/jmp.us:43 a_sel alu_op segment_wr_en segment_force segment next_instruction
+0100110011000000000000000000010000000000000000000000000000000000 // 264 /home/gatecat/80x86/rtl/microcode/jmp.us:48 jump_type jump_target
+0100110011000000000000000000000000000001000000000000000000000000 // 265 /home/gatecat/80x86/rtl/microcode/jmp.us:49 next_instruction
+0100110011101000010001000000000001000001000000000000000000000000 // 266 /home/gatecat/80x86/rtl/microcode/jmp.us:51 a_sel b_sel alu_op load_ip next_instruction
+0100110100100000000000000000001110000000000000000000000000000000 // 267 /home/gatecat/80x86/rtl/microcode/jmp.us:86 jump_type jump_target
+0100110100100000000000000000000000000001000000000000000000000000 // 268 /home/gatecat/80x86/rtl/microcode/jmp.us:87 next_instruction
+0100110101001000010001000000000001000001000000000000000000000000 // 269 /home/gatecat/80x86/rtl/microcode/jmp.us:89 a_sel b_sel alu_op load_ip next_instruction
+0100110101100000000000000000000000000001000000000000000000000000 // 26a /home/gatecat/80x86/rtl/microcode/lds.us:26 next_instruction
+0100110110000000000000000000000000000100000000000000110000000000 // 26b /home/gatecat/80x86/rtl/microcode/lds.us:28 segment mem_read
+0100110110111000000000000000000000000000000000000100110000000000 // 26c /home/gatecat/80x86/rtl/microcode/lds.us:29 rd_sel_source a_sel alu_op segment
+0100110111010000010001000011000000110000000000000000110000000000 // 26d /home/gatecat/80x86/rtl/microcode/lds.us:30 a_sel alu_op b_sel immediate mar_write mar_wr_sel segment
+0100110111100000000000000000000000000100000000000000110000000000 // 26e /home/gatecat/80x86/rtl/microcode/lds.us:31 segment mem_read
+0100111000011000000000000000000000000001000000000000111100000000 // 26f /home/gatecat/80x86/rtl/microcode/lds.us:32 segment_force segment segment_wr_en a_sel alu_op next_instruction
+0100111000100000000000000000000000000001000000000000000000000000 // 270 /home/gatecat/80x86/rtl/microcode/lea.us:26 next_instruction
+0100111001010000000000000000000000000001000000000100000000000000 // 271 /home/gatecat/80x86/rtl/microcode/lea.us:28 rd_sel rd_sel_source a_sel alu_op next_instruction
+0100111001100000000000000000000000110000000001001100101000000000 // 272 /home/gatecat/80x86/rtl/microcode/leave.us:26 a_sel alu_op rd_sel rd_sel_source mar_write mar_wr_sel segment segment_force
+0100111010000000000000000000000000000100000000000000101000000000 // 273 /home/gatecat/80x86/rtl/microcode/leave.us:27 segment segment_force mem_read
+0100111010111000000000000000000000000000000001011100000000000000 // 274 /home/gatecat/80x86/rtl/microcode/leave.us:28 a_sel alu_op rd_sel rd_sel_source
+0100111011010000010001000011000000000001000001001100000000000000 // 275 /home/gatecat/80x86/rtl/microcode/leave.us:29 a_sel b_sel immediate alu_op rd_sel_source rd_sel next_instruction
+0100111011100000000000000000000000000001000000000000000000000000 // 276 /home/gatecat/80x86/rtl/microcode/les.us:26 next_instruction
+0100111100000000000000000000000000000100000000000000110000000000 // 277 /home/gatecat/80x86/rtl/microcode/les.us:28 segment mem_read
+0100111100111000000000000000000000000000000000000100110000000000 // 278 /home/gatecat/80x86/rtl/microcode/les.us:29 rd_sel_source a_sel alu_op segment
+0100111101010000010001000011000000110000000000000000110000000000 // 279 /home/gatecat/80x86/rtl/microcode/les.us:30 a_sel alu_op b_sel immediate mar_write mar_wr_sel segment
+0100111101100000000000000000000000000100000000000000110000000000 // 27a /home/gatecat/80x86/rtl/microcode/les.us:31 segment mem_read
+0100111110011000000000000000000000000001000000000000001100000000 // 27b /home/gatecat/80x86/rtl/microcode/les.us:32 segment_force segment segment_wr_en a_sel alu_op next_instruction
+0100111111100000000000000000001000000000011010000000000000000000 // 27c /home/gatecat/80x86/rtl/microcode/lods.us:26 ra_sel rb_cl jump_type jump_target
+0101000001100000000000000000010000000000000100000000000000000000 // 27d /home/gatecat/80x86/rtl/microcode/lods.us:28 ra_sel jump_type jump_target
+0100111111100000111001000101000000000000011000011100000000000000 // 27e /home/gatecat/80x86/rtl/microcode/lods.us:29 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0101000000000000000000000000000000110000011000000000110000000000 // 27f /home/gatecat/80x86/rtl/microcode/lods.us:31 ra_sel a_sel alu_op mar_wr_sel mar_write segment
+0101000000100010111001000101000000000000000001101100110000000000 // 280 /home/gatecat/80x86/rtl/microcode/lods.us:32 a_sel b_sel immediate alu_op rd_sel_source rd_sel segment
+0101000001111000000000000000001000000100000000001100110000000001 // 281 /home/gatecat/80x86/rtl/microcode/lods.us:33 width segment mem_read a_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0100111110100000000000010000000000000000000010000000000000000000 // 282 /home/gatecat/80x86/rtl/microcode/lods.us:34 rb_cl ext_int_yield jump_type jump_target
+0101000010000000000000000000000000000001000000000000000000000000 // 283 /home/gatecat/80x86/rtl/microcode/lods.us:36 next_instruction
+0101000011100000000000000000001000000000011010000000000000000000 // 284 /home/gatecat/80x86/rtl/microcode/lods.us:41 ra_sel rb_cl jump_type jump_target
+0101000101100000000000000000010000000000000100000000000000000000 // 285 /home/gatecat/80x86/rtl/microcode/lods.us:43 ra_sel jump_type jump_target
+0101000011100000111001000101000000000000011000011100000000000000 // 286 /home/gatecat/80x86/rtl/microcode/lods.us:44 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0101000100000000000000000000000000110000011000000000110000000000 // 287 /home/gatecat/80x86/rtl/microcode/lods.us:46 ra_sel a_sel alu_op mar_wr_sel mar_write segment
+0101000100100010111001000011000000000000000001101100110000000000 // 288 /home/gatecat/80x86/rtl/microcode/lods.us:47 a_sel b_sel immediate alu_op rd_sel_source rd_sel segment
+0101000101111000000000000000001000000100000000001100110000000000 // 289 /home/gatecat/80x86/rtl/microcode/lods.us:48 segment mem_read a_sel alu_op rd_sel_source rd_sel jump_type jump_target
+0101000010100000000000010000000000000000000010000000000000000000 // 28a /home/gatecat/80x86/rtl/microcode/lods.us:49 rb_cl ext_int_yield jump_type jump_target
+0101000110000000000000000000000000000001000000000000000000000000 // 28b /home/gatecat/80x86/rtl/microcode/lods.us:51 next_instruction
+0101000110100000111001000101000000000000000010011100000000000000 // 28c /home/gatecat/80x86/rtl/microcode/loop.us:27 a_sel b_sel immediate alu_op rd_sel_source rd_sel rb_cl
+0101000111100000000000000000010000000000000000000000000000000000 // 28d /home/gatecat/80x86/rtl/microcode/loop.us:28 jump_type jump_target
+0101000111101000010001000000000001000001000000000000000000000000 // 28e /home/gatecat/80x86/rtl/microcode/loop.us:29 a_sel b_sel alu_op load_ip next_instruction
+0101001000000000000000000000000000000001000000000000000000000000 // 28f /home/gatecat/80x86/rtl/microcode/loop.us:31 next_instruction
+0101001001000000111001000101001010000000000010011100000000000000 // 290 /home/gatecat/80x86/rtl/microcode/loop.us:36 a_sel b_sel immediate alu_op rd_sel_source rd_sel rb_cl jump_type jump_target
+0101000111100000000000000000000000000000000000000000000000000000 // 291 /home/gatecat/80x86/rtl/microcode/loop.us:37 jump_type jump_target
+0101000111100000000000000000010000000000000000000000000000000000 // 292 /home/gatecat/80x86/rtl/microcode/loop.us:39 jump_type jump_target
+0101001010001000010001000000000001000001000000000000000000000000 // 293 /home/gatecat/80x86/rtl/microcode/loop.us:40 a_sel b_sel alu_op load_ip next_instruction
+0101000111100000111001000101001010000000000010011100000000000000 // 294 /home/gatecat/80x86/rtl/microcode/loop.us:45 a_sel b_sel immediate alu_op rd_sel_source rd_sel rb_cl jump_type jump_target
+0101000111100000000000000000010000000000000000000000000000000000 // 295 /home/gatecat/80x86/rtl/microcode/loop.us:46 jump_type jump_target
+0101001011101000010001000000000001000001000000000000000000000000 // 296 /home/gatecat/80x86/rtl/microcode/loop.us:48 a_sel b_sel alu_op load_ip next_instruction
+0101001100000000001000000000000000000001000000001000000000000010 // 297 /home/gatecat/80x86/rtl/microcode/mov.us:29 b_sel alu_op rd_sel_source width next_instruction
+1001001100100000001000000000000000001000000000000000110000000000 // 298 /home/gatecat/80x86/rtl/microcode/mov.us:31 b_sel alu_op mdr_write segment jump_type jump_target
+0101001101000000000000000000000000000001100000000100000000000010 // 299 /home/gatecat/80x86/rtl/microcode/mov.us:38 a_sel ra_modrm_rm_reg alu_op rd_sel_source width next_instruction
+0101001101100000000000000000000000000100000000000000110000000010 // 29a /home/gatecat/80x86/rtl/microcode/mov.us:40 mem_read width segment
+0101001110011000000000000000000000000001000000000100000000000010 // 29b /home/gatecat/80x86/rtl/microcode/mov.us:41 rd_sel_source a_sel alu_op width next_instruction
+0101010010000000000000000000000010000000000000000000000000000000 // 29c /home/gatecat/80x86/rtl/microcode/mov.us:48 jump_type jump_target
+0101001111000000000000000000000000000001000000000000000000000000 // 29d /home/gatecat/80x86/rtl/microcode/mov.us:49 next_instruction
+0101001111100000000000000000000000000001000000000000000000000000 // 29e /home/gatecat/80x86/rtl/microcode/mov.us:50 next_instruction
+0101010000000000000000000000000000000001000000000000000000000000 // 29f /home/gatecat/80x86/rtl/microcode/mov.us:51 next_instruction
+0101010000100000000000000000000000000001000000000000000000000000 // 2a0 /home/gatecat/80x86/rtl/microcode/mov.us:52 next_instruction
+0101010001000000000000000000000000000001000000000000000000000000 // 2a1 /home/gatecat/80x86/rtl/microcode/mov.us:53 next_instruction
+0101010001100000000000000000000000000001000000000000000000000000 // 2a2 /home/gatecat/80x86/rtl/microcode/mov.us:54 next_instruction
+0101010010000000000000000000000000000001000000000000000000000000 // 2a3 /home/gatecat/80x86/rtl/microcode/mov.us:55 next_instruction
+0101010010100000001001000000000000000001000000001000000000000010 // 2a4 /home/gatecat/80x86/rtl/microcode/mov.us:57 b_sel alu_op rd_sel_source width next_instruction
+1001001100100000001001000000000000001000000000000000110000000000 // 2a5 /home/gatecat/80x86/rtl/microcode/mov.us:59 b_sel alu_op mdr_write segment jump_type jump_target
+0101010011100000000000000000000000000100000000000000110000000010 // 2a6 /home/gatecat/80x86/rtl/microcode/mov.us:98 segment width mem_read
+0101010100011000000000000000000000000001000000001100000000000010 // 2a7 /home/gatecat/80x86/rtl/microcode/mov.us:99 rd_sel_source rd_sel width a_sel alu_op next_instruction
+1001001100100000000000000000000000001000000000000000110000000000 // 2a8 /home/gatecat/80x86/rtl/microcode/mov.us:106 a_sel alu_op mdr_write segment jump_type jump_target
+0101010101000000000000100000000000000001000000000100000100000000 // 2a9 /home/gatecat/80x86/rtl/microcode/mov.us:111 segment_wr_en rd_sel_source a_sel alu_op ext_int_inhibit next_instruction
+0101010101100000000000000000000000000100000000000000110000000000 // 2aa /home/gatecat/80x86/rtl/microcode/mov.us:113 segment mem_read
+0101010110011000000000100000000000000001000000000100000100000000 // 2ab /home/gatecat/80x86/rtl/microcode/mov.us:114 rd_sel_source segment_wr_en a_sel alu_op ext_int_inhibit next_instruction
+0101011010000000000000000000000010000000000000000000001000000000 // 2ac /home/gatecat/80x86/rtl/microcode/mov.us:119 segment_force segment jump_type jump_target
+0101011010000000000000000000000010000000000000000000011000000000 // 2ad /home/gatecat/80x86/rtl/microcode/mov.us:120 segment_force segment jump_type jump_target
+0101011010000000000000000000000010000000000000000000101000000000 // 2ae /home/gatecat/80x86/rtl/microcode/mov.us:121 segment_force segment jump_type jump_target
+0101011010000000000000000000000010000000000000000000111000000000 // 2af /home/gatecat/80x86/rtl/microcode/mov.us:122 segment_force segment jump_type jump_target
+0101011010000000000000000000000010000000000000000000001000000000 // 2b0 /home/gatecat/80x86/rtl/microcode/mov.us:123 segment_force segment jump_type jump_target
+0101011010000000000000000000000010000000000000000000011000000000 // 2b1 /home/gatecat/80x86/rtl/microcode/mov.us:124 segment_force segment jump_type jump_target
+0101011010000000000000000000000010000000000000000000101000000000 // 2b2 /home/gatecat/80x86/rtl/microcode/mov.us:125 segment_force segment jump_type jump_target
+0101011010000000000000000000000010000000000000000000111000000000 // 2b3 /home/gatecat/80x86/rtl/microcode/mov.us:126 segment_force segment jump_type jump_target
+0101011010100000001010000000000000000001000000001000000000000000 // 2b4 /home/gatecat/80x86/rtl/microcode/mov.us:128 rd_sel_source b_sel alu_op next_instruction
+1001001100000000001010000000000000001000000000000000110000000000 // 2b5 /home/gatecat/80x86/rtl/microcode/mov.us:130 b_sel alu_op mdr_write segment jump_type jump_target
+0101011100100000000000000000001000000000011010000000000000000000 // 2b6 /home/gatecat/80x86/rtl/microcode/movs.us:26 ra_sel rb_cl jump_type jump_target
+0101011111100000000000000000010000000000000100000000000000000000 // 2b7 /home/gatecat/80x86/rtl/microcode/movs.us:28 ra_sel jump_type jump_target
+0101011100100000111001000101000000000000011000011100000000000000 // 2b8 /home/gatecat/80x86/rtl/microcode/movs.us:29 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0101011101000000000000000000000000110000011000000000110000000000 // 2b9 /home/gatecat/80x86/rtl/microcode/movs.us:31 a_sel alu_op mar_wr_sel mar_write ra_sel segment
+0101011101100000000000000000000000000100000000000000110000000001 // 2ba /home/gatecat/80x86/rtl/microcode/movs.us:32 width segment mem_read
+0101011110010010111001000101000000000000011101101100000000000000 // 2bb /home/gatecat/80x86/rtl/microcode/movs.us:33 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0101011110100000000000000000000000110000011100000000001000000000 // 2bc /home/gatecat/80x86/rtl/microcode/movs.us:34 ra_sel a_sel alu_op mar_wr_sel mar_write segment segment_force
+0101100000000000000000000000001000000010000000000000001000000001 // 2bd /home/gatecat/80x86/rtl/microcode/movs.us:35 width segment segment_force mem_write jump_type jump_target
+0101011011110010111001010101000000000000000011111100000000000000 // 2be /home/gatecat/80x86/rtl/microcode/movs.us:36 a_sel b_sel immediate alu_op rd_sel_source rd_sel rb_cl ext_int_yield jump_type jump_target
+0101100000000000000000000000000000000001000000000000000000000000 // 2bf /home/gatecat/80x86/rtl/microcode/movs.us:38 next_instruction
+0101100000110010111001000101000000000001000001111100000000000000 // 2c0 /home/gatecat/80x86/rtl/microcode/movs.us:40 a_sel b_sel immediate alu_op rd_sel_source rd_sel next_instruction
+0101100010000000000000000000001000000000011010000000000000000000 // 2c1 /home/gatecat/80x86/rtl/microcode/movs.us:45 ra_sel rb_cl jump_type jump_target
+0101100101000000000000000000010000000000000100000000000000000000 // 2c2 /home/gatecat/80x86/rtl/microcode/movs.us:47 ra_sel jump_type jump_target
+0101100010000000111001000101000000000000011000011100000000000000 // 2c3 /home/gatecat/80x86/rtl/microcode/movs.us:48 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0101100010100000000000000000000000110000011000000000000000000000 // 2c4 /home/gatecat/80x86/rtl/microcode/movs.us:50 a_sel alu_op mar_wr_sel mar_write ra_sel
+0101100011000010111001000011000000000000000001101100110000000000 // 2c5 /home/gatecat/80x86/rtl/microcode/movs.us:51 a_sel b_sel immediate alu_op rd_sel_source rd_sel segment
+0101100011100000000000000000000000110100011100000000110000000000 // 2c6 /home/gatecat/80x86/rtl/microcode/movs.us:52 segment mem_read ra_sel a_sel alu_op mar_wr_sel mar_write
+0101100100000010111001000011000000000000000001111100001000000000 // 2c7 /home/gatecat/80x86/rtl/microcode/movs.us:53 a_sel b_sel immediate alu_op rd_sel_source rd_sel segment segment_force
+0101100101000000000000000000001000000010000000000000001000000000 // 2c8 /home/gatecat/80x86/rtl/microcode/movs.us:54 segment segment_force mem_write jump_type jump_target
+0101100001000000000000010000000000000000000010000000000000000000 // 2c9 /home/gatecat/80x86/rtl/microcode/movs.us:55 rb_cl ext_int_yield jump_type jump_target
+0101100101100000000000000000000000000001000000000000000000000000 // 2ca /home/gatecat/80x86/rtl/microcode/movs.us:57 next_instruction
+0101100110100000000000000000000000001000000000000000000000000001 // 2cb /home/gatecat/80x86/rtl/microcode/mul.us:24 width a_sel alu_op mdr_write ra_sel jump_type jump_target
+0101100110100000000000000000000000000100000000000000110000000001 // 2cc /home/gatecat/80x86/rtl/microcode/mul.us:26 width segment mem_read ra_sel jump_type jump_target
+0101100111000000000000000000000000000000000000000000000010000001 // 2cd /home/gatecat/80x86/rtl/microcode/mul.us:28 width a_sel alu_op tmp_wr_en
+0101100111111011100011000000000000000000000000000000000010101101 // 2ce /home/gatecat/80x86/rtl/microcode/mul.us:29 width a_sel b_sel alu_op update_flags tmp_wr_en
+0101101000000000001011000000000000000001000000001100000000000000 // 2cf /home/gatecat/80x86/rtl/microcode/mul.us:30 b_sel alu_op rd_sel_source rd_sel next_instruction
+0101101001000000000000000000000000001000000000000000000000000000 // 2d0 /home/gatecat/80x86/rtl/microcode/mul.us:32 a_sel alu_op mdr_write ra_sel jump_type jump_target
+0101101001000000000000000000000000000100000000000000110000000000 // 2d1 /home/gatecat/80x86/rtl/microcode/mul.us:34 segment mem_read ra_sel jump_type jump_target
+0101101001100000000000000000000000000000000000000000000010000000 // 2d2 /home/gatecat/80x86/rtl/microcode/mul.us:36 a_sel alu_op tmp_wr_en
+0101101010011011100011000000000000000000000000001100000011101100 // 2d3 /home/gatecat/80x86/rtl/microcode/mul.us:37 a_sel b_sel alu_op update_flags tmp_wr_sel tmp_wr_en rd_sel_source rd_sel
+0101101010100000001011000000000000000001000000101100000000000000 // 2d4 /home/gatecat/80x86/rtl/microcode/mul.us:38 b_sel alu_op rd_sel_source rd_sel next_instruction
+0101101011100000000000000000000000001000000000000000000000000001 // 2d5 /home/gatecat/80x86/rtl/microcode/mul.us:40 width a_sel alu_op mdr_write ra_sel jump_type jump_target
+0101101011100000000000000000000000000100000000000000110000000001 // 2d6 /home/gatecat/80x86/rtl/microcode/mul.us:42 width segment mem_read ra_sel jump_type jump_target
+0101101100000000000000000000000000000000000000000000000010000001 // 2d7 /home/gatecat/80x86/rtl/microcode/mul.us:44 width a_sel alu_op tmp_wr_en
+0101101100111011101011000000000000000000000000000000000010101101 // 2d8 /home/gatecat/80x86/rtl/microcode/mul.us:45 width a_sel b_sel alu_op update_flags tmp_wr_en
+0101101101000000001011000000000000000001000000001100000000000000 // 2d9 /home/gatecat/80x86/rtl/microcode/mul.us:46 b_sel alu_op rd_sel_source rd_sel next_instruction
+0101101110000000000000000000000000001000000000000000000000000000 // 2da /home/gatecat/80x86/rtl/microcode/mul.us:48 a_sel alu_op mdr_write ra_sel jump_type jump_target
+0101101110000000000000000000000000000100000000000000110000000000 // 2db /home/gatecat/80x86/rtl/microcode/mul.us:50 segment mem_read ra_sel jump_type jump_target
+0101101110100000000000000000000000000000000000000000000010000000 // 2dc /home/gatecat/80x86/rtl/microcode/mul.us:52 a_sel alu_op tmp_wr_en
+0101101111011011101011000000000000000000000000001100000011101100 // 2dd /home/gatecat/80x86/rtl/microcode/mul.us:53 a_sel b_sel alu_op update_flags tmp_wr_sel tmp_wr_en rd_sel_source rd_sel
+0101101111100000001011000000000000000001000000101100000000000000 // 2de /home/gatecat/80x86/rtl/microcode/mul.us:54 b_sel alu_op rd_sel_source rd_sel next_instruction
+0101110000000011101001000000000000000001000000000100000000101100 // 2df /home/gatecat/80x86/rtl/microcode/mul.us:59 a_sel b_sel alu_op update_flags rd_sel_source next_instruction
+0101110000100000000000000000000000000100000000000000110000000000 // 2e0 /home/gatecat/80x86/rtl/microcode/mul.us:61 segment mem_read
+0101110001011011101001000000000000000001000000000100000000101100 // 2e1 /home/gatecat/80x86/rtl/microcode/mul.us:62 a_sel b_sel alu_op update_flags rd_sel_source next_instruction
+0101110001100001000001000001000000000001000000001000000000001110 // 2e2 /home/gatecat/80x86/rtl/microcode/neg.us:23 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0101110010000000000000000000000000000100100000000000110000000010 // 2e3 /home/gatecat/80x86/rtl/microcode/neg.us:25 width segment mem_read ra_modrm_rm_reg
+1001001100111001000001000001000000001000000000000000110000001110 // 2e4 /home/gatecat/80x86/rtl/microcode/neg.us:26 a_sel b_sel immediate alu_op mdr_write update_flags width segment jump_type jump_target
+0101110011000010110001000001000000000001000000001000000000001110 // 2e5 /home/gatecat/80x86/rtl/microcode/not.us:23 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0101110011100000000000000000000000000100100000000000110000000010 // 2e6 /home/gatecat/80x86/rtl/microcode/not.us:25 width segment mem_read ra_modrm_rm_reg
+1001001100111010110001000001000000001000000000000000110000001110 // 2e7 /home/gatecat/80x86/rtl/microcode/not.us:26 a_sel b_sel immediate alu_op mdr_write update_flags width segment jump_type jump_target
+0101110100100000110000000000000000000001000000001000000000010010 // 2e8 /home/gatecat/80x86/rtl/microcode/or.us:31 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0101110101000000000000000000000000000100000000000000110000000010 // 2e9 /home/gatecat/80x86/rtl/microcode/or.us:33 segment mem_read width
+1001001100111000110000000000000000001000000000000000110000010010 // 2ea /home/gatecat/80x86/rtl/microcode/or.us:34 a_sel b_sel alu_op mdr_write update_flags width segment jump_type jump_target
+0101110110000000110000000000000000000001000000000100000000010010 // 2eb /home/gatecat/80x86/rtl/microcode/or.us:41 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0101110110100000000000000000000000000100000000000000110000000010 // 2ec /home/gatecat/80x86/rtl/microcode/or.us:43 segment mem_read width
+0101110111011000110000000000000000000001000000000100000000010010 // 2ed /home/gatecat/80x86/rtl/microcode/or.us:44 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0101110111100000110001000000000000000001000000001100000000010010 // 2ee /home/gatecat/80x86/rtl/microcode/or.us:51 a_sel b_sel alu_op rd_sel_source rd_sel update_flags width next_instruction
+0101111000000000110001000000000000000001000000001000000000010010 // 2ef /home/gatecat/80x86/rtl/microcode/or.us:53 a_sel b_sel alu_op rd_sel_source width update_flags next_instruction
+0101111000100000000000000000000000000100000000000000110000000010 // 2f0 /home/gatecat/80x86/rtl/microcode/or.us:55 segment mem_read width
+1001001100111000110001000000000000001000000000000000110000010010 // 2f1 /home/gatecat/80x86/rtl/microcode/or.us:56 a_sel b_sel alu_op mdr_write update_flags segment width jump_type jump_target
+0101111010000000000000000000000000000000100000000000000000000000 // 2f2 /home/gatecat/80x86/rtl/microcode/or.us:58 ra_modrm_rm_reg jump_type jump_target
+0101111010100000000000000000000000000000100000000000110000000000 // 2f3 /home/gatecat/80x86/rtl/microcode/or.us:60 ra_modrm_rm_reg segment jump_type jump_target
+0101111010100000110001000000000000000001000000001000000000010000 // 2f4 /home/gatecat/80x86/rtl/microcode/or.us:62 a_sel b_sel alu_op rd_sel_source update_flags next_instruction
+0101111011000000000000000000000000000100000000000000110000000000 // 2f5 /home/gatecat/80x86/rtl/microcode/or.us:64 segment mem_read
+1001001100011000110001000000000000001000000000000000110000010000 // 2f6 /home/gatecat/80x86/rtl/microcode/or.us:65 a_sel b_sel alu_op mdr_write update_flags segment jump_type jump_target
+0101111100100000000000000000000000110000000000000000101000000000 // 2f7 /home/gatecat/80x86/rtl/microcode/pop.us:23 a_sel alu_op mar_wr_sel mar_write segment_force segment jump_type jump_target
+0101111110000000000000000000000000110000000000000000101000000000 // 2f8 /home/gatecat/80x86/rtl/microcode/pop.us:25 a_sel alu_op mar_wr_sel mar_write segment_force segment jump_type jump_target
+0101111101000000000000000000000000000100010000000000101000000000 // 2f9 /home/gatecat/80x86/rtl/microcode/pop.us:27 segment_force segment mem_read ra_sel
+0101111101100000010001000011000000000000000001001100000000000000 // 2fa /home/gatecat/80x86/rtl/microcode/pop.us:28 a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0101111110011000000000000000000000000001000000001000000000000000 // 2fb /home/gatecat/80x86/rtl/microcode/pop.us:29 a_sel alu_op rd_sel_source next_instruction
+0101111110100000000000000000000000000100010000000000101000000000 // 2fc /home/gatecat/80x86/rtl/microcode/pop.us:31 segment_force segment mem_read ra_sel
+0101111111000000010001000011000000000000000001001100000000000000 // 2fd /home/gatecat/80x86/rtl/microcode/pop.us:32 a_sel b_sel immediate alu_op rd_sel rd_sel_source
+1001001100000000000000000000000000010000000000000000110000000000 // 2fe /home/gatecat/80x86/rtl/microcode/pop.us:33 mar_write mar_wr_sel segment jump_type jump_target
+0110000000000000000000000000000000110000000000000000101000000000 // 2ff /home/gatecat/80x86/rtl/microcode/pop.us:83 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110000000110000010001000011000000000100000001001100101000000000 // 300 /home/gatecat/80x86/rtl/microcode/pop.us:84 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110000001011000000000100000000000000001000000000000001100000000 // 301 /home/gatecat/80x86/rtl/microcode/pop.us:85 a_sel alu_op segment_force segment segment_wr_en ext_int_inhibit next_instruction
+0110000001100000000000000000000000110000000000000000101000000000 // 302 /home/gatecat/80x86/rtl/microcode/pop.us:90 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110000010010000010001000011000000000100000001001100101000000000 // 303 /home/gatecat/80x86/rtl/microcode/pop.us:91 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110000010111000000000100000000000000001000000000000101100000000 // 304 /home/gatecat/80x86/rtl/microcode/pop.us:92 a_sel alu_op segment_force segment segment_wr_en ext_int_inhibit next_instruction
+0110000011000000000000000000000000110000000000000000101000000000 // 305 /home/gatecat/80x86/rtl/microcode/pop.us:97 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110000011110000010001000011000000000100000001001100101000000000 // 306 /home/gatecat/80x86/rtl/microcode/pop.us:98 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110000100011000000000100000000000000001000000000000111100000000 // 307 /home/gatecat/80x86/rtl/microcode/pop.us:99 a_sel alu_op segment_force segment segment_wr_en ext_int_inhibit next_instruction
+0110000100100000000000000000000000110000000000000000101000000000 // 308 /home/gatecat/80x86/rtl/microcode/pop.us:104 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110000101010000010001000011000000000100000001001100101000000000 // 309 /home/gatecat/80x86/rtl/microcode/pop.us:105 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110000101111000000000000000000000000001000000001100000000000000 // 30a /home/gatecat/80x86/rtl/microcode/pop.us:106 a_sel alu_op rd_sel rd_sel_source next_instruction
+0110000110000000000000000000000000110000000000000000101000000000 // 30b /home/gatecat/80x86/rtl/microcode/pop.us:111 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110000110110000010001000011000000000100000001001100101000000000 // 30c /home/gatecat/80x86/rtl/microcode/pop.us:112 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110000111011000000000000000000000000001000000011100000000000000 // 30d /home/gatecat/80x86/rtl/microcode/pop.us:113 a_sel alu_op rd_sel rd_sel_source next_instruction
+0110000111100000000000000000000000110000000000000000101000000000 // 30e /home/gatecat/80x86/rtl/microcode/pop.us:118 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110001000010000010001000011000000000100000001001100101000000000 // 30f /home/gatecat/80x86/rtl/microcode/pop.us:119 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110001000111000000000000000000000000001000000101100000000000000 // 310 /home/gatecat/80x86/rtl/microcode/pop.us:120 a_sel alu_op rd_sel rd_sel_source next_instruction
+0110001001000000000000000000000000110000000000000000101000000000 // 311 /home/gatecat/80x86/rtl/microcode/pop.us:125 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110001001110000010001000011000000000100000001001100101000000000 // 312 /home/gatecat/80x86/rtl/microcode/pop.us:126 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110001010011000000000000000000000000001000000111100000000000000 // 313 /home/gatecat/80x86/rtl/microcode/pop.us:127 a_sel alu_op rd_sel rd_sel_source next_instruction
+0110001010100000000000000000000000110000000000000000101000000000 // 314 /home/gatecat/80x86/rtl/microcode/pop.us:132 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110001011010000010001000011000000000100000001001100101000000000 // 315 /home/gatecat/80x86/rtl/microcode/pop.us:133 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110001011111000000000000000000000000001000001001100000000000000 // 316 /home/gatecat/80x86/rtl/microcode/pop.us:134 a_sel alu_op rd_sel rd_sel_source next_instruction
+0110001100000000000000000000000000110000000000000000101000000000 // 317 /home/gatecat/80x86/rtl/microcode/pop.us:139 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110001100110000010001000011000000000100000001001100101000000000 // 318 /home/gatecat/80x86/rtl/microcode/pop.us:140 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110001101011000000000000000000000000001000001011100000000000000 // 319 /home/gatecat/80x86/rtl/microcode/pop.us:141 a_sel alu_op rd_sel rd_sel_source next_instruction
+0110001101100000000000000000000000110000000000000000101000000000 // 31a /home/gatecat/80x86/rtl/microcode/pop.us:146 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110001110010000010001000011000000000100000001001100101000000000 // 31b /home/gatecat/80x86/rtl/microcode/pop.us:147 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110001110111000000000000000000000000001000001101100000000000000 // 31c /home/gatecat/80x86/rtl/microcode/pop.us:148 a_sel alu_op rd_sel rd_sel_source next_instruction
+0110001111000000000000000000000000110000000000000000101000000000 // 31d /home/gatecat/80x86/rtl/microcode/pop.us:153 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110001111110000010001000011000000000100000001001100101000000000 // 31e /home/gatecat/80x86/rtl/microcode/pop.us:154 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110010000011000000000000000000000000001000001111100000000000000 // 31f /home/gatecat/80x86/rtl/microcode/pop.us:155 a_sel alu_op rd_sel rd_sel_source next_instruction
+0110010000100000000000000000000000110000000000000000101000000000 // 320 /home/gatecat/80x86/rtl/microcode/pop.us:160 alu_op mar_wr_sel mar_write segment_force segment
+0110010001010000010001000011000000000100000001001100101000000000 // 321 /home/gatecat/80x86/rtl/microcode/pop.us:161 segment_force segment mem_read a_sel b_sel immediate alu_op rd_sel rd_sel_source
+0110010001111001101000100000000000000001000000000000000000110000 // 322 /home/gatecat/80x86/rtl/microcode/pop.us:162 a_sel alu_op update_flags ext_int_inhibit next_instruction
+0110010010100000111001000011000000110000100001001100110000000000 // 323 /home/gatecat/80x86/rtl/microcode/push.us:23 a_sel b_sel immediate alu_op rd_sel rd_sel_source mar_write mar_wr_sel jump_type ra_modrm_rm_reg segment jump_target
+0110010011100000000000000000000000000100010000000000110000000000 // 324 /home/gatecat/80x86/rtl/microcode/push.us:25 segment mem_read jump_type ra_sel jump_target
+0110010011000000000000000000000000001000000000000000101000000000 // 325 /home/gatecat/80x86/rtl/microcode/push.us:27 a_sel alu_op mdr_write segment_force segment
+0110010011110000000000000000000000000011000000000000101000000000 // 326 /home/gatecat/80x86/rtl/microcode/push.us:28 segment_force segment mem_write a_sel next_instruction
+0110010100000000111001000011000000110000000001001100101000000000 // 327 /home/gatecat/80x86/rtl/microcode/push.us:30 a_sel b_sel immediate alu_op rd_sel rd_sel_source mar_write mar_wr_sel segment_force segment
+0110010100110000000000000000000000000011000000000000101000000000 // 328 /home/gatecat/80x86/rtl/microcode/push.us:31 segment_force segment mem_write a_sel alu_op next_instruction
+0110010101000000000000000000000000001000010000000000000000000000 // 329 /home/gatecat/80x86/rtl/microcode/push.us:81 a_sel alu_op mdr_write ra_sel
+0110010101100000111001000011000000110000000001000000101000000000 // 32a /home/gatecat/80x86/rtl/microcode/push.us:82 a_sel b_sel immediate alu_op rd_sel mar_write mar_wr_sel segment_force segment
+0110010110010000000000000000000000000011000001001100101000000000 // 32b /home/gatecat/80x86/rtl/microcode/push.us:83 segment_force segment mem_write a_sel rd_sel rd_sel_source next_instruction
+0110010110100000111001000011000000111000000001000000101000000000 // 32c /home/gatecat/80x86/rtl/microcode/push.us:88 a_sel b_sel immediate alu_op rd_sel mar_write mar_wr_sel mdr_write segment_force segment
+0110010111010000000000000000000000000011000001001100101000000000 // 32d /home/gatecat/80x86/rtl/microcode/push.us:89 segment_force segment mem_write a_sel rd_sel rd_sel_source next_instruction
+0110010111100000001010000000000000001000010000000000000000000000 // 32e /home/gatecat/80x86/rtl/microcode/push.us:91 b_sel alu_op mdr_write ra_sel
+0110011000000000111001000011000000110000000001000000101000000000 // 32f /home/gatecat/80x86/rtl/microcode/push.us:92 a_sel b_sel immediate alu_op rd_sel mar_write mar_wr_sel segment_force segment
+0110011000110000000000000000000000000011000001001100101000000000 // 330 /home/gatecat/80x86/rtl/microcode/push.us:93 segment_force segment mem_write a_sel rd_sel rd_sel_source next_instruction
+0110011001000000111001000011000000110000000001001100000000000000 // 331 /home/gatecat/80x86/rtl/microcode/push.us:98 a_sel b_sel immediate alu_op mar_write mar_wr_sel rd_sel rd_sel_source
+0110011001100000001001000000000000001000000000000000101000000000 // 332 /home/gatecat/80x86/rtl/microcode/push.us:99 b_sel alu_op mdr_write segment_force segment
+0110011010000000000000000000000000000011000000000000101000000000 // 333 /home/gatecat/80x86/rtl/microcode/push.us:100 segment_force segment mem_write next_instruction
+0110011010100000111001000011000000110000000001001100000000000000 // 334 /home/gatecat/80x86/rtl/microcode/push.us:105 a_sel b_sel immediate alu_op mar_write mar_wr_sel rd_sel rd_sel_source
+0110011011000000001001000000000000001000000000000000101000000000 // 335 /home/gatecat/80x86/rtl/microcode/push.us:106 b_sel alu_op mdr_write segment_force segment
+0110011011100000000000000000000000000011000000000000101000000000 // 336 /home/gatecat/80x86/rtl/microcode/push.us:107 segment_force segment mem_write next_instruction
+0110011100000000111001000011000000110000000001001100101000000000 // 337 /home/gatecat/80x86/rtl/microcode/push.us:112 a_sel b_sel immediate alu_op mar_wr_sel mar_write segment_force segment rd_sel rd_sel_source
+0110011100100000000000000000000000000011000000000000101000000000 // 338 /home/gatecat/80x86/rtl/microcode/push.us:113 segment_force segment mem_write next_instruction
+0110011101000000111001000011000000110000000000000000000000000000 // 339 /home/gatecat/80x86/rtl/microcode/push.us:118 a_sel ra_sel b_sel immediate alu_op mar_write mar_wr_sel
+0110011101100000000000000000000000001000000000000000101000000000 // 33a /home/gatecat/80x86/rtl/microcode/push.us:119 a_sel alu_op mdr_write segment_force segment
+0110011110010000111001000011000000110010000100000000101000000000 // 33b /home/gatecat/80x86/rtl/microcode/push.us:120 segment_force segment mem_write ra_sel a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0110011110100000000000000000000000001000000000000000101000000000 // 33c /home/gatecat/80x86/rtl/microcode/push.us:121 a_sel alu_op mdr_write segment_force segment
+0110011111010000111001000011000000110010001000000000101000000000 // 33d /home/gatecat/80x86/rtl/microcode/push.us:122 segment_force segment mem_write ra_sel a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0110011111100000000000000000000000001000000000000000101000000000 // 33e /home/gatecat/80x86/rtl/microcode/push.us:123 a_sel alu_op mdr_write segment_force segment
+0110100000010000111001000011000000110010001100000000101000000000 // 33f /home/gatecat/80x86/rtl/microcode/push.us:124 segment_force segment mem_write ra_sel a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0110100000100000000000000000000000001000000000000000101000000000 // 340 /home/gatecat/80x86/rtl/microcode/push.us:125 a_sel alu_op mdr_write segment_force segment
+0110100001010000111001000011000000110010010000000000101000000000 // 341 /home/gatecat/80x86/rtl/microcode/push.us:126 segment_force segment mem_write ra_sel a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0110100001100000000000000000000000001000000000000000101000000000 // 342 /home/gatecat/80x86/rtl/microcode/push.us:127 a_sel alu_op mdr_write segment_force segment
+0110100010010000111001000011000000110010010100000000101000000000 // 343 /home/gatecat/80x86/rtl/microcode/push.us:128 segment_force segment mem_write ra_sel a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0110100010100000000000000000000000001000000000000000101000000000 // 344 /home/gatecat/80x86/rtl/microcode/push.us:129 a_sel alu_op mdr_write segment_force segment
+0110100011010000111001000011000000110010011000000000101000000000 // 345 /home/gatecat/80x86/rtl/microcode/push.us:130 segment_force segment mem_write ra_sel a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0110100011100000000000000000000000001000000000000000101000000000 // 346 /home/gatecat/80x86/rtl/microcode/push.us:131 a_sel alu_op mdr_write segment_force segment
+0110100100010000111001000011000000110010011100000000101000000000 // 347 /home/gatecat/80x86/rtl/microcode/push.us:132 segment_force segment mem_write ra_sel a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0110100100100000000000000000000000001000000000000000101000000000 // 348 /home/gatecat/80x86/rtl/microcode/push.us:133 a_sel alu_op mdr_write segment_force segment
+0110100101010000000000000000000000000011000001001100101000000000 // 349 /home/gatecat/80x86/rtl/microcode/push.us:134 segment_force segment mem_write rd_sel_source rd_sel a_sel alu_op next_instruction
+0110100101100000000000000000000000110000000000000000101000000000 // 34a /home/gatecat/80x86/rtl/microcode/push.us:139 a_sel alu_op mar_wr_sel mar_write segment_force segment
+0110100110011000000000000000000000000100000001111100101000000000 // 34b /home/gatecat/80x86/rtl/microcode/push.us:140 segment_force segment mem_read rd_sel_source rd_sel a_sel
+0110100110110000010001000011000000110000000000000000101000000000 // 34c /home/gatecat/80x86/rtl/microcode/push.us:141 a_sel b_sel immediate alu_op mar_wr_sel mar_write segment_force segment
+0110100111011000000000000000000000000100000001101100101000000000 // 34d /home/gatecat/80x86/rtl/microcode/push.us:142 segment_force segment mem_read rd_sel_source rd_sel a_sel
+0110100111110000010001000011000000110000000000000000101000000000 // 34e /home/gatecat/80x86/rtl/microcode/push.us:143 a_sel b_sel immediate alu_op mar_wr_sel mar_write segment_force segment
+0110101000011000000000000000000000000100000001011100101000000000 // 34f /home/gatecat/80x86/rtl/microcode/push.us:144 segment_force segment mem_read rd_sel_source rd_sel a_sel
+0110101000110000010001001001000000110000000000000000101000000000 // 350 /home/gatecat/80x86/rtl/microcode/push.us:145 a_sel b_sel immediate alu_op mar_wr_sel mar_write segment_force segment
+0110101001011000000000000000000000000100000000111100101000000000 // 351 /home/gatecat/80x86/rtl/microcode/push.us:146 segment_force segment mem_read rd_sel_source rd_sel a_sel
+0110101001110000010001000011000000110000000000000000101000000000 // 352 /home/gatecat/80x86/rtl/microcode/push.us:147 a_sel b_sel immediate alu_op mar_wr_sel mar_write segment_force segment
+0110101010011000000000000000000000000100000000101100101000000000 // 353 /home/gatecat/80x86/rtl/microcode/push.us:148 segment_force segment mem_read rd_sel_source rd_sel a_sel
+0110101010110000010001000011000000110000000000000000101000000000 // 354 /home/gatecat/80x86/rtl/microcode/push.us:149 a_sel b_sel immediate alu_op mar_wr_sel mar_write segment_force segment
+0110101011011000000000000000000000000100000000011100101000000000 // 355 /home/gatecat/80x86/rtl/microcode/push.us:150 segment_force segment mem_read rd_sel_source rd_sel a_sel
+0110101011110000010001000011000000110000000000000000101000000000 // 356 /home/gatecat/80x86/rtl/microcode/push.us:151 a_sel b_sel immediate alu_op mar_wr_sel mar_write segment_force segment
+0110101100011000000000000000000000000100000000001100101000000000 // 357 /home/gatecat/80x86/rtl/microcode/push.us:152 segment_force segment mem_read rd_sel_source rd_sel a_sel
+0110101100110000010001000011000000000001000001001100000000000000 // 358 /home/gatecat/80x86/rtl/microcode/push.us:153 a_sel b_sel immediate alu_op rd_sel_source rd_sel next_instruction
+0110101101000010100001000101000000000001000000001000000000110110 // 359 /home/gatecat/80x86/rtl/microcode/rcl.us:27 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0110101101100000000000000000000000000100000000000000110000000010 // 35a /home/gatecat/80x86/rtl/microcode/rcl.us:29 segment mem_read width
+1001001100111010100001000101000000001000000000000000110000110110 // 35b /home/gatecat/80x86/rtl/microcode/rcl.us:30 width a_sel b_sel immediate alu_op mdr_write update_flags segment jump_type jump_target
+0110101110100000001000000000000010000000100000000000110010000010 // 35c /home/gatecat/80x86/rtl/microcode/rcl.us:32 ra_modrm_rm_reg b_sel alu_op tmp_wr_en width segment jump_type jump_target
+0110101111000010100000000000000000000001100000001000000011010110 // 35d /home/gatecat/80x86/rtl/microcode/rcl.us:34 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0110101111100000000000000000000000000100000010000000110000000010 // 35e /home/gatecat/80x86/rtl/microcode/rcl.us:36 segment mem_read width rb_cl
+1001001100111010100000000000000000001000000000000000110011010110 // 35f /home/gatecat/80x86/rtl/microcode/rcl.us:37 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0110110000100010100001000000000000000001100000001000000011010110 // 360 /home/gatecat/80x86/rtl/microcode/rcl.us:39 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0110110001000000000000000000000000000100000000000000110000000010 // 361 /home/gatecat/80x86/rtl/microcode/rcl.us:41 segment mem_read width
+1001001100111010100001000000000000001000000000000000110011010110 // 362 /home/gatecat/80x86/rtl/microcode/rcl.us:42 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0110110000000000001001000000000010000000100000000000110010000000 // 363 /home/gatecat/80x86/rtl/microcode/rcl.us:44 tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0110110010100010101001000101000000000001000000001000000000110110 // 364 /home/gatecat/80x86/rtl/microcode/rcr.us:27 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0110110011000000000000000000000000000100000000000000110000000010 // 365 /home/gatecat/80x86/rtl/microcode/rcr.us:29 segment mem_read width
+1001001100111010101001000101000000001000000000000000110000110110 // 366 /home/gatecat/80x86/rtl/microcode/rcr.us:30 width a_sel b_sel immediate alu_op mdr_write update_flags segment jump_type jump_target
+0110110100000000001000000000000010000000100000000000110010000010 // 367 /home/gatecat/80x86/rtl/microcode/rcr.us:32 ra_modrm_rm_reg b_sel alu_op tmp_wr_en width segment jump_type jump_target
+0110110100100010101000000000000000000001100000001000000011010110 // 368 /home/gatecat/80x86/rtl/microcode/rcr.us:34 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0110110101000000000000000000000000000100000010000000110000000010 // 369 /home/gatecat/80x86/rtl/microcode/rcr.us:36 segment mem_read width rb_cl
+1001001100111010101000000000000000001000000000000000110011010110 // 36a /home/gatecat/80x86/rtl/microcode/rcr.us:37 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0110110110000010101001000000000000000001100000001000000011010110 // 36b /home/gatecat/80x86/rtl/microcode/rcr.us:39 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0110110110100000000000000000000000000100000000000000110000000010 // 36c /home/gatecat/80x86/rtl/microcode/rcr.us:41 segment mem_read width
+1001001100111010101001000000000000001000000000000000110011010110 // 36d /home/gatecat/80x86/rtl/microcode/rcr.us:42 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0110110101100000001001000000000010000000100000000000110010000000 // 36e /home/gatecat/80x86/rtl/microcode/rcr.us:44 tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0110111000000000000000000000000000110000000000000000101000000000 // 36f /home/gatecat/80x86/rtl/microcode/ret.us:26 a_sel alu_op mar_write mar_wr_sel segment segment_force
+0110111000110000010001000011000000000100000001001100101000000000 // 370 /home/gatecat/80x86/rtl/microcode/ret.us:27 segment segment_force mem_read a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0110111001011000000000000000000001000001000000000000000000000000 // 371 /home/gatecat/80x86/rtl/microcode/ret.us:28 a_sel alu_op load_ip next_instruction
+0110111001100000000000000000000000110000000000000000101000000000 // 372 /home/gatecat/80x86/rtl/microcode/ret.us:33 a_sel alu_op mar_write mar_wr_sel segment segment_force
+0110111010010000010001000011000000000100000001001100101000000000 // 373 /home/gatecat/80x86/rtl/microcode/ret.us:34 segment segment_force mem_read a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0110111010111000000000000000000001000000010000000000000000000000 // 374 /home/gatecat/80x86/rtl/microcode/ret.us:35 a_sel alu_op load_ip ra_sel
+0110111011000000010001000000000000000001000001001100000000000000 // 375 /home/gatecat/80x86/rtl/microcode/ret.us:36 a_sel b_sel alu_op rd_sel_source rd_sel next_instruction
+0110111011100000000000000000000000110000000000000000101000000000 // 376 /home/gatecat/80x86/rtl/microcode/ret.us:41 a_sel alu_op mar_write mar_wr_sel segment segment_force
+0110111100010000010001000011000000110100000000000000101000000000 // 377 /home/gatecat/80x86/rtl/microcode/ret.us:42 segment segment_force mem_read a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0110111100111000000000000000000001000000000000000000101000000000 // 378 /home/gatecat/80x86/rtl/microcode/ret.us:43 a_sel alu_op load_ip segment_force segment
+0110111101010000010001000011000000000100000001001100101000000000 // 379 /home/gatecat/80x86/rtl/microcode/ret.us:44 segment segment_force mem_read a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0110111101111000000000000000000000000001000000000000011100000000 // 37a /home/gatecat/80x86/rtl/microcode/ret.us:45 a_sel alu_op segment_force segment segment_wr_en next_instruction
+0110111110000000000000000000000000110000000000000000101000000000 // 37b /home/gatecat/80x86/rtl/microcode/ret.us:50 a_sel alu_op mar_write mar_wr_sel segment segment_force
+0110111110110000010001000011000000110100000000000000101000000000 // 37c /home/gatecat/80x86/rtl/microcode/ret.us:51 segment segment_force mem_read a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0110111111011000000000000000000001000000000000000000101000000000 // 37d /home/gatecat/80x86/rtl/microcode/ret.us:52 a_sel alu_op load_ip segment_force segment
+0110111111110000010001000011000000110100000000000000101000000000 // 37e /home/gatecat/80x86/rtl/microcode/ret.us:53 segment segment_force mem_read a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0111000000010000010001000000000000000000000001001100000000000000 // 37f /home/gatecat/80x86/rtl/microcode/ret.us:54 a_sel b_sel alu_op rd_sel_source rd_sel
+0111000000111000000000000000000000000001000000000000011100000000 // 380 /home/gatecat/80x86/rtl/microcode/ret.us:55 a_sel alu_op segment_force segment segment_wr_en next_instruction
+0111000001000000000000000000000000110000000000000000101000000000 // 381 /home/gatecat/80x86/rtl/microcode/ret.us:60 a_sel alu_op mar_write mar_wr_sel segment segment_force
+0111000001110000010001000011000000110100000000000000101000000000 // 382 /home/gatecat/80x86/rtl/microcode/ret.us:61 segment segment_force mem_read a_sel b_sel immediate alu_op mar_wr_sel mar_write
+0111000010011000000000000000000001000000000000000000101000000000 // 383 /home/gatecat/80x86/rtl/microcode/ret.us:62 a_sel alu_op load_ip segment_force segment
+0111000010100000000000000000000000000100000000000000101000000000 // 384 /home/gatecat/80x86/rtl/microcode/ret.us:63 segment segment_force mem_read
+0111000011011000000000000000000000000000000000000000011100000000 // 385 /home/gatecat/80x86/rtl/microcode/ret.us:64 a_sel alu_op segment_force segment segment_wr_en
+0111000011110000010001000011000000110000000000000000101000000000 // 386 /home/gatecat/80x86/rtl/microcode/ret.us:65 a_sel b_sel immediate alu_op mar_wr_sel mar_write segment segment_force
+0111000100011001101000000000000000000100000000000000101000110000 // 387 /home/gatecat/80x86/rtl/microcode/ret.us:66 segment segment_force mem_read a_sel alu_op update_flags
+0111000100110000010001100011000000000001000001001100000000000000 // 388 /home/gatecat/80x86/rtl/microcode/ret.us:67 a_sel b_sel immediate alu_op rd_sel rd_sel_source ext_int_inhibit next_instruction
+0111000101000010011001000101000000000001000000001000000000110110 // 389 /home/gatecat/80x86/rtl/microcode/rol.us:27 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0111000101100000000000000000000000000100000000000000110000000010 // 38a /home/gatecat/80x86/rtl/microcode/rol.us:29 segment mem_read width
+1001001100111010011001000101000000001000000000000000110000110110 // 38b /home/gatecat/80x86/rtl/microcode/rol.us:30 width a_sel b_sel immediate alu_op mdr_write update_flags segment jump_type jump_target
+0111000110100000001000000000000010000000100000000000110010000010 // 38c /home/gatecat/80x86/rtl/microcode/rol.us:32 ra_modrm_rm_reg b_sel alu_op tmp_wr_en width segment jump_type jump_target
+0111000111000010011000000000000000000001100000001000000011010110 // 38d /home/gatecat/80x86/rtl/microcode/rol.us:34 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111000111100000000000000000000000000100000010000000110000000010 // 38e /home/gatecat/80x86/rtl/microcode/rol.us:36 segment mem_read width rb_cl
+1001001100111010011000000000000000001000000000000000110011010110 // 38f /home/gatecat/80x86/rtl/microcode/rol.us:37 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111001000100010011001000000000000000001100000001000000011010110 // 390 /home/gatecat/80x86/rtl/microcode/rol.us:39 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111001001000000000000000000000000000100000000000000110000000010 // 391 /home/gatecat/80x86/rtl/microcode/rol.us:41 segment mem_read width
+1001001100111010011001000000000000001000000000000000110011010110 // 392 /home/gatecat/80x86/rtl/microcode/rol.us:42 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111001000000000001001000000000010000000100000000000110010000000 // 393 /home/gatecat/80x86/rtl/microcode/rol.us:44 tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111001010100010010001000101000000000001000000001000000000110110 // 394 /home/gatecat/80x86/rtl/microcode/ror.us:27 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0111001011000000000000000000000000000100000000000000110000000010 // 395 /home/gatecat/80x86/rtl/microcode/ror.us:29 segment mem_read width
+1001001100111010010001000101000000001000000000000000110000110110 // 396 /home/gatecat/80x86/rtl/microcode/ror.us:30 width a_sel b_sel immediate alu_op mdr_write update_flags segment jump_type jump_target
+0111001100000000001000000000000010000000100000000000110010000010 // 397 /home/gatecat/80x86/rtl/microcode/ror.us:32 ra_modrm_rm_reg b_sel alu_op tmp_wr_en width segment jump_type jump_target
+0111001100100010010000000000000000000001100000001000000011010110 // 398 /home/gatecat/80x86/rtl/microcode/ror.us:34 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111001101000000000000000000000000000100000010000000110000000010 // 399 /home/gatecat/80x86/rtl/microcode/ror.us:36 segment mem_read width rb_cl
+1001001100111010010000000000000000001000000000000000110011010110 // 39a /home/gatecat/80x86/rtl/microcode/ror.us:37 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111001110000010010001000000000000000001100000001000000011010110 // 39b /home/gatecat/80x86/rtl/microcode/ror.us:39 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111001110100000000000000000000000000100000000000000110000000010 // 39c /home/gatecat/80x86/rtl/microcode/ror.us:41 segment mem_read width
+1001001100111010010001000000000000001000000000000000110011010110 // 39d /home/gatecat/80x86/rtl/microcode/ror.us:42 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111001101100000001001000000000010000000100000000000110010000000 // 39e /home/gatecat/80x86/rtl/microcode/ror.us:44 tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111010000000010001001000101000000000001000000001000000000010010 // 39f /home/gatecat/80x86/rtl/microcode/sar.us:27 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0111010000100000000000000000000000000100000000000000110000000010 // 3a0 /home/gatecat/80x86/rtl/microcode/sar.us:29 segment mem_read width
+1001001100111010001001000101000000001000000000000000110000010010 // 3a1 /home/gatecat/80x86/rtl/microcode/sar.us:30 width a_sel b_sel immediate alu_op mdr_write update_flags segment jump_type jump_target
+0111010001100000001000000000000010000000100000000000110010000010 // 3a2 /home/gatecat/80x86/rtl/microcode/sar.us:32 ra_modrm_rm_reg b_sel alu_op tmp_wr_en width segment jump_type jump_target
+0111010010000010001000000000000000000001100000001000000011111010 // 3a3 /home/gatecat/80x86/rtl/microcode/sar.us:34 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111010010100000000000000000000000000100000010000000110000000010 // 3a4 /home/gatecat/80x86/rtl/microcode/sar.us:36 segment mem_read width rb_cl
+1001001100111010001000000000000000001000000000000000110011111010 // 3a5 /home/gatecat/80x86/rtl/microcode/sar.us:37 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111010011100010001001000000000000000001100000001000000011111010 // 3a6 /home/gatecat/80x86/rtl/microcode/sar.us:39 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111010100000000000000000000000000000100000000000000110000000010 // 3a7 /home/gatecat/80x86/rtl/microcode/sar.us:41 segment mem_read width
+1001001100111010001001000000000000001000000000000000110011111010 // 3a8 /home/gatecat/80x86/rtl/microcode/sar.us:42 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111010011000000001001000000000010000000100000000000110010000000 // 3a9 /home/gatecat/80x86/rtl/microcode/sar.us:44 tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111010101100001001000000000000000000001000000001000000000001110 // 3aa /home/gatecat/80x86/rtl/microcode/sbb.us:31 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0111010110000000000000000000000000000100000000000000110000000010 // 3ab /home/gatecat/80x86/rtl/microcode/sbb.us:33 segment mem_read width
+1001001100111001001000000000000000001000000000000000110000001110 // 3ac /home/gatecat/80x86/rtl/microcode/sbb.us:34 a_sel b_sel alu_op mdr_write update_flags width segment jump_type jump_target
+0111010111000001010000000000000000000001000000000100000000001110 // 3ad /home/gatecat/80x86/rtl/microcode/sbb.us:41 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0111010111100000000000000000000000000100000000000000110000000010 // 3ae /home/gatecat/80x86/rtl/microcode/sbb.us:43 segment mem_read width
+0111011000011001010000000000000000000001000000000100000000001110 // 3af /home/gatecat/80x86/rtl/microcode/sbb.us:44 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0111011000100001001001000000000000000001000000001100000000001110 // 3b0 /home/gatecat/80x86/rtl/microcode/sbb.us:51 a_sel b_sel alu_op rd_sel_source rd_sel update_flags width next_instruction
+0111011001000001001001000000000000000001000000001000000000001110 // 3b1 /home/gatecat/80x86/rtl/microcode/sbb.us:53 a_sel b_sel alu_op rd_sel_source width update_flags next_instruction
+0111011001100000000000000000000000000100000000000000110000000010 // 3b2 /home/gatecat/80x86/rtl/microcode/sbb.us:55 segment mem_read width
+1001001100111001001001000000000000001000000000000000110000001110 // 3b3 /home/gatecat/80x86/rtl/microcode/sbb.us:56 a_sel b_sel alu_op mdr_write update_flags segment width jump_type jump_target
+0111011011000000000000000000000000000000100000000000000000000000 // 3b4 /home/gatecat/80x86/rtl/microcode/sbb.us:58 ra_modrm_rm_reg jump_type jump_target
+0111011011100000000000000000000000000000100000000000110000000000 // 3b5 /home/gatecat/80x86/rtl/microcode/sbb.us:60 ra_modrm_rm_reg segment jump_type jump_target
+0111011011100001001001000000000000000001000000001000000000001100 // 3b6 /home/gatecat/80x86/rtl/microcode/sbb.us:62 a_sel b_sel alu_op rd_sel_source update_flags next_instruction
+0111011100000000000000000000000000000100000000000000110000000000 // 3b7 /home/gatecat/80x86/rtl/microcode/sbb.us:64 segment mem_read
+1001001100011001001001000000000000001000000000000000110000001100 // 3b8 /home/gatecat/80x86/rtl/microcode/sbb.us:65 a_sel b_sel alu_op mdr_write update_flags segment jump_type jump_target
+0111011110000000000000000000001000110000011110000000000000000000 // 3b9 /home/gatecat/80x86/rtl/microcode/scas.us:26 ra_sel a_sel alu_op mar_wr_sel mar_write rb_cl jump_type jump_target
+0111011111100000000000000000010000000000000100000000000000000000 // 3ba /home/gatecat/80x86/rtl/microcode/scas.us:28 ra_sel jump_type jump_target
+0111011110000000111001000101000000000000011100011100001000000000 // 3bb /home/gatecat/80x86/rtl/microcode/scas.us:29 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel segment segment_force
+0111011110100000000000000000000000000100000000000000001010000001 // 3bc /home/gatecat/80x86/rtl/microcode/scas.us:31 width segment segment_force mem_read ra_sel a_sel alu_op tmp_wr_en
+0111100000011001000011000000001000000000000000000000000000001101 // 3bd /home/gatecat/80x86/rtl/microcode/scas.us:32 width a_sel b_sel alu_op update_flags jump_type jump_target
+0111011101010010111001010101001100110000000011111100001000000000 // 3be /home/gatecat/80x86/rtl/microcode/scas.us:33 a_sel b_sel immediate alu_op rd_sel_source rd_sel mar_write mar_wr_sel rb_cl ext_int_yield jump_type segment segment_force jump_target
+0111100000000000000000000000000000000001000000000000000000000000 // 3bf /home/gatecat/80x86/rtl/microcode/scas.us:35 next_instruction
+0111100000110010111001000101000000000001000001111100000000000000 // 3c0 /home/gatecat/80x86/rtl/microcode/scas.us:37 a_sel b_sel immediate alu_op rd_sel_source rd_sel next_instruction
+0111100010000000000000000000001000110000011110000000000000000000 // 3c1 /home/gatecat/80x86/rtl/microcode/scas.us:42 ra_sel a_sel alu_op mar_wr_sel mar_write rb_cl jump_type jump_target
+0111100011100000000000000000010000000000000100000000000000000000 // 3c2 /home/gatecat/80x86/rtl/microcode/scas.us:44 ra_sel jump_type jump_target
+0111100010000000111001000101000000000000011100011100001000000000 // 3c3 /home/gatecat/80x86/rtl/microcode/scas.us:45 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel segment segment_force
+0111100010100000000000000000000000000100000000000000001010000000 // 3c4 /home/gatecat/80x86/rtl/microcode/scas.us:47 segment segment_force mem_read ra_sel a_sel alu_op tmp_wr_en
+0111100100011001000011000000001000000000000000000000000000001100 // 3c5 /home/gatecat/80x86/rtl/microcode/scas.us:48 a_sel b_sel alu_op update_flags jump_type jump_target
+0111100001010010111001010011001100110000000011111100001000000000 // 3c6 /home/gatecat/80x86/rtl/microcode/scas.us:49 a_sel b_sel immediate alu_op rd_sel_source rd_sel mar_write mar_wr_sel rb_cl ext_int_yield jump_type segment segment_force jump_target
+0111100100000000000000000000000000000001000000000000000000000000 // 3c7 /home/gatecat/80x86/rtl/microcode/scas.us:51 next_instruction
+0111100100110010111001000011000000000001000001111100000000000000 // 3c8 /home/gatecat/80x86/rtl/microcode/scas.us:53 a_sel b_sel immediate alu_op rd_sel_source rd_sel next_instruction
+0111100101000010000001000101000000000001000000001000000000010010 // 3c9 /home/gatecat/80x86/rtl/microcode/shl.us:27 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0111100101100000000000000000000000000100000000000000110000000010 // 3ca /home/gatecat/80x86/rtl/microcode/shl.us:29 segment mem_read width
+1001001100111010000001000101000000001000000000000000110000010010 // 3cb /home/gatecat/80x86/rtl/microcode/shl.us:30 width a_sel b_sel immediate alu_op mdr_write update_flags segment jump_type jump_target
+0111100110100000001000000000000010000000100000000000110010000010 // 3cc /home/gatecat/80x86/rtl/microcode/shl.us:32 ra_modrm_rm_reg b_sel alu_op tmp_wr_en width segment jump_type jump_target
+0111100111000010000000000000000000000001100000001000000011111010 // 3cd /home/gatecat/80x86/rtl/microcode/shl.us:34 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111100111100000000000000000000000000100000010000000110000000010 // 3ce /home/gatecat/80x86/rtl/microcode/shl.us:36 segment mem_read width rb_cl
+1001001100111010000000000000000000001000000000000000110011111010 // 3cf /home/gatecat/80x86/rtl/microcode/shl.us:37 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111101000100010000001000000000000000001100000001000000011111010 // 3d0 /home/gatecat/80x86/rtl/microcode/shl.us:39 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111101001000000000000000000000000000100000000000000110000000010 // 3d1 /home/gatecat/80x86/rtl/microcode/shl.us:41 segment mem_read width
+1001001100111010000001000000000000001000000000000000110011111010 // 3d2 /home/gatecat/80x86/rtl/microcode/shl.us:42 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111101000000000001001000000000010000000100000000000110010000000 // 3d3 /home/gatecat/80x86/rtl/microcode/shl.us:44 tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111101010100001111001000101000000000001000000001000000000010010 // 3d4 /home/gatecat/80x86/rtl/microcode/shr.us:27 a_sel b_sel immediate alu_op rd_sel_source update_flags width next_instruction
+0111101011000000000000000000000000000100000000000000110000000010 // 3d5 /home/gatecat/80x86/rtl/microcode/shr.us:29 segment mem_read width
+1001001100111001111001000101000000001000000000000000110000010010 // 3d6 /home/gatecat/80x86/rtl/microcode/shr.us:30 width a_sel b_sel immediate alu_op mdr_write update_flags segment jump_type jump_target
+0111101100000000001000000000000010000000100000000000110010000010 // 3d7 /home/gatecat/80x86/rtl/microcode/shr.us:32 ra_modrm_rm_reg b_sel alu_op tmp_wr_en width segment jump_type jump_target
+0111101100100001111000000000000000000001100000001000000011111010 // 3d8 /home/gatecat/80x86/rtl/microcode/shr.us:34 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111101101000000000000000000000000000100000010000000110000000010 // 3d9 /home/gatecat/80x86/rtl/microcode/shr.us:36 segment mem_read width rb_cl
+1001001100111001111000000000000000001000000000000000110011111010 // 3da /home/gatecat/80x86/rtl/microcode/shr.us:37 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111101110000001111001000000000000000001100000001000000011111010 // 3db /home/gatecat/80x86/rtl/microcode/shr.us:39 a_sel b_sel alu_op rd_sel_source update_flags width tmp_wr_sel tmp_wr_en next_instruction ra_modrm_rm_reg
+0111101110100000000000000000000000000100000000000000110000000010 // 3dc /home/gatecat/80x86/rtl/microcode/shr.us:41 segment mem_read width
+1001001100111001111001000000000000001000000000000000110011111010 // 3dd /home/gatecat/80x86/rtl/microcode/shr.us:42 width a_sel b_sel alu_op mdr_write update_flags segment tmp_wr_sel tmp_wr_en jump_type jump_target
+0111101101100000001001000000000010000000100000000000110010000000 // 3de /home/gatecat/80x86/rtl/microcode/shr.us:44 tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111110000000000000000000000000000001000000000000000000000000001 // 3df /home/gatecat/80x86/rtl/microcode/stos.us:26 width a_sel alu_op mdr_write
+0111110001100000000000000000001000000000011110000000000000000000 // 3e0 /home/gatecat/80x86/rtl/microcode/stos.us:27 ra_sel rb_cl jump_type jump_target
+0111110100100000000000000000010000000000000100000000000000000000 // 3e1 /home/gatecat/80x86/rtl/microcode/stos.us:29 ra_sel jump_type jump_target
+0111110001100000111001000101000000000000011100011100000000000000 // 3e2 /home/gatecat/80x86/rtl/microcode/stos.us:30 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0111110010000000000000000000000000110000011100000000000000000000 // 3e3 /home/gatecat/80x86/rtl/microcode/stos.us:32 ra_sel a_sel alu_op mar_wr_sel mar_write
+0111110010100010111001000101000000000000000001111100000000000000 // 3e4 /home/gatecat/80x86/rtl/microcode/stos.us:33 a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0111110011000000000000000000000000000000000000000000000000000001 // 3e5 /home/gatecat/80x86/rtl/microcode/stos.us:34 width ra_sel
+0111110011100000000000000000000000001000000000000000001000000001 // 3e6 /home/gatecat/80x86/rtl/microcode/stos.us:35 width alu_op mdr_write segment segment_force
+0111110100100000000000000000001000000010000000000000001000000001 // 3e7 /home/gatecat/80x86/rtl/microcode/stos.us:36 width segment segment_force mem_write jump_type jump_target
+0111110000100000000000010000000000000000000010000000000000000000 // 3e8 /home/gatecat/80x86/rtl/microcode/stos.us:37 rb_cl ext_int_yield jump_type jump_target
+0111110101000000000000000000000000000001000000000000000000000000 // 3e9 /home/gatecat/80x86/rtl/microcode/stos.us:39 next_instruction
+0111110110100000000000000000001000001000011110000000000000000000 // 3ea /home/gatecat/80x86/rtl/microcode/stos.us:44 a_sel alu_op mdr_write ra_sel rb_cl jump_type jump_target
+0111111000100000000000000000010000000000000100000000000000000000 // 3eb /home/gatecat/80x86/rtl/microcode/stos.us:46 ra_sel jump_type jump_target
+0111110110100000111001000101000000000000011100011100000000000000 // 3ec /home/gatecat/80x86/rtl/microcode/stos.us:47 ra_sel a_sel b_sel immediate alu_op rd_sel_source rd_sel
+0111110111000000000000000000000000110000011100000000000000000000 // 3ed /home/gatecat/80x86/rtl/microcode/stos.us:49 ra_sel a_sel alu_op mar_wr_sel mar_write
+0111110111100010111001000011000000000000000001111100001000000000 // 3ee /home/gatecat/80x86/rtl/microcode/stos.us:50 a_sel b_sel immediate alu_op rd_sel_source rd_sel segment segment_force
+0111111000100000000000000000001000000010000000000000001000000000 // 3ef /home/gatecat/80x86/rtl/microcode/stos.us:51 segment segment_force mem_write jump_type jump_target
+0111110101100000000000010000000000000000000010000000000000000000 // 3f0 /home/gatecat/80x86/rtl/microcode/stos.us:52 rb_cl ext_int_yield jump_type jump_target
+0111111001000000000000000000000000000001000000000000000000000000 // 3f1 /home/gatecat/80x86/rtl/microcode/stos.us:54 next_instruction
+0111111001100000111000000000000000000001000000001000000000001110 // 3f2 /home/gatecat/80x86/rtl/microcode/sub.us:31 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0111111010000000000000000000000000000100000000000000110000000010 // 3f3 /home/gatecat/80x86/rtl/microcode/sub.us:33 segment mem_read width
+1001001100111000111000000000000000001000000000000000110000001110 // 3f4 /home/gatecat/80x86/rtl/microcode/sub.us:34 a_sel b_sel alu_op mdr_write update_flags width segment jump_type jump_target
+0111111011000001000000000000000000000001000000000100000000001110 // 3f5 /home/gatecat/80x86/rtl/microcode/sub.us:41 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0111111011100000000000000000000000000100000000000000110000000010 // 3f6 /home/gatecat/80x86/rtl/microcode/sub.us:43 segment mem_read width
+0111111100011001000000000000000000000001000000000100000000001110 // 3f7 /home/gatecat/80x86/rtl/microcode/sub.us:44 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+0111111100100000111001000000000000000001000000001100000000001110 // 3f8 /home/gatecat/80x86/rtl/microcode/sub.us:51 a_sel b_sel alu_op rd_sel_source rd_sel update_flags width next_instruction
+0111111101000000111001000000000000000001000000001000000000001110 // 3f9 /home/gatecat/80x86/rtl/microcode/sub.us:53 a_sel b_sel alu_op rd_sel_source width update_flags next_instruction
+0111111101100000000000000000000000000100000000000000110000000010 // 3fa /home/gatecat/80x86/rtl/microcode/sub.us:55 segment mem_read width
+1001001100111000111001000000000000001000000000000000110000001110 // 3fb /home/gatecat/80x86/rtl/microcode/sub.us:56 a_sel b_sel alu_op mdr_write update_flags segment width jump_type jump_target
+0111111111000000000000000000000000000000100000000000000000000000 // 3fc /home/gatecat/80x86/rtl/microcode/sub.us:58 ra_modrm_rm_reg jump_type jump_target
+0111111111100000000000000000000000000000100000000000110000000000 // 3fd /home/gatecat/80x86/rtl/microcode/sub.us:60 ra_modrm_rm_reg segment jump_type jump_target
+0111111111100000111001000000000000000001000000001000000000001100 // 3fe /home/gatecat/80x86/rtl/microcode/sub.us:62 a_sel b_sel alu_op rd_sel_source update_flags next_instruction
+1000000000000000000000000000000000000100000000000000110000000000 // 3ff /home/gatecat/80x86/rtl/microcode/sub.us:64 segment mem_read
+1001001100011000111001000000000000001000000000000000110000001100 // 400 /home/gatecat/80x86/rtl/microcode/sub.us:65 a_sel b_sel alu_op mdr_write update_flags segment jump_type jump_target
+1000000001000000100000000000000000000001000000000000000000010010 // 401 /home/gatecat/80x86/rtl/microcode/test.us:31 a_sel b_sel alu_op update_flags width next_instruction
+1000000001100000000000000000000000000100000000000000110000000010 // 402 /home/gatecat/80x86/rtl/microcode/test.us:33 segment mem_read width
+1000000010011000100000000000000000000001000000000000000000010010 // 403 /home/gatecat/80x86/rtl/microcode/test.us:34 a_sel b_sel alu_op update_flags width next_instruction
+1000000010100000100001000000000000000001000000000000000000010010 // 404 /home/gatecat/80x86/rtl/microcode/test.us:41 a_sel b_sel alu_op update_flags width next_instruction
+1000000011000000100001000000000000000001000000000000000000010001 // 405 /home/gatecat/80x86/rtl/microcode/test.us:43 a_sel b_sel alu_op update_flags width next_instruction
+1000000011100000000000000000000000000100000000000000110000000001 // 406 /home/gatecat/80x86/rtl/microcode/test.us:45 segment mem_read width
+1000000100011000100001000000000000000001000000000000000000010001 // 407 /home/gatecat/80x86/rtl/microcode/test.us:46 a_sel b_sel alu_op update_flags width next_instruction
+1000000100100000100001000000000000000001000000000000000000010000 // 408 /home/gatecat/80x86/rtl/microcode/test.us:48 a_sel b_sel alu_op update_flags next_instruction
+1000000101000000000000000000000000000100000000000000110000000000 // 409 /home/gatecat/80x86/rtl/microcode/test.us:50 segment mem_read
+1000000101111000100001000000000000000001000000000000000000010000 // 40a /home/gatecat/80x86/rtl/microcode/test.us:51 a_sel b_sel alu_op update_flags next_instruction
+1000001000000000000000000000000000110000000000000000000000000010 // 40b /home/gatecat/80x86/rtl/microcode/xchg.us:28 width a_sel alu_op mar_write mar_wr_sel jump_type jump_target
+1000000110100000000000000000000000000100000000000000110000000010 // 40c /home/gatecat/80x86/rtl/microcode/xchg.us:30 segment width mem_read
+1000000111000000001000000000000000110000000000000000000000000010 // 40d /home/gatecat/80x86/rtl/microcode/xchg.us:31 width b_sel alu_op mar_write mar_wr_sel
+1000000111111000000000000000000000000000000000000100000000000010 // 40e /home/gatecat/80x86/rtl/microcode/xchg.us:32 width a_sel alu_op rd_sel_source
+1001001100110000000000000000000000011000000000000000110000000010 // 40f /home/gatecat/80x86/rtl/microcode/xchg.us:33 width a_sel alu_op mdr_write mar_wr_sel mar_write segment jump_type jump_target
+1000001000100000001000000000000000000000000000001000000000000010 // 410 /home/gatecat/80x86/rtl/microcode/xchg.us:35 width b_sel alu_op rd_sel_source
+1000001001010000000000000000000000000001000000000100000000000010 // 411 /home/gatecat/80x86/rtl/microcode/xchg.us:36 width a_sel alu_op rd_sel_source next_instruction
+1000001001100000000000000000000000110000000000000000000000000000 // 412 /home/gatecat/80x86/rtl/microcode/xchg.us:80 a_sel alu_op mar_write mar_wr_sel ra_sel
+1000001010000000000000000000000000000000000000011100000000000000 // 413 /home/gatecat/80x86/rtl/microcode/xchg.us:81 a_sel alu_op rd_sel_source rd_sel
+1000001010110000000000000000000000000001000000001100000000000000 // 414 /home/gatecat/80x86/rtl/microcode/xchg.us:82 a_sel alu_op rd_sel_source rd_sel next_instruction
+1000001011000000000000000000000000110000000000000000000000000000 // 415 /home/gatecat/80x86/rtl/microcode/xchg.us:87 a_sel alu_op mar_write mar_wr_sel ra_sel
+1000001011100000000000000000000000000000000000101100000000000000 // 416 /home/gatecat/80x86/rtl/microcode/xchg.us:88 a_sel alu_op rd_sel_source rd_sel
+1000001100010000000000000000000000000001000000001100000000000000 // 417 /home/gatecat/80x86/rtl/microcode/xchg.us:89 a_sel alu_op rd_sel_source rd_sel next_instruction
+1000001100100000000000000000000000110000000000000000000000000000 // 418 /home/gatecat/80x86/rtl/microcode/xchg.us:94 a_sel alu_op mar_write mar_wr_sel ra_sel
+1000001101000000000000000000000000000000000000111100000000000000 // 419 /home/gatecat/80x86/rtl/microcode/xchg.us:95 a_sel alu_op rd_sel_source rd_sel
+1000001101110000000000000000000000000001000000001100000000000000 // 41a /home/gatecat/80x86/rtl/microcode/xchg.us:96 a_sel alu_op rd_sel_source rd_sel next_instruction
+1000001110000000000000000000000000110000000000000000000000000000 // 41b /home/gatecat/80x86/rtl/microcode/xchg.us:101 a_sel alu_op mar_write mar_wr_sel ra_sel
+1000001110100000000000000000000000000000000001001100000000000000 // 41c /home/gatecat/80x86/rtl/microcode/xchg.us:102 a_sel alu_op rd_sel_source rd_sel
+1000001111010000000000000000000000000001000000001100000000000000 // 41d /home/gatecat/80x86/rtl/microcode/xchg.us:103 a_sel alu_op rd_sel_source rd_sel next_instruction
+1000001111100000000000000000000000110000000000000000000000000000 // 41e /home/gatecat/80x86/rtl/microcode/xchg.us:108 a_sel alu_op mar_write mar_wr_sel ra_sel
+1000010000000000000000000000000000000000000001011100000000000000 // 41f /home/gatecat/80x86/rtl/microcode/xchg.us:109 a_sel alu_op rd_sel_source rd_sel
+1000010000110000000000000000000000000001000000001100000000000000 // 420 /home/gatecat/80x86/rtl/microcode/xchg.us:110 a_sel alu_op rd_sel_source rd_sel next_instruction
+1000010001000000000000000000000000110000000000000000000000000000 // 421 /home/gatecat/80x86/rtl/microcode/xchg.us:115 a_sel alu_op mar_write mar_wr_sel ra_sel
+1000010001100000000000000000000000000000000001101100000000000000 // 422 /home/gatecat/80x86/rtl/microcode/xchg.us:116 a_sel alu_op rd_sel_source rd_sel
+1000010010010000000000000000000000000001000000001100000000000000 // 423 /home/gatecat/80x86/rtl/microcode/xchg.us:117 a_sel alu_op rd_sel_source rd_sel next_instruction
+1000010010100000000000000000000000110000000000000000000000000000 // 424 /home/gatecat/80x86/rtl/microcode/xchg.us:122 a_sel alu_op mar_write mar_wr_sel ra_sel
+1000010011000000000000000000000000000000000001111100000000000000 // 425 /home/gatecat/80x86/rtl/microcode/xchg.us:123 a_sel alu_op rd_sel_source rd_sel
+1000010011110000000000000000000000000001000000001100000000000000 // 426 /home/gatecat/80x86/rtl/microcode/xchg.us:124 a_sel alu_op rd_sel_source rd_sel next_instruction
+1000010100000000000000000000000000000000001100000000000010000000 // 427 /home/gatecat/80x86/rtl/microcode/xlat.us:26 a_sel alu_op tmp_wr_en ra_sel
+1000010100100000000000000000000000110000000000000000000000000000 // 428 /home/gatecat/80x86/rtl/microcode/xlat.us:27 a_sel alu_op mar_wr_sel mar_write
+1000010101010000010011000000000000110000000000000000110000000000 // 429 /home/gatecat/80x86/rtl/microcode/xlat.us:28 a_sel b_sel alu_op mar_wr_sel mar_write segment
+1000010101111000000000000000000000000101000000001100110000000001 // 42a /home/gatecat/80x86/rtl/microcode/xlat.us:29 segment width mem_read a_sel alu_op rd_sel_source rd_sel next_instruction
+1000010110000000101000000000000000000001000000001000000000010010 // 42b /home/gatecat/80x86/rtl/microcode/xor.us:31 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+1000010110100000000000000000000000000100000000000000110000000010 // 42c /home/gatecat/80x86/rtl/microcode/xor.us:33 segment mem_read width
+1001001100111000101000000000000000001000000000000000110000010010 // 42d /home/gatecat/80x86/rtl/microcode/xor.us:34 a_sel b_sel alu_op mdr_write update_flags width segment jump_type jump_target
+1000010111100000101000000000000000000001000000000100000000010010 // 42e /home/gatecat/80x86/rtl/microcode/xor.us:41 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+1000011000000000000000000000000000000100000000000000110000000010 // 42f /home/gatecat/80x86/rtl/microcode/xor.us:43 segment mem_read width
+1000011000111000101000000000000000000001000000000100000000010010 // 430 /home/gatecat/80x86/rtl/microcode/xor.us:44 a_sel b_sel alu_op rd_sel_source update_flags width next_instruction
+1000011001000000101001000000000000000001000000001100000000010010 // 431 /home/gatecat/80x86/rtl/microcode/xor.us:51 a_sel b_sel alu_op rd_sel_source rd_sel update_flags width next_instruction
+1000011001100000101001000000000000000001000000001000000000010010 // 432 /home/gatecat/80x86/rtl/microcode/xor.us:53 a_sel b_sel alu_op rd_sel_source width update_flags next_instruction
+1000011010000000000000000000000000000100000000000000110000000010 // 433 /home/gatecat/80x86/rtl/microcode/xor.us:55 segment mem_read width
+1001001100111000101001000000000000001000000000000000110000010010 // 434 /home/gatecat/80x86/rtl/microcode/xor.us:56 a_sel b_sel alu_op mdr_write update_flags segment width jump_type jump_target
+1000011011100000000000000000000000000000100000000000000000000000 // 435 /home/gatecat/80x86/rtl/microcode/xor.us:58 ra_modrm_rm_reg jump_type jump_target
+1000011100000000000000000000000000000000100000000000110000000000 // 436 /home/gatecat/80x86/rtl/microcode/xor.us:60 ra_modrm_rm_reg segment jump_type jump_target
+1000011100000000101001000000000000000001000000001000000000010000 // 437 /home/gatecat/80x86/rtl/microcode/xor.us:62 a_sel b_sel alu_op rd_sel_source update_flags next_instruction
+1000011100100000000000000000000000000100000000000000110000000000 // 438 /home/gatecat/80x86/rtl/microcode/xor.us:64 segment mem_read
+1001001100011000101001000000000000001000000000000000110000010000 // 439 /home/gatecat/80x86/rtl/microcode/xor.us:65 a_sel b_sel alu_op mdr_write update_flags segment jump_type jump_target
+0010010110100000001001000010000000000000000000000000000010000000 // 43a /home/gatecat/80x86/rtl/microcode/microcode.us:123 b_sel immediate alu_op tmp_wr_en jump_type jump_target
+0010100110000000000000000000000010000000100000000000110000000010 // 43b /home/gatecat/80x86/rtl/microcode/microcode.us:128 width ra_modrm_rm_reg segment jump_type jump_target
+0101110111100000000000000000000010000000100000000000110000000010 // 43c /home/gatecat/80x86/rtl/microcode/microcode.us:129 width ra_modrm_rm_reg segment jump_type jump_target
+0010011110100000000000000000000010000000100000000000110000000010 // 43d /home/gatecat/80x86/rtl/microcode/microcode.us:130 width ra_modrm_rm_reg segment jump_type jump_target
+0111011000100000000000000000000010000000100000000000110000000010 // 43e /home/gatecat/80x86/rtl/microcode/microcode.us:131 width ra_modrm_rm_reg segment jump_type jump_target
+0010101101100000000000000000000010000000100000000000110000000010 // 43f /home/gatecat/80x86/rtl/microcode/microcode.us:132 width ra_modrm_rm_reg segment jump_type jump_target
+0111111100100000000000000000000010000000100000000000110000000010 // 440 /home/gatecat/80x86/rtl/microcode/microcode.us:133 width ra_modrm_rm_reg segment jump_type jump_target
+1000011001000000000000000000000010000000100000000000110000000010 // 441 /home/gatecat/80x86/rtl/microcode/microcode.us:134 width ra_modrm_rm_reg segment jump_type jump_target
+0011001001100000000000000000000010000000100000000000110000000010 // 442 /home/gatecat/80x86/rtl/microcode/microcode.us:135 width ra_modrm_rm_reg segment jump_type jump_target
+0010100111100000000000000000000010000000000000000000110000000000 // 443 /home/gatecat/80x86/rtl/microcode/microcode.us:144 segment jump_type jump_target
+0101111001000000000000000000000010000000000000000000110000000000 // 444 /home/gatecat/80x86/rtl/microcode/microcode.us:145 segment jump_type jump_target
+0010100000000000000000000000000010000000000000000000110000000000 // 445 /home/gatecat/80x86/rtl/microcode/microcode.us:146 segment jump_type jump_target
+0111011010000000000000000000000010000000000000000000110000000000 // 446 /home/gatecat/80x86/rtl/microcode/microcode.us:147 segment jump_type jump_target
+0010101111000000000000000000000010000000000000000000110000000000 // 447 /home/gatecat/80x86/rtl/microcode/microcode.us:148 segment jump_type jump_target
+0111111110000000000000000000000010000000000000000000110000000000 // 448 /home/gatecat/80x86/rtl/microcode/microcode.us:149 segment jump_type jump_target
+1000011010100000000000000000000010000000000000000000110000000000 // 449 /home/gatecat/80x86/rtl/microcode/microcode.us:150 segment jump_type jump_target
+0011001011000000000000000000000010000000000000000000110000000000 // 44a /home/gatecat/80x86/rtl/microcode/microcode.us:151 segment jump_type jump_target
+0101111011100000000000000000000010000000010000000000000000000000 // 44b /home/gatecat/80x86/rtl/microcode/microcode.us:156 ra_sel jump_type jump_target
+1000100110100000000000000000000000000001000000000000000000000000 // 44c /home/gatecat/80x86/rtl/microcode/microcode.us:157 next_instruction
+1000100111000000000000000000000000000001000000000000000000000000 // 44d /home/gatecat/80x86/rtl/microcode/microcode.us:158 next_instruction
+1000100111100000000000000000000000000001000000000000000000000000 // 44e /home/gatecat/80x86/rtl/microcode/microcode.us:159 next_instruction
+1000101000000000000000000000000000000001000000000000000000000000 // 44f /home/gatecat/80x86/rtl/microcode/microcode.us:160 next_instruction
+1000101000100000000000000000000000000001000000000000000000000000 // 450 /home/gatecat/80x86/rtl/microcode/microcode.us:161 next_instruction
+1000101001000000000000000000000000000001000000000000000000000000 // 451 /home/gatecat/80x86/rtl/microcode/microcode.us:162 next_instruction
+1000101001100000000000000000000000000001000000000000000000000000 // 452 /home/gatecat/80x86/rtl/microcode/microcode.us:163 next_instruction
+0111000100100000000000000000000010000000100000000000110000000010 // 453 /home/gatecat/80x86/rtl/microcode/microcode.us:168 width ra_modrm_rm_reg segment jump_type jump_target
+0111001010000000000000000000000010000000100000000000110000000010 // 454 /home/gatecat/80x86/rtl/microcode/microcode.us:169 width ra_modrm_rm_reg segment jump_type jump_target
+0110101100100000000000000000000010000000100000000000110000000010 // 455 /home/gatecat/80x86/rtl/microcode/microcode.us:170 width ra_modrm_rm_reg segment jump_type jump_target
+0110110010000000000000000000000010000000100000000000110000000010 // 456 /home/gatecat/80x86/rtl/microcode/microcode.us:171 width ra_modrm_rm_reg segment jump_type jump_target
+0111100100100000000000000000000010000000100000000000110000000010 // 457 /home/gatecat/80x86/rtl/microcode/microcode.us:172 width ra_modrm_rm_reg segment jump_type jump_target
+0111101010000000000000000000000010000000100000000000110000000010 // 458 /home/gatecat/80x86/rtl/microcode/microcode.us:173 width ra_modrm_rm_reg segment jump_type jump_target
+0111100100100000000000000000000010000000100000000000110000000010 // 459 /home/gatecat/80x86/rtl/microcode/microcode.us:174 width ra_modrm_rm_reg segment jump_type jump_target
+0111001111100000000000000000000010000000100000000000110000000010 // 45a /home/gatecat/80x86/rtl/microcode/microcode.us:175 width ra_modrm_rm_reg segment jump_type jump_target
+0111001000000000001001000000000010000000100000000000110010000001 // 45b /home/gatecat/80x86/rtl/microcode/microcode.us:180 width tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111001101100000001001000000000010000000100000000000110010000001 // 45c /home/gatecat/80x86/rtl/microcode/microcode.us:181 width tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0110110000000000001001000000000010000000100000000000110010000001 // 45d /home/gatecat/80x86/rtl/microcode/microcode.us:182 width tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0110110101100000001001000000000010000000100000000000110010000001 // 45e /home/gatecat/80x86/rtl/microcode/microcode.us:183 width tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111101000000000001001000000000010000000100000000000110010000001 // 45f /home/gatecat/80x86/rtl/microcode/microcode.us:184 width tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111101101100000001001000000000010000000100000000000110010000001 // 460 /home/gatecat/80x86/rtl/microcode/microcode.us:185 width tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111101000000000001001000000000010000000100000000000110010000001 // 461 /home/gatecat/80x86/rtl/microcode/microcode.us:186 width tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111010011000000001001000000000010000000100000000000110010000001 // 462 /home/gatecat/80x86/rtl/microcode/microcode.us:187 width tmp_wr_en alu_op b_sel ra_modrm_rm_reg segment jump_type jump_target
+0111001001100000001001000000000000000000000000000000000010000001 // 463 /home/gatecat/80x86/rtl/microcode/microcode.us:192 width tmp_wr_en alu_op b_sel jump_type jump_target
+0111001111000000001001000000000000000000000000000000000010000001 // 464 /home/gatecat/80x86/rtl/microcode/microcode.us:193 width tmp_wr_en alu_op b_sel jump_type jump_target
+0110110001100000001001000000000000000000000000000000000010000001 // 465 /home/gatecat/80x86/rtl/microcode/microcode.us:194 width tmp_wr_en alu_op b_sel jump_type jump_target
+0110110111000000001001000000000000000000000000000000000010000001 // 466 /home/gatecat/80x86/rtl/microcode/microcode.us:195 width tmp_wr_en alu_op b_sel jump_type jump_target
+0111101001100000001001000000000000000000000000000000000010000001 // 467 /home/gatecat/80x86/rtl/microcode/microcode.us:196 width tmp_wr_en alu_op b_sel jump_type jump_target
+0111101111000000001001000000000000000000000000000000000010000001 // 468 /home/gatecat/80x86/rtl/microcode/microcode.us:197 width tmp_wr_en alu_op b_sel jump_type jump_target
+0111101001100000001001000000000000000000000000000000000010000001 // 469 /home/gatecat/80x86/rtl/microcode/microcode.us:198 width tmp_wr_en alu_op b_sel jump_type jump_target
+0111010100100000001001000000000000000000000000000000000010000001 // 46a /home/gatecat/80x86/rtl/microcode/microcode.us:199 width tmp_wr_en alu_op b_sel jump_type jump_target
+0111000110000000000000000000000000000000100010000000110000000010 // 46b /home/gatecat/80x86/rtl/microcode/microcode.us:206 width ra_modrm_rm_reg rb_cl segment jump_type jump_target
+0111001011100000000000000000000000000000100010000000110000000010 // 46c /home/gatecat/80x86/rtl/microcode/microcode.us:207 width ra_modrm_rm_reg rb_cl segment jump_type jump_target
+0110101110000000000000000000000000000000100010000000110000000010 // 46d /home/gatecat/80x86/rtl/microcode/microcode.us:208 width ra_modrm_rm_reg rb_cl segment jump_type jump_target
+0110110011100000000000000000000000000000100010000000110000000010 // 46e /home/gatecat/80x86/rtl/microcode/microcode.us:209 width ra_modrm_rm_reg rb_cl segment jump_type jump_target
+0111100110000000000000000000000000000000100010000000110000000010 // 46f /home/gatecat/80x86/rtl/microcode/microcode.us:210 width ra_modrm_rm_reg rb_cl segment jump_type jump_target
+0111101011100000000000000000000000000000100010000000110000000010 // 470 /home/gatecat/80x86/rtl/microcode/microcode.us:211 width ra_modrm_rm_reg rb_cl segment jump_type jump_target
+0111100110000000000000000000000000000000100010000000110000000010 // 471 /home/gatecat/80x86/rtl/microcode/microcode.us:212 width ra_modrm_rm_reg rb_cl segment jump_type jump_target
+0111010001000000000000000000000000000000100010000000110000000010 // 472 /home/gatecat/80x86/rtl/microcode/microcode.us:213 width ra_modrm_rm_reg rb_cl segment jump_type jump_target
+1000000010100000000000000000000010000000100000000000110000000001 // 473 /home/gatecat/80x86/rtl/microcode/microcode.us:220 width ra_modrm_rm_reg segment jump_type jump_target
+1000000010100000000000000000000010000000100000000000110000000001 // 474 /home/gatecat/80x86/rtl/microcode/microcode.us:221 width ra_modrm_rm_reg segment jump_type jump_target
+0101110010100000000000000000000010000000100000000000110000000001 // 475 /home/gatecat/80x86/rtl/microcode/microcode.us:222 width ra_modrm_rm_reg segment jump_type jump_target
+0101110001000000000000000000000010000000100000000000110000000001 // 476 /home/gatecat/80x86/rtl/microcode/microcode.us:223 width ra_modrm_rm_reg segment jump_type jump_target
+0101100101100000000000000000000010000000100000000000110000000001 // 477 /home/gatecat/80x86/rtl/microcode/microcode.us:224 width ra_modrm_rm_reg segment jump_type jump_target
+0101101010100000000000000000000010000000100000000000110000000001 // 478 /home/gatecat/80x86/rtl/microcode/microcode.us:225 width ra_modrm_rm_reg segment jump_type jump_target
+0011011001000000000000000000000010000000100000000000110000000001 // 479 /home/gatecat/80x86/rtl/microcode/microcode.us:226 width ra_modrm_rm_reg segment jump_type jump_target
+0011011111100000000000000000000010000000100000000000110000000001 // 47a /home/gatecat/80x86/rtl/microcode/microcode.us:227 width ra_modrm_rm_reg segment jump_type jump_target
+1000000100000000000000000000000010000000100000000000110000000000 // 47b /home/gatecat/80x86/rtl/microcode/microcode.us:232 ra_modrm_rm_reg segment jump_type jump_target
+1000000100000000000000000000000010000000100000000000110000000000 // 47c /home/gatecat/80x86/rtl/microcode/microcode.us:233 ra_modrm_rm_reg segment jump_type jump_target
+0101110010100000000000000000000010000000100000000000110000000000 // 47d /home/gatecat/80x86/rtl/microcode/microcode.us:234 ra_modrm_rm_reg segment jump_type jump_target
+0101110001000000000000000000000010000000100000000000110000000000 // 47e /home/gatecat/80x86/rtl/microcode/microcode.us:235 ra_modrm_rm_reg segment jump_type jump_target
+0101101000000000000000000000000010000000100000000000110000000000 // 47f /home/gatecat/80x86/rtl/microcode/microcode.us:236 ra_modrm_rm_reg segment jump_type jump_target
+0101101101000000000000000000000010000000100000000000110000000000 // 480 /home/gatecat/80x86/rtl/microcode/microcode.us:237 ra_modrm_rm_reg segment jump_type jump_target
+0011011100100000000000000000000010000000100000000000110000000000 // 481 /home/gatecat/80x86/rtl/microcode/microcode.us:238 ra_modrm_rm_reg segment jump_type jump_target
+0011100010000000000000000000000010000000100000000000110000000000 // 482 /home/gatecat/80x86/rtl/microcode/microcode.us:239 ra_modrm_rm_reg segment jump_type jump_target
+0011111000000000000000000000000010000000100000000000110000000000 // 483 /home/gatecat/80x86/rtl/microcode/microcode.us:244 ra_modrm_rm_reg segment jump_type jump_target
+0011111001100000000000000000000010000000100000000000110000000000 // 484 /home/gatecat/80x86/rtl/microcode/microcode.us:245 ra_modrm_rm_reg segment jump_type jump_target
+0010111001000000000000000000000010000000100000000000110000000000 // 485 /home/gatecat/80x86/rtl/microcode/microcode.us:246 ra_modrm_rm_reg segment jump_type jump_target
+0010111111100000000000000000000010000000000000000000011000000000 // 486 /home/gatecat/80x86/rtl/microcode/microcode.us:247 segment_force segment jump_type jump_target
+0100101101100000000000000000000010000000100000000000110000000000 // 487 /home/gatecat/80x86/rtl/microcode/microcode.us:248 ra_modrm_rm_reg segment jump_type jump_target
+0100101111000000000000000000000010000000100000000000110000000000 // 488 /home/gatecat/80x86/rtl/microcode/microcode.us:249 ra_modrm_rm_reg segment jump_type jump_target
+0110010001100000000000000000000010000000010000000000110000000000 // 489 /home/gatecat/80x86/rtl/microcode/microcode.us:250 ra_sel segment jump_type jump_target
+1000011101000000000000000000000000000000000000000000000000000000 // 48a /home/gatecat/80x86/rtl/microcode/microcode.us:251 jump_type jump_target
+1001000110000000001001000001000000000000000000001100000000000000 // 48b /home/gatecat/80x86/rtl/microcode/microcode.us:256 b_sel alu_op immediate rd_sel_source rd_sel
+1001000110100000001001000001000000000000000000011100000000000000 // 48c /home/gatecat/80x86/rtl/microcode/microcode.us:257 b_sel alu_op immediate rd_sel_source rd_sel
+1001000111000000001001000001000000000000000000101100000000000000 // 48d /home/gatecat/80x86/rtl/microcode/microcode.us:258 b_sel alu_op immediate rd_sel_source rd_sel
+1001000111100000001001000001000000000000000000111100000000000000 // 48e /home/gatecat/80x86/rtl/microcode/microcode.us:259 b_sel alu_op immediate rd_sel_source rd_sel
+1001001000000000001001000001000000000000000001001100000000000000 // 48f /home/gatecat/80x86/rtl/microcode/microcode.us:260 b_sel alu_op immediate rd_sel_source rd_sel
+1001001000100000001001000001000000000000000001011100000000000000 // 490 /home/gatecat/80x86/rtl/microcode/microcode.us:261 b_sel alu_op immediate rd_sel_source rd_sel
+1001001001000000001001000001000000000000000001101100000000000000 // 491 /home/gatecat/80x86/rtl/microcode/microcode.us:262 b_sel alu_op immediate rd_sel_source rd_sel
+1001001001100000001001000001000000000000000001111100000000000000 // 492 /home/gatecat/80x86/rtl/microcode/microcode.us:263 b_sel alu_op immediate rd_sel_source rd_sel
+1001001010000000001001000001000000000000000000000000001100000000 // 493 /home/gatecat/80x86/rtl/microcode/microcode.us:264 b_sel alu_op immediate segment_force segment segment_wr_en
+1001001010100000001001000110000000000000000000000000011100000000 // 494 /home/gatecat/80x86/rtl/microcode/microcode.us:265 b_sel alu_op immediate segment_force segment segment_wr_en
+1001001011000000001001000001000000000000000000000000101100000000 // 495 /home/gatecat/80x86/rtl/microcode/microcode.us:266 b_sel alu_op immediate segment_force segment segment_wr_en
+1001001011100000001001000001000000000000000000000000111100000000 // 496 /home/gatecat/80x86/rtl/microcode/microcode.us:267 b_sel alu_op immediate segment_force segment segment_wr_en
+0010000000000000000000000000000000000001000000000000000000000000 // 497 /home/gatecat/80x86/rtl/microcode/microcode.us:268 next_instruction jump_type jump_target
+1001001100100000000000000000000000000011000000000000110000000000 // 498 /home/gatecat/80x86/rtl/microcode/microcode.us:271 segment mem_write next_instruction
+1001001101000000000000000000000000000011000000000000110000000010 // 499 /home/gatecat/80x86/rtl/microcode/microcode.us:273 segment mem_write width next_instruction
+0010000001000000000000000000000000000000000000000000000010000000 // 49a /home/gatecat/80x86/rtl/microcode/debug.us:113 a_sel alu_op tmp_wr_en jump_type jump_target
+0010000001000000001010000000000000000000000000000000000010000000 // 49b /home/gatecat/80x86/rtl/microcode/debug.us:115 b_sel alu_op tmp_wr_en jump_type jump_target
+1001001110100000000000000000000000000100000000000000111000000001 // 49c /home/gatecat/80x86/rtl/microcode/debug.us:132 segment_force segment width mem_read
+1001001111011000000000000000000000000000000000000000000010000000 // 49d /home/gatecat/80x86/rtl/microcode/debug.us:133 a_sel alu_op tmp_wr_en
+0010000001010000010001000101000000110000000000000000000000000000 // 49e /home/gatecat/80x86/rtl/microcode/debug.us:134 a_sel b_sel immediate alu_op mar_wr_sel mar_write jump_type jump_target
+1001010000000000000000000000000000000100000000000000111000000000 // 49f /home/gatecat/80x86/rtl/microcode/debug.us:139 segment_force segment mem_read
+1001010000111000000000000000000000000000000000000000000010000000 // 4a0 /home/gatecat/80x86/rtl/microcode/debug.us:140 a_sel alu_op tmp_wr_en
+0010000001010000010001000011000000110000000000000000000000000000 // 4a1 /home/gatecat/80x86/rtl/microcode/debug.us:141 a_sel b_sel immediate alu_op mar_wr_sel mar_write jump_type jump_target
+1001010001100000000000000000000000000010000000000000111000000001 // 4a2 /home/gatecat/80x86/rtl/microcode/debug.us:146 segment_force segment width mem_write
+0010000001010000010001000101000000110000000000000000000000000000 // 4a3 /home/gatecat/80x86/rtl/microcode/debug.us:147 a_sel b_sel immediate alu_op mar_wr_sel mar_write jump_type jump_target
+1001010010100000000000000000000000000010000000000000111000000000 // 4a4 /home/gatecat/80x86/rtl/microcode/debug.us:152 segment_force segment mem_write
+0010000001010000010001000011000000110000000000000000000000000000 // 4a5 /home/gatecat/80x86/rtl/microcode/debug.us:153 a_sel b_sel immediate alu_op mar_wr_sel mar_write jump_type jump_target
+1001010011100000000000000000100000000100000000000000111000000001 // 4a6 /home/gatecat/80x86/rtl/microcode/debug.us:158 segment_force segment width mem_read io
+0010000001011000000000000000000000000000000000000000000010000000 // 4a7 /home/gatecat/80x86/rtl/microcode/debug.us:159 a_sel alu_op tmp_wr_en jump_type jump_target
+1001010100100000000000000000100000000100000000000000111000000000 // 4a8 /home/gatecat/80x86/rtl/microcode/debug.us:164 segment_force segment mem_read io
+0010000001011000000000000000000000000000000000000000000010000000 // 4a9 /home/gatecat/80x86/rtl/microcode/debug.us:165 a_sel alu_op tmp_wr_en jump_type jump_target
+0010000001000000000000000000100000000010000000000000111000000001 // 4aa /home/gatecat/80x86/rtl/microcode/debug.us:170 segment_force segment width mem_write io jump_type jump_target
+0010000001000000000000000000100000000010000000000000111000000000 // 4ab /home/gatecat/80x86/rtl/microcode/debug.us:175 segment_force segment mem_write io jump_type jump_target
